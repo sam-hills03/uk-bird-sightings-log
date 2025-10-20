@@ -11,8 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
     
-    <!-- ADD THIS LINE: Load Supabase library -->
+    <!-- Load Supabase library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load Chart.js for the monthly chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <header>
@@ -67,13 +69,42 @@
 
     <section id="checklist-view" class="tab-content">
         <h2>Raw Sighting Checklist</h2>
+        
+        <!-- Pagination controls -->
+        <div id="pagination-controls">
+            <button id="prev-page-btn" disabled>← Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-page-btn">Next →</button>
+        </div>
+        
         <ul id="sightings-list">
             No sightings recorded yet.
         </ul>
+        
+        <!-- Pagination controls at bottom too -->
+        <div id="pagination-controls-bottom">
+            <button id="prev-page-btn-bottom" disabled>← Previous</button>
+            <span id="page-info-bottom">Page 1</span>
+            <button id="next-page-btn-bottom">Next →</button>
+        </div>
     </section>
 
     <section id="summary-view" class="tab-content">
         <h2>Seen Bird Species Summary</h2>
+        
+        <!-- Rarity filter for summary -->
+        <div id="summary-filters">
+            <label for="summary-rarity-filter">Filter by Rarity:</label>
+            <select id="summary-rarity-filter">
+                <option value="All">All Rarities</option>
+                <option value="Mega">Mega</option>
+                <option value="Rare">Rare</option>
+                <option value="Scarce">Scarce</option>
+                <option value="Local">Local</option>
+                <option value="Common">Common</option>
+            </select>
+        </div>
+        
         <div id="seen-birds-summary">
             No unique birds seen yet.
         </div>
@@ -84,6 +115,10 @@
         <div id="stats-page">
             <p>Total Unique Species Seen: <span id="total-species">0</span></p>
             <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
+            <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
+            
+            <h3>Sightings Over Time</h3>
+            <canvas id="monthly-chart"></canvas>
         </div>
     </section>
 
