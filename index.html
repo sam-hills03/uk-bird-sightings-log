@@ -10,10 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
-    </head>
-<body>
-    </body>
-</html>
+    
+    <!-- ADD THIS LINE: Load Supabase library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
 <body>
     <header>
         <h1>UK Bird Sighting Log</h1>
@@ -58,8 +58,7 @@
             <input type="text" id="location" list="location-datalist" required>
             <datalist id="location-datalist"></datalist>
 
-            <div id="entries-container">
-                </div>
+            <div id="entries-container"></div>
 
             <button type="button" id="add-entry-btn">➕ Add Another Bird</button>
             <button type="submit" id="submit-all-btn">✅ Record All Sightings</button>
@@ -113,7 +112,6 @@
             </div>
         </div>
     </template>
-
 
     <script src="script.js"></script>
 </body>

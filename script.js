@@ -1,59 +1,122 @@
-// script.js
+// ============================================
+// SUPABASE CONFIGURATION
+// ============================================
+// IMPORTANT: Replace these with YOUR values from Supabase dashboard
+const SUPABASE_URL = 'YOUR_PROJECT_URL_HERE';  // Example: 'https://xxxxx.supabase.co'
+const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';     // The long anon/public key
 
-// Global variables to hold all data
+// Initialize Supabase client
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
 let allUKBirds = [];
 let mySightings = [];
-let savedLocations = []; 
-const SIGHTINGS_KEY = 'birdSightings';
-const LOCATIONS_KEY = 'savedLocations'; 
+let savedLocations = [];
 
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
 const sightingForm = document.getElementById('sighting-form');
 
 
-// --- A. INITIAL LOAD FUNCTIONS ---
+// ============================================
+// A. INITIAL LOAD FUNCTIONS
+// ============================================
 
 async function loadUKBirds() {
     try {
         const response = await fetch('uk_birds.json');
         allUKBirds = await response.json();
         
-        // Initial setup calls
         populateSpeciesDatalist(); 
         filterAndDisplayBirds();
-        loadSightings();
-        loadLocations(); 
+        await loadSightings();
+        await loadLocations(); 
         addSightingEntry(); 
         setupTabSwitching(); 
     } catch (error) {
-        console.error("Failed to load UK bird list. Check your uk_birds.json file and path.", error);
+        console.error("Failed to load UK bird list:", error);
     }
 }
 
-function loadSightings() {
-    const storedSightings = localStorage.getItem(SIGHTINGS_KEY);
-    if (storedSightings) {
-        mySightings = JSON.parse(storedSightings);
+// Load sightings from Supabase database
+async function loadSightings() {
+    try {
+        const { data, error } = await supabase
+            .from('sightings')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        mySightings = data || [];
+        updateAllDisplays();
+    } catch (error) {
+        console.error("Error loading sightings:", error);
+        alert("Failed to load sightings from database. Check console for details.");
     }
-    updateAllDisplays();
 }
 
-function saveSightings() {
-    localStorage.setItem(SIGHTINGS_KEY, JSON.stringify(mySightings));
-    updateAllDisplays();
+// Save a new sighting to Supabase
+async function saveSighting(sighting) {
+    try {
+        const { data, error } = await supabase
+            .from('sightings')
+            .insert([{
+                species: sighting.species,
+                date: sighting.date,
+                location: sighting.location
+            }])
+            .select();
+        
+        if (error) throw error;
+        
+        // Add the returned data (with id) to our local array
+        if (data && data.length > 0) {
+            mySightings.unshift(data[0]); // Add to beginning
+            updateAllDisplays();
+        }
+        
+        return true;
+    } catch (error) {
+        console.error("Error saving sighting:", error);
+        return false;
+    }
+}
+
+// Delete a sighting from Supabase
+async function deleteSightingFromDB(idToDelete) {
+    try {
+        const { error } = await supabase
+            .from('sightings')
+            .delete()
+            .eq('id', idToDelete);
+        
+        if (error) throw error;
+        
+        // Remove from local array
+        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
+        updateAllDisplays();
+        
+        return true;
+    } catch (error) {
+        console.error("Error deleting sighting:", error);
+        return false;
+    }
 }
 
 function updateAllDisplays() {
     displaySightings();
     displaySeenBirdsSummary(); 
     calculateAndDisplayStats();
-    // Re-filter and display birds whenever stats change (or sightings change)
     filterAndDisplayBirds(); 
 }
 
 
-// --- B. TAB SWITCHING LOGIC ---
+// ============================================
+// B. TAB SWITCHING LOGIC
+// ============================================
 
 function setupTabSwitching() {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -85,24 +148,51 @@ function setupTabSwitching() {
         });
     });
 
-    switchTab('database-view'); // Start on the database view
+    switchTab('database-view');
 }
 
 
-// --- C. LOCATION MANAGEMENT ---
-function loadLocations() {
-    const storedLocations = localStorage.getItem(LOCATIONS_KEY);
-    if (storedLocations) {
-        savedLocations = JSON.parse(storedLocations);
+// ============================================
+// C. LOCATION MANAGEMENT
+// ============================================
+
+async function loadLocations() {
+    try {
+        const { data, error } = await supabase
+            .from('saved_locations')
+            .select('location')
+            .order('location', { ascending: true });
+        
+        if (error) throw error;
+        
+        savedLocations = data ? data.map(item => item.location) : [];
+        populateLocationDatalist();
+    } catch (error) {
+        console.error("Error loading locations:", error);
     }
-    populateLocationDatalist();
 }
 
-function saveNewLocation(location) {
-    if (location && !savedLocations.includes(location)) {
-        savedLocations.push(location);
-        localStorage.setItem(LOCATIONS_KEY, JSON.stringify(savedLocations));
-        populateLocationDatalist(); 
+async function saveNewLocation(location) {
+    if (!location || savedLocations.includes(location)) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('saved_locations')
+            .insert([{ location: location }]);
+        
+        if (error) {
+            // If it's a duplicate error, ignore it
+            if (!error.message.includes('duplicate')) {
+                throw error;
+            }
+        } else {
+            savedLocations.push(location);
+            populateLocationDatalist();
+        }
+    } catch (error) {
+        console.error("Error saving location:", error);
     }
 }
 
@@ -117,7 +207,10 @@ function populateLocationDatalist() {
 }
 
 
-// --- D. DYNAMIC FORM ENTRY FUNCTIONS ---
+// ============================================
+// D. DYNAMIC FORM ENTRY FUNCTIONS
+// ============================================
+
 function populateSpeciesDatalist() {
     const datalist = document.getElementById('species-datalist');
     datalist.innerHTML = '';
@@ -146,13 +239,11 @@ function addSightingEntry() {
 addEntryBtn.addEventListener('click', addSightingEntry);
 
 
-// --- E. BIRD LIST & IMAGE FUNCTIONS (UK BIRD LIST) ---
+// ============================================
+// E. BIRD LIST & IMAGE FUNCTIONS
+// ============================================
 
-/**
- * Returns a Set of all unique, validated species names the user has sighted.
- */
 function getUniqueSeenSpecies() {
-    // We filter the entire list of sightings against the bird database for accuracy
     const validSeenSpecies = mySightings
         .filter(s => isSpeciesValid(s.species))
         .map(s => s.species);
@@ -160,10 +251,6 @@ function getUniqueSeenSpecies() {
     return new Set(validSeenSpecies);
 }
 
-/**
- * Fetches the image URL for a bird from iNaturalist API.
- * Uses Latin name first, then Common name as fallback.
- */
 async function getiNaturalistImage(commonName, latinName) {
     const searchTerms = [latinName, commonName].filter(name => name && name.trim() !== 'No Data');
     
@@ -175,12 +262,10 @@ async function getiNaturalistImage(commonName, latinName) {
             if (data.results && data.results.length > 0) {
                 const result = data.results[0];
                 
-                // Check for exact Latin name match
                 if (searchTerm === latinName && result.name && result.name.toLowerCase() === latinName.toLowerCase() && result.default_photo && result.default_photo.medium_url) {
                     return result.default_photo.medium_url;
                 }
                 
-                // Check for exact Common name match
                 if (searchTerm === commonName && result.preferred_common_name && result.preferred_common_name.toLowerCase() === commonName.toLowerCase() && result.default_photo && result.default_photo.medium_url) {
                     return result.default_photo.medium_url;
                 }
@@ -189,9 +274,8 @@ async function getiNaturalistImage(commonName, latinName) {
             console.error(`iNaturalist search failed for "${searchTerm}":`, error);
         }
     }
-    return null; // Return null if no exact match or image found
+    return null;
 }
-
 
 function filterAndDisplayBirds() {
     const filterValue = document.getElementById('rarity-filter').value;
@@ -202,21 +286,17 @@ function filterAndDisplayBirds() {
         ? allUKBirds
         : allUKBirds.filter(bird => bird.Rarity === filterValue); 
         
-    // NEW: Get the list of seen birds once for efficient lookup
     const seenSpecies = getUniqueSeenSpecies();
-
     const cardTemplate = document.getElementById('bird-card-template');
 
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
-        const commonName = bird.CommonName; // Store for easy comparison
+        const commonName = bird.CommonName;
 
-        // NEW: Check if the bird has been seen
         if (seenSpecies.has(commonName)) {
             card.classList.add('seen');
             
-            // Add the checkmark badge
             const badge = document.createElement('div');
             badge.classList.add('seen-badge');
             badge.textContent = '✓'; 
@@ -230,16 +310,13 @@ function filterAndDisplayBirds() {
         const imageEl = card.querySelector('.card-image');
         const imageContainer = card.querySelector('.card-image-container');
 
-        // Populate text content
         commonNameEl.textContent = commonName;
         latinNameEl.textContent = bird.LatinName && bird.LatinName !== 'No Data' ? bird.LatinName : '';
         statusTextEl.textContent = bird.Status && bird.Status !== 'No Data' ? bird.Status : '';
 
-        // Add Rarity Tag with class for styling
         rarityTagEl.textContent = bird.Rarity;
         rarityTagEl.classList.add(`rarity-${bird.Rarity}`);
 
-        // Set up image placeholder and loading
         imageEl.src = ''; 
         imageEl.alt = `${commonName} photo`;
         
@@ -248,7 +325,6 @@ function filterAndDisplayBirds() {
         placeholderDiv.textContent = 'Image not available';
         imageContainer.appendChild(placeholderDiv);
         
-        // Fetch image asynchronously
         getiNaturalistImage(commonName, bird.LatinName).then(imageUrl => {
             if (imageUrl) {
                 imageEl.src = imageUrl;
@@ -270,16 +346,15 @@ function filterAndDisplayBirds() {
 document.getElementById('rarity-filter').addEventListener('change', filterAndDisplayBirds);
 
 
-// --- F. SUBMISSION & CHECKLIST FUNCTIONS (USER DATA) ---
+// ============================================
+// F. SUBMISSION & CHECKLIST FUNCTIONS
+// ============================================
 
-/**
- * Checks if the entered species name exists in the allUKBirds array.
- */
 function isSpeciesValid(speciesName) {
     return allUKBirds.some(bird => bird.CommonName.trim() === speciesName.trim());
 }
 
-sightingForm.addEventListener('submit', (e) => {
+sightingForm.addEventListener('submit', async (e) => {
     e.preventDefault(); 
 
     const date = document.getElementById('sighting-date').value;
@@ -290,42 +365,43 @@ sightingForm.addEventListener('submit', (e) => {
         return;
     }
 
-    saveNewLocation(location);
+    await saveNewLocation(location);
 
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
-    let sightingsToSave = [];
-    let invalidEntries = 0; 
+    let successCount = 0;
+    let invalidEntries = 0;
     
-    entryGroups.forEach(group => {
+    for (const group of entryGroups) {
         const speciesInput = group.querySelector('.species-input');
         const species = speciesInput ? speciesInput.value.trim() : '';
         
         if (species) {
             if (isSpeciesValid(species)) {
-                const newSighting = {
-                    id: Date.now() + Math.random(), 
+                const success = await saveSighting({
                     species: species,
                     date: date,
                     location: location
-                };
+                });
                 
-                sightingsToSave.push(newSighting);
+                if (success) {
+                    successCount++;
+                }
             } else {
                 speciesInput.value = ''; 
                 invalidEntries++;
             }
         }
-    });
+    }
 
-    if (sightingsToSave.length > 0) {
-        mySightings.push(...sightingsToSave); 
-        saveSightings(); 
+    if (successCount > 0) {
         entriesContainer.innerHTML = ''; 
         addSightingEntry(); 
         document.getElementById('location').value = location; 
         
         if (invalidEntries > 0) {
-             alert(`Successfully recorded ${sightingsToSave.length} sightings. Note: ${invalidEntries} entr${invalidEntries === 1 ? 'y was' : 'ies were'} cleared because the species name did not match the UK Bird database.`);
+            alert(`Successfully recorded ${successCount} sightings. Note: ${invalidEntries} entr${invalidEntries === 1 ? 'y was' : 'ies were'} cleared because the species name did not match the UK Bird database.`);
+        } else {
+            alert(`Successfully recorded ${successCount} sighting${successCount === 1 ? '' : 's'}!`);
         }
     } else {
         if (invalidEntries === 0) {
@@ -336,15 +412,16 @@ sightingForm.addEventListener('submit', (e) => {
     }
 });
 
-
-// Display the user's raw sightings checklist (Raw Checklist tab)
 function displaySightings() {
     const list = document.getElementById('sightings-list');
     list.innerHTML = ''; 
 
-    const reversedSightings = [...mySightings].reverse();
+    if (mySightings.length === 0) {
+        list.innerHTML = 'No sightings recorded yet.';
+        return;
+    }
 
-    reversedSightings.forEach(sighting => {
+    mySightings.forEach(sighting => {
         const li = document.createElement('li');
         
         const dateObj = new Date(sighting.date + 'T00:00:00');
@@ -360,16 +437,16 @@ function displaySightings() {
     });
 }
 
-// Function to delete a sighting
-function deleteSighting(idToDelete) {
+async function deleteSighting(idToDelete) {
     if (confirm("Are you sure you want to delete this sighting?")) {
-        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
-        saveSightings(); 
+        await deleteSightingFromDB(idToDelete);
     }
 }
 
 
-// --- G. SEEN BIRD SUMMARY FUNCTION (Species Summary tab) ---
+// ============================================
+// G. SEEN BIRD SUMMARY FUNCTION
+// ============================================
 
 function displaySeenBirdsSummary() {
     const summaryContainer = document.getElementById('seen-birds-summary');
@@ -390,6 +467,11 @@ function displaySeenBirdsSummary() {
             });
         }
     });
+
+    if (speciesMap.size === 0) {
+        summaryContainer.innerHTML = 'No unique birds seen yet.';
+        return;
+    }
 
     speciesMap.forEach((data, species) => {
         const count = data.sightings.length;
@@ -424,13 +506,14 @@ function displaySeenBirdsSummary() {
 }
 
 
-// --- H. STATS CALCULATIONS ---
+// ============================================
+// H. STATS CALCULATIONS
+// ============================================
 
 function calculateAndDisplayStats() {
     const totalSpeciesElement = document.getElementById('total-species');
     const percentageElement = document.getElementById('percentage-seen');
 
-    // Stats are now reliably calculated using the validated species list from getUniqueSeenSpecies()
     const uniqueSpeciesSeen = getUniqueSeenSpecies();
     const totalUniqueSeen = uniqueSpeciesSeen.size;
 
@@ -446,5 +529,8 @@ function calculateAndDisplayStats() {
 }
 
 
-// --- START THE APPLICATION ---
+// ============================================
+// START THE APPLICATION
+// ============================================
+
 loadUKBirds();
