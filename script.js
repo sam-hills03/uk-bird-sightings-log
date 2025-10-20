@@ -590,6 +590,11 @@ function isSpeciesValid(speciesName) {
     return allUKBirds.some(bird => bird.CommonName.trim() === speciesName.trim());
 }
 
+// Helper function to add delay between requests
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 sightingForm.addEventListener('submit', async (e) => {
     e.preventDefault(); 
 
@@ -606,13 +611,29 @@ sightingForm.addEventListener('submit', async (e) => {
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
     let successCount = 0;
     let invalidEntries = 0;
+    let failedEntries = 0;
+    const totalEntries = Array.from(entryGroups).filter(g => {
+        const input = g.querySelector('.species-input');
+        return input && input.value.trim();
+    }).length;
+    
+    // Show progress message for bulk submissions
+    if (totalEntries > 5) {
+        alert(`Submitting ${totalEntries} sightings... This may take a moment. Click OK and wait for confirmation.`);
+    }
+    
+    let currentEntry = 0;
     
     for (const group of entryGroups) {
         const speciesInput = group.querySelector('.species-input');
         const species = speciesInput ? speciesInput.value.trim() : '';
         
         if (species) {
+            currentEntry++;
+            
             if (isSpeciesValid(species)) {
+                console.log(`Submitting ${currentEntry}/${totalEntries}: ${species}`);
+                
                 const success = await saveSighting({
                     species: species,
                     date: date,
@@ -621,31 +642,48 @@ sightingForm.addEventListener('submit', async (e) => {
                 
                 if (success) {
                     successCount++;
+                } else {
+                    failedEntries++;
+                    console.error(`Failed to save: ${species}`);
+                }
+                
+                // Add 200ms delay between each submission to avoid rate limiting
+                if (currentEntry < totalEntries) {
+                    await delay(200);
                 }
             } else {
                 speciesInput.value = ''; 
                 invalidEntries++;
+                console.warn(`Invalid species name: ${species}`);
             }
         }
     }
 
+    // Clear form after submission
+    entriesContainer.innerHTML = ''; 
+    addSightingEntry(); 
+    document.getElementById('location').value = location;
+    
+    // Show comprehensive results
+    let message = '';
+    
     if (successCount > 0) {
-        entriesContainer.innerHTML = ''; 
-        addSightingEntry(); 
-        document.getElementById('location').value = location; 
-        
-        if (invalidEntries > 0) {
-            alert(`Successfully recorded ${successCount} sightings. Note: ${invalidEntries} entr${invalidEntries === 1 ? 'y was' : 'ies were'} cleared because the species name did not match the UK Bird database.`);
-        } else {
-            alert(`Successfully recorded ${successCount} sighting${successCount === 1 ? '' : 's'}!`);
-        }
-    } else {
-        if (invalidEntries === 0) {
-            alert("Please enter at least one bird species.");
-        } else {
-            alert(`No valid sightings recorded. Please check your spelling against the UK Bird Database.`);
-        }
+        message = `✅ Successfully recorded ${successCount} sighting${successCount === 1 ? '' : 's'}!`;
     }
+    
+    if (failedEntries > 0) {
+        message += `\n\n⚠️ ${failedEntries} sighting${failedEntries === 1 ? '' : 's'} failed to save. This may be due to rate limiting. Please try submitting them again.`;
+    }
+    
+    if (invalidEntries > 0) {
+        message += `\n\n❌ ${invalidEntries} entr${invalidEntries === 1 ? 'y was' : 'ies were'} cleared because the species name did not match the UK Bird database.`;
+    }
+    
+    if (successCount === 0 && failedEntries === 0 && invalidEntries === 0) {
+        message = "Please enter at least one bird species.";
+    }
+    
+    alert(message);
 });
 
 // ============================================
