@@ -1,0 +1,3650 @@
+[
+ {
+   "CommonName": "Acadian Flycatcher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Empidonax virescens"
+ },
+ {
+   "CommonName": "Alder Flycatcher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Empidonax alnorum"
+ },
+ {
+   "CommonName": "Aleutian Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Onychoprion aleuticus"
+ },
+ {
+   "CommonName": "Allen's Gallinule",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Alpine Accentor",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Prunella collaris"
+ },
+ {
+   "CommonName": "Alpine Swift",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Tachymarptis melba"
+ },
+ {
+   "CommonName": "American Bittern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Botaurus lentiginosus"
+ },
+ {
+   "CommonName": "American Black Duck",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Anas rubripes"
+ },
+ {
+   "CommonName": "American Cliff Swallow",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Petrochelidon pyrrhonota"
+ },
+ {
+   "CommonName": "American Coot",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Fulica americana"
+ },
+ {
+   "CommonName": "American Golden Plover",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Pluvialis dominica"
+ },
+ {
+   "CommonName": "American Herring Gull",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Larus smithsonianus"
+ },
+ {
+   "CommonName": "American Kestrel",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Falco sparverius"
+ },
+ {
+   "CommonName": "American Pipit",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "American Redstart",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga ruticilla"
+ },
+ {
+   "CommonName": "American Robin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Turdus migratorius"
+ },
+ {
+   "CommonName": "American Wigeon",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Mareca americana"
+ },
+ {
+   "CommonName": "American Yellow Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Amur Falcon",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Falco amurensis"
+ },
+ {
+   "CommonName": "Amur Stonechat",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ancient Murrelet",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Synthliboramphus antiquus"
+ },
+ {
+   "CommonName": "Aquatic Warbler",
+   "Rarity": "Rare",
+   "Status": "Passage Visitor",
+   "LatinName": "Acrocephalus paludicola"
+ },
+ {
+   "CommonName": "Arctic Skua",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Stercorarius parasiticus"
+ },
+ {
+   "CommonName": "Arctic Tern",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sterna paradisaea"
+ },
+ {
+   "CommonName": "Arctic Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Phylloscopus borealis"
+ },
+ {
+   "CommonName": "Ascension Frigatebird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Fregata aquila"
+ },
+ {
+   "CommonName": "Asian Brown Flycatcher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Muscicapa dauurica"
+ },
+ {
+   "CommonName": "Asian Desert Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sylvia nana"
+ },
+ {
+   "CommonName": "Asian Houbara",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Atlantic Yellow-nosed Albatross",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalassarche chlororhynchos"
+ },
+ {
+   "CommonName": "Audouin's Gull",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Ichthyaetus audouinii"
+ },
+ {
+   "CommonName": "Avocet",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Recurvirostra avosetta"
+ },
+ {
+   "CommonName": "Baikal Teal",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Sibirionetta formosa"
+ },
+ {
+   "CommonName": "Baillon's Crake",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Baird's Sandpiper",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Balearic Shearwater",
+   "Rarity": "Local",
+   "Status": "Passage Visitor",
+   "LatinName": "Puffinus mauretanicus"
+ },
+ {
+   "CommonName": "Bar-headed goose",
+   "Rarity": "",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Bar-tailed Godwit",
+   "Rarity": "Common",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Limosa lapponica"
+ },
+ {
+   "CommonName": "Barn Owl",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Tyto alba"
+ },
+ {
+   "CommonName": "Barnacle Goose",
+   "Rarity": "Common",
+   "Status": "Escaped Breeder, Winter Visitor",
+   "LatinName": "Branta leucopsis"
+ },
+ {
+   "CommonName": "Barolo Shearwater",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Puffinus baroli"
+ },
+ {
+   "CommonName": "Barred Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Sylvia nisoria"
+ },
+ {
+   "CommonName": "Barrow's Goldeneye",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Bay-breasted Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga castanea"
+ },
+ {
+   "CommonName": "Bearded Tit",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Panurus biarmicus"
+ },
+ {
+   "CommonName": "Belted Kingfisher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Megaceryle alcyon"
+ },
+ {
+   "CommonName": "Bimaculated Lark",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Melanocorypha bimaculata"
+ },
+ {
+   "CommonName": "Black Grouse",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Lyrurus tetrix"
+ },
+ {
+   "CommonName": "Black Guillemot",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Cepphus grylle"
+ },
+ {
+   "CommonName": "Black Kite",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Milvus migrans"
+ },
+ {
+   "CommonName": "Black Lark",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Melanocorypha yeltoniensis"
+ },
+ {
+   "CommonName": "Black Redstart",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Phoenicurus ochruros"
+ },
+ {
+   "CommonName": "Black Scoter",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Melanitta americana"
+ },
+ {
+   "CommonName": "Black Stork",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Ciconia nigra"
+ },
+ {
+   "CommonName": "Black swan",
+   "Rarity": "",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Black Tern",
+   "Rarity": "Local",
+   "Status": "Former Breeder, Passage Visitor",
+   "LatinName": "Chlidonias niger"
+ },
+ {
+   "CommonName": "Black-and-white Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Mniotilta varia"
+ },
+ {
+   "CommonName": "Black-billed Cuckoo",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Coccyzus erythropthalmus"
+ },
+ {
+   "CommonName": "Black-browed Albatross",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalassarche melanophris"
+ },
+ {
+   "CommonName": "Black-capped Petrel",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Pterodroma hasitata"
+ },
+ {
+   "CommonName": "Black-crowned Night Heron",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Black-headed Gull",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Chroicocephalus ridibundus"
+ },
+ {
+   "CommonName": "Black-necked Grebe",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Podiceps nigricollis"
+ },
+ {
+   "CommonName": "Black-tailed Godwit",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage/Winter Visitor",
+   "LatinName": "Limosa limosa"
+ },
+ {
+   "CommonName": "Black-throated Diver",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Gavia arctica"
+ },
+ {
+   "CommonName": "Black-throated Thrush",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Turdus atrogularis"
+ },
+ {
+   "CommonName": "Black-winged Kite",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Black-winged Pratincole",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Glareola nordmanni"
+ },
+ {
+   "CommonName": "Black-winged Stilt",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Has Bred",
+   "LatinName": "Himantopus himantopus"
+ },
+ {
+   "CommonName": "Blackbird",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Turdus merula"
+ },
+ {
+   "CommonName": "Blackburnian Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga fusca"
+ },
+ {
+   "CommonName": "Blackcap",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage/Winter Visitor",
+   "LatinName": "Sylvia atricapilla"
+ },
+ {
+   "CommonName": "Blue Rock Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Monticola solitarius"
+ },
+ {
+   "CommonName": "Blue Tit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Cyanistes caeruleus"
+ },
+ {
+   "CommonName": "Blue-cheeked Bee-eater",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Merops persicus"
+ },
+ {
+   "CommonName": "Blue-winged Teal",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Spatula discors"
+ },
+ {
+   "CommonName": "Bluethroat",
+   "Rarity": "Scarce",
+   "Status": "Scarce Breeder, Passage Visitor",
+   "LatinName": "Luscinia svecica"
+ },
+ {
+   "CommonName": "Blyth's Pipit",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Blyth's Reed Warbler",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Bonaparte's Gull",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Booted Warbler",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Iduna caligata"
+ },
+ {
+   "CommonName": "Brambling",
+   "Rarity": "Common",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Fringilla montifringilla"
+ },
+ {
+   "CommonName": "Brent Goose",
+   "Rarity": "Local",
+   "Status": "Winter Visitor",
+   "LatinName": "Branta bernicla"
+ },
+ {
+   "CommonName": "Bridled Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Onychoprion anaethetus"
+ },
+ {
+   "CommonName": "Broad-billed Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Calidris falcinellus"
+ },
+ {
+   "CommonName": "Brown Booby",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Brown Shrike",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Lanius cristatus"
+ },
+ {
+   "CommonName": "Brown Thrasher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Toxostoma rufum"
+ },
+ {
+   "CommonName": "Brünnich's Guillemot",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Buff-breasted Sandpiper",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Calidris subruficollis"
+ },
+ {
+   "CommonName": "Bufflehead",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Bucephala albeola"
+ },
+ {
+   "CommonName": "Cabot's Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalasseus acuflavidus"
+ },
+ {
+   "CommonName": "Cackling Goose",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Branta hutchinsii"
+ },
+ {
+   "CommonName": "Calandra Lark",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Melanocorypha calandra"
+ },
+ {
+   "CommonName": "Canada Goose",
+   "Rarity": "Common",
+   "Status": "Introduced Breeder, Accidental",
+   "LatinName": "Branta canadensis"
+ },
+ {
+   "CommonName": "Canvasback",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Aythya valisineria"
+ },
+ {
+   "CommonName": "Cape May Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga tigrina"
+ },
+ {
+   "CommonName": "Carrion Crow",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Corvus corone"
+ },
+ {
+   "CommonName": "Caspian Gull",
+   "Rarity": "Local",
+   "Status": "Scarce Visitor",
+   "LatinName": "Larus cachinnans"
+ },
+ {
+   "CommonName": "Caspian Plover",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Charadrius asiaticus"
+ },
+ {
+   "CommonName": "Caspian Tern",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Hydroprogne caspia"
+ },
+ {
+   "CommonName": "Cedar Waxwing",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Bombycilla cedrorum"
+ },
+ {
+   "CommonName": "Cetti's Warbler",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Chaffinch",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Fringilla coelebs"
+ },
+ {
+   "CommonName": "Chestnut-sided Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga pensylvanica"
+ },
+ {
+   "CommonName": "Chimney Swift",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Chaetura pelagica"
+ },
+ {
+   "CommonName": "Chinese Pond Heron",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Ardeola bacchus"
+ },
+ {
+   "CommonName": "Chough",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Pyrrhocorax pyrrhocorax"
+ },
+ {
+   "CommonName": "Cirl Bunting",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Emberiza cirlus"
+ },
+ {
+   "CommonName": "Citril Finch",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Carduelis citrinella"
+ },
+ {
+   "CommonName": "Citrine Wagtail",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Motacilla citreola"
+ },
+ {
+   "CommonName": "Coal Tit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Periparus ater"
+ },
+ {
+   "CommonName": "Collared Dove",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Streptopelia decaocto"
+ },
+ {
+   "CommonName": "Collared Flycatcher",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Ficedula albicollis"
+ },
+ {
+   "CommonName": "Collared Pratincole",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Glareola pratincola"
+ },
+ {
+   "CommonName": "Common Buzzard",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Chiffchaff",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Crane",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Cuckoo",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Eider",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Gallinule",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Goldeneye",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Gull",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Larus canus"
+ },
+ {
+   "CommonName": "Common Kestrel",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Kingfisher",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Linnet",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Moorhen",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Nighthawk",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Chordeiles minor"
+ },
+ {
+   "CommonName": "Common Nightingale",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Pheasant",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Pochard",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Quail",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Redshank",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Redstart",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Rock Thrush",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Rosefinch",
+   "Rarity": "Scarce",
+   "Status": "Scarce Breeder, Passage Visitor",
+   "LatinName": "Carpodacus erythrinus"
+ },
+ {
+   "CommonName": "Common Sandpiper",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage/Winter Visitor",
+   "LatinName": "Actitis hypoleucos"
+ },
+ {
+   "CommonName": "Common Scoter",
+   "Rarity": "Common",
+   "Status": "Resident/Migrant Breeder, Passage/Winter Visitor",
+   "LatinName": "Melanitta nigra"
+ },
+ {
+   "CommonName": "Common Shelduck",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Snipe",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Swift",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Tern",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sterna hirundo"
+ },
+ {
+   "CommonName": "Common Whitethroat",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Common Yellowthroat",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Geothlypis trichas"
+ },
+ {
+   "CommonName": "Corn Bunting",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage Visitor",
+   "LatinName": "Emberiza calandra"
+ },
+ {
+   "CommonName": "Corncrake",
+   "Rarity": "Scarce",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Crex crex"
+ },
+ {
+   "CommonName": "Cory's Shearwater",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Cream-coloured Courser",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Cursorius cursor"
+ },
+ {
+   "CommonName": "Crested Lark",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Galerida cristata"
+ },
+ {
+   "CommonName": "Crested Tit",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Lophophanes cristatus"
+ },
+ {
+   "CommonName": "Crossbill",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Curlew Sandpiper",
+   "Rarity": "Local",
+   "Status": "Passage Visitor",
+   "LatinName": "Calidris ferruginea"
+ },
+ {
+   "CommonName": "Dalmatian Pelican",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Pelecanus crispus"
+ },
+ {
+   "CommonName": "Dartford Warbler",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Sylvia undata"
+ },
+ {
+   "CommonName": "Desert Wheatear",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Oenanthe deserti"
+ },
+ {
+   "CommonName": "Dipper",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Cinclus cinclus"
+ },
+ {
+   "CommonName": "Double-crested Cormorant",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Phalacrocorax auritus"
+ },
+ {
+   "CommonName": "Dunlin",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage/Winter Visitor",
+   "LatinName": "Calidris alpina"
+ },
+ {
+   "CommonName": "Dunnock",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Prunella modularis"
+ },
+ {
+   "CommonName": "Dusky Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Turdus eunomus"
+ },
+ {
+   "CommonName": "Dusky Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Phylloscopus fuscatus"
+ },
+ {
+   "CommonName": "Eastern Black-eared Wheatear",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eastern Bonelli's Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eastern Crowned Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Phylloscopus coronatus"
+ },
+ {
+   "CommonName": "Eastern Kingbird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tyrannus tyrannus"
+ },
+ {
+   "CommonName": "Eastern Olivaceous Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Iduna pallida"
+ },
+ {
+   "CommonName": "Eastern Orphean Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sylvia crassirostris"
+ },
+ {
+   "CommonName": "Eastern Phoebe",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sayornis phoebe"
+ },
+ {
+   "CommonName": "Eastern Red-rumped Swallow",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eastern Subalpine Warbler",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eastern Yellow Wagtail",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Motacilla tschutschensis"
+ },
+ {
+   "CommonName": "Egyptian Goose",
+   "Rarity": "Local",
+   "Status": "Introduced Breeder",
+   "LatinName": "Alopochen aegyptiaca"
+ },
+ {
+   "CommonName": "Egyptian Vulture",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Elegant Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalasseus elegans"
+ },
+ {
+   "CommonName": "Eleonora's Falcon",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eskimo Curlew",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Bittern",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Bullfinch",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Coot",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Crag Martin",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Curlew",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Dotterel",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Goshawk",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Hobby",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Jay",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Nuthatch",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Oystercatcher",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Penduline Tit",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Scops Owl",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Siskin",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Skylark",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Sparrowhawk",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Spoonbill",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Stone-curlew",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Teal",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Treecreeper",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Wigeon",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Woodcock",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Eurasian Wren",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Bee-eater",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Golden Plover",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Herring Gull",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Honey Buzzard",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Nightjar",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Red-rumped Swallow",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Robin",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Roller",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Serin",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Shag",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Stonechat",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Storm Petrel",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "European Turtle Dove",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Evening Grosbeak",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Hesperiphona vespertina"
+ },
+ {
+   "CommonName": "Eyebrowed Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Turdus obscurus"
+ },
+ {
+   "CommonName": "Falcated Duck",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Mareca falcata"
+ },
+ {
+   "CommonName": "Fea's Petrel",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ferruginous Duck",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Aythya nyroca"
+ },
+ {
+   "CommonName": "Fieldfare",
+   "Rarity": "Common",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Turdus pilaris"
+ },
+ {
+   "CommonName": "Firecrest",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Regulus ignicapilla"
+ },
+ {
+   "CommonName": "Forster's Tern",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Franklin's Gull",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Gadwall",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Mareca strepera"
+ },
+ {
+   "CommonName": "Garden Warbler",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sylvia borin"
+ },
+ {
+   "CommonName": "Garganey",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Spatula querquedula"
+ },
+ {
+   "CommonName": "Glaucous Gull",
+   "Rarity": "Local",
+   "Status": "Winter Visitor",
+   "LatinName": "Larus hyperboreus"
+ },
+ {
+   "CommonName": "Glaucous-winged Gull",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Larus glaucescens"
+ },
+ {
+   "CommonName": "Glossy Ibis",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Plegadis falcinellus"
+ },
+ {
+   "CommonName": "Goldcrest",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Regulus regulus"
+ },
+ {
+   "CommonName": "Golden Eagle",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Aquila chrysaetos"
+ },
+ {
+   "CommonName": "Golden Oriole",
+   "Rarity": "Scarce",
+   "Status": "Scarce Breeder, Passage Visitor",
+   "LatinName": "Oriolus oriolus"
+ },
+ {
+   "CommonName": "Golden Pheasant",
+   "Rarity": "Scarce",
+   "Status": "Introduced Breeder",
+   "LatinName": "Chrysolophus pictus"
+ },
+ {
+   "CommonName": "Golden-winged Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Vermivora chrysoptera"
+ },
+ {
+   "CommonName": "Goldfinch",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder",
+   "LatinName": "Carduelis carduelis"
+ },
+ {
+   "CommonName": "Goosander",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Mergus merganser"
+ },
+ {
+   "CommonName": "Grasshopper Warbler",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Locustella naevia"
+ },
+ {
+   "CommonName": "Great Black-backed Gull",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Larus marinus"
+ },
+ {
+   "CommonName": "Great Blue Heron",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Ardea herodias"
+ },
+ {
+   "CommonName": "Great Bustard",
+   "Rarity": "Scarce",
+   "Status": "Re-introduced Breeder, Accidental",
+   "LatinName": "Otis tarda"
+ },
+ {
+   "CommonName": "Great Cormorant",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Great Crested Grebe",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Podiceps cristatus"
+ },
+ {
+   "CommonName": "Great Egret",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Great Grey Shrike",
+   "Rarity": "Scarce",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Lanius excubitor"
+ },
+ {
+   "CommonName": "Great Horned Owl",
+   "Rarity": "Ungraded",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Great Knot",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calidris tenuirostris"
+ },
+ {
+   "CommonName": "Great Northern Diver",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Winter Visitor",
+   "LatinName": "Gavia immer"
+ },
+ {
+   "CommonName": "Great Reed Warbler",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Acrocephalus arundinaceus"
+ },
+ {
+   "CommonName": "Great Shearwater",
+   "Rarity": "Local",
+   "Status": "Scarce Migrant",
+   "LatinName": "Ardenna gravis"
+ },
+ {
+   "CommonName": "Great Skua",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Stercorarius skua"
+ },
+ {
+   "CommonName": "Great Snipe",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Gallinago media"
+ },
+ {
+   "CommonName": "Great Spotted Cuckoo",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Clamator glandarius"
+ },
+ {
+   "CommonName": "Great Spotted Woodpecker",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Scarce Visitor",
+   "LatinName": "Dendrocopos major"
+ },
+ {
+   "CommonName": "Great Tit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Parus major"
+ },
+ {
+   "CommonName": "Greater Sand Plover",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Charadrius leschenaultii"
+ },
+ {
+   "CommonName": "Greater Scaup",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Greater Short-toed Lark",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Greater Spotted Eagle",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Greater White-fronted Goose",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Greater Yellowlegs",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Tringa melanoleuca"
+ },
+ {
+   "CommonName": "Green Heron",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Butorides virescens"
+ },
+ {
+   "CommonName": "Green Sandpiper",
+   "Rarity": "Common",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Tringa ochropus"
+ },
+ {
+   "CommonName": "Green Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Phylloscopus nitidus"
+ },
+ {
+   "CommonName": "Green Woodpecker",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Picus viridis"
+ },
+ {
+   "CommonName": "Green-winged Teal",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Anas carolinensis"
+ },
+ {
+   "CommonName": "Greenfinch",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Chloris chloris"
+ },
+ {
+   "CommonName": "Greenish Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Phylloscopus trochiloides"
+ },
+ {
+   "CommonName": "Greenshank",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Tringa nebularia"
+ },
+ {
+   "CommonName": "Grey Catbird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Dumetella carolinensis"
+ },
+ {
+   "CommonName": "Grey Heron",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Ardea cinerea"
+ },
+ {
+   "CommonName": "Grey Partridge",
+   "Rarity": "Common",
+   "Status": "Resident/Introduced Breeder",
+   "LatinName": "Perdix perdix"
+ },
+ {
+   "CommonName": "Grey Phalarope",
+   "Rarity": "Scarce",
+   "Status": "Passage Visitor",
+   "LatinName": "Phalaropus fulicarius"
+ },
+ {
+   "CommonName": "Grey Plover",
+   "Rarity": "Common",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Pluvialis squatarola"
+ },
+ {
+   "CommonName": "Grey Wagtail",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage Visitor",
+   "LatinName": "Motacilla cinerea"
+ },
+ {
+   "CommonName": "Grey-cheeked Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Catharus minimus"
+ },
+ {
+   "CommonName": "Grey-headed Lapwing",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Grey-tailed Tattler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tringa brevipes"
+ },
+ {
+   "CommonName": "Greylag Goose",
+   "Rarity": "Common",
+   "Status": "Introduced/Resident Breeder, Winter Migrant",
+   "LatinName": "Anser anser"
+ },
+ {
+   "CommonName": "Guillemot",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Uria aalge"
+ },
+ {
+   "CommonName": "Gull-billed Tern",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor, Has Bred",
+   "LatinName": "Gelochelidon nilotica"
+ },
+ {
+   "CommonName": "Gyr Falcon",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Harlequin Duck",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Histrionicus histrionicus"
+ },
+ {
+   "CommonName": "Hawfinch",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Passage Visitor",
+   "LatinName": "Coccothraustes coccothraustes"
+ },
+ {
+   "CommonName": "Hen Harrier",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Circus cyaneus"
+ },
+ {
+   "CommonName": "Hermit Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Catharus guttatus"
+ },
+ {
+   "CommonName": "Hooded Crow",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Corvus cornix"
+ },
+ {
+   "CommonName": "Hooded Merganser",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Lophodytes cucullatus"
+ },
+ {
+   "CommonName": "Hooded Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga citrina"
+ },
+ {
+   "CommonName": "Hoopoe",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Has Bred",
+   "LatinName": "Upupa epops"
+ },
+ {
+   "CommonName": "House Martin",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Delichon urbicum"
+ },
+ {
+   "CommonName": "House Sparrow",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Passer domesticus"
+ },
+ {
+   "CommonName": "Hudsonian Godwit",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Limosa haemastica"
+ },
+ {
+   "CommonName": "Hudsonian Whimbrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Hume's Leaf Warbler",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Iberian Chiffchaff",
+   "Rarity": "Rare",
+   "Status": "Accidental, Has Bred",
+   "LatinName": "Phylloscopus ibericus"
+ },
+ {
+   "CommonName": "Iceland Gull",
+   "Rarity": "Local",
+   "Status": "Winter Visitor",
+   "LatinName": "Larus glaucoides"
+ },
+ {
+   "CommonName": "Icterine Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Scarce Breeder",
+   "LatinName": "Hippolais icterina"
+ },
+ {
+   "CommonName": "Isabelline Shrike",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Isabelline Wheatear",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Oenanthe isabellina"
+ },
+ {
+   "CommonName": "Ivory Gull",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Pagophila eburnea"
+ },
+ {
+   "CommonName": "Jack Snipe",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Lymnocryptes minimus"
+ },
+ {
+   "CommonName": "Jackdaw",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Coloeus monedula"
+ },
+ {
+   "CommonName": "Kelp Gull",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Kentish Plover",
+   "Rarity": "Rare",
+   "Status": "Former Breeder, Scarce Visitor",
+   "LatinName": "Charadrius alexandrinus"
+ },
+ {
+   "CommonName": "Killdeer",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Charadrius vociferus"
+ },
+ {
+   "CommonName": "King Eider",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Somateria spectabilis"
+ },
+ {
+   "CommonName": "Kittiwake",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Rissa tridactyla"
+ },
+ {
+   "CommonName": "Lady Amherst's Pheasant",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Lanceolated Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Locustella lanceolata"
+ },
+ {
+   "CommonName": "Lapland Bunting",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Calcarius lapponicus"
+ },
+ {
+   "CommonName": "Laughing Gull",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Leucophaeus atricilla"
+ },
+ {
+   "CommonName": "Leach's Storm Petrel",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Least Bittern",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Least Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Calidris minutilla"
+ },
+ {
+   "CommonName": "Least Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sternula antillarum"
+ },
+ {
+   "CommonName": "Lesser Black-backed Gull",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage Visitor",
+   "LatinName": "Larus fuscus"
+ },
+ {
+   "CommonName": "Lesser Crested Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalasseus bengalensis"
+ },
+ {
+   "CommonName": "Lesser Grey Shrike",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Lanius minor"
+ },
+ {
+   "CommonName": "Lesser Kestrel",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Falco naumanni"
+ },
+ {
+   "CommonName": "Lesser Scaup",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Aythya affinis"
+ },
+ {
+   "CommonName": "Lesser Spotted Woodpecker",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Dryobates minor"
+ },
+ {
+   "CommonName": "Lesser White-fronted Goose",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Anser erythropus"
+ },
+ {
+   "CommonName": "Lesser Whitethroat",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sylvia curruca"
+ },
+ {
+   "CommonName": "Lesser Yellowlegs",
+   "Rarity": "Scarce",
+   "Status": "Accidental",
+   "LatinName": "Tringa flavipes"
+ },
+ {
+   "CommonName": "Little Auk",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Alle alle"
+ },
+ {
+   "CommonName": "Little Bittern",
+   "Rarity": "Rare",
+   "Status": "Accidental, Has Bred",
+   "LatinName": "Ixobrychus minutus"
+ },
+ {
+   "CommonName": "Little Bunting",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Emberiza pusilla"
+ },
+ {
+   "CommonName": "Little Bustard",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tetrax tetrax"
+ },
+ {
+   "CommonName": "Little Crake",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Porzana parva"
+ },
+ {
+   "CommonName": "Little Curlew",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Numenius minutus"
+ },
+ {
+   "CommonName": "Little Egret",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Passage Visitor",
+   "LatinName": "Egretta garzetta"
+ },
+ {
+   "CommonName": "Little Grebe",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Tachybaptus ruficollis"
+ },
+ {
+   "CommonName": "Little Gull",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Hydrocoloeus minutus"
+ },
+ {
+   "CommonName": "Little Owl",
+   "Rarity": "Common",
+   "Status": "Introduced Breeder",
+   "LatinName": "Athene noctua"
+ },
+ {
+   "CommonName": "Little Ringed Plover",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Charadrius dubius"
+ },
+ {
+   "CommonName": "Little Stint",
+   "Rarity": "Local",
+   "Status": "Passage Visitor",
+   "LatinName": "Calidris minuta"
+ },
+ {
+   "CommonName": "Little Swift",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Apus affinis"
+ },
+ {
+   "CommonName": "Little Tern",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sternula albifrons"
+ },
+ {
+   "CommonName": "Long-billed Dowitcher",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Limnodromus scolopaceus"
+ },
+ {
+   "CommonName": "Long-billed Murrelet",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Brachyramphus perdix"
+ },
+ {
+   "CommonName": "Long-eared Owl",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Asio otus"
+ },
+ {
+   "CommonName": "Long-tailed Duck",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Winter Visitor",
+   "LatinName": "Clangula hyemalis"
+ },
+ {
+   "CommonName": "Long-tailed Shrike",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Lanius schach"
+ },
+ {
+   "CommonName": "Long-tailed Skua",
+   "Rarity": "Scarce",
+   "Status": "Passage Visitor, Has Bred",
+   "LatinName": "Stercorarius longicaudus"
+ },
+ {
+   "CommonName": "Long-tailed Tit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Aegithalos caudatus"
+ },
+ {
+   "CommonName": "Long-toed Stint",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calidris subminuta"
+ },
+ {
+   "CommonName": "Madeiran Storm Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Magnificent Frigatebird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Fregata magnificens"
+ },
+ {
+   "CommonName": "Magnolia Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga magnolia"
+ },
+ {
+   "CommonName": "Magpie",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Pica pica"
+ },
+ {
+   "CommonName": "Mallard",
+   "Rarity": "Common",
+   "Status": "Introduced/Resident Breeder, Winter Visitor",
+   "LatinName": "Anas platyrhynchos"
+ },
+ {
+   "CommonName": "Mandarin Duck",
+   "Rarity": "Local",
+   "Status": "Introduced Breeder",
+   "LatinName": "Aix galericulata"
+ },
+ {
+   "CommonName": "Manx Shearwater",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder",
+   "LatinName": "Puffinus puffinus"
+ },
+ {
+   "CommonName": "Marmora's Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Marsh Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Tringa stagnatilis"
+ },
+ {
+   "CommonName": "Marsh Tit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Poecile palustris"
+ },
+ {
+   "CommonName": "Marsh Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Scarce Breeder",
+   "LatinName": "Acrocephalus palustris"
+ },
+ {
+   "CommonName": "Masked Shrike",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Lanius nubicus"
+ },
+ {
+   "CommonName": "Meadow Pipit",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Anthus pratensis"
+ },
+ {
+   "CommonName": "Mediterranean Gull",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Ichthyaetus melanocephalus"
+ },
+ {
+   "CommonName": "Melodious Warbler",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Hippolais polyglotta"
+ },
+ {
+   "CommonName": "Merlin",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Falco columbarius"
+ },
+ {
+   "CommonName": "Mistle Thrush",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Turdus viscivorus"
+ },
+ {
+   "CommonName": "Moltoni's Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Montagu's Harrier",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Mourning Dove",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Zenaida macroura"
+ },
+ {
+   "CommonName": "Moussier's Redstart",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Mute Swan",
+   "Rarity": "Common",
+   "Status": "Resident/Introduced Breeder",
+   "LatinName": "Cygnus olor"
+ },
+ {
+   "CommonName": "Naumann's Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Turdus naumanni"
+ },
+ {
+   "CommonName": "Northern Fulmar",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Gannet",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Harrier",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Circus hudsonius"
+ },
+ {
+   "CommonName": "Northern Hawk-Owl",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Lapwing",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Mockingbird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Mimus polyglottos"
+ },
+ {
+   "CommonName": "Northern Nutcracker",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Parula",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Setophaga americana"
+ },
+ {
+   "CommonName": "Northern Pintail",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Shoveler",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Northern Waterthrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Parkesia noveboracensis"
+ },
+ {
+   "CommonName": "Northern Wheatear",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Olive-backed Pipit",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Anthus hodgsoni"
+ },
+ {
+   "CommonName": "Olive-tree Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Hippolais olivetorum"
+ },
+ {
+   "CommonName": "Oriental Pratincole",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Glareola maldivarum"
+ },
+ {
+   "CommonName": "Oriental Turtle Dove",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Streptopelia orientalis"
+ },
+ {
+   "CommonName": "Ortolan Bunting",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Emberiza hortulana"
+ },
+ {
+   "CommonName": "Osprey",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Pandion haliaetus"
+ },
+ {
+   "CommonName": "Ovenbird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Seiurus aurocapilla"
+ },
+ {
+   "CommonName": "Pacific Diver",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Gavia pacifica"
+ },
+ {
+   "CommonName": "Pacific Golden Plover",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Pluvialis fulva"
+ },
+ {
+   "CommonName": "Pacific Swift",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Apus pacificus"
+ },
+ {
+   "CommonName": "Paddyfield Warbler",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Acrocephalus agricola"
+ },
+ {
+   "CommonName": "Pale-legged Leaf Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Phylloscopus tenellipes"
+ },
+ {
+   "CommonName": "Pallas's Grasshopper Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Pallas's Gull",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Pallas's Sandgrouse",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Pallas's Warbler",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Pallid Harrier",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Circus macrourus"
+ },
+ {
+   "CommonName": "Pallid Swift",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Apus pallidus"
+ },
+ {
+   "CommonName": "Parrot Crossbill",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor, Occasional Breeder",
+   "LatinName": "Loxia pytyopsittacus"
+ },
+ {
+   "CommonName": "Pechora Pipit",
+   "Rarity": "Mega",
+   "Status": "Scarce Visitor",
+   "LatinName": "Anthus gustavi"
+ },
+ {
+   "CommonName": "Pectoral Sandpiper",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Has probably bred",
+   "LatinName": "Calidris melanotos"
+ },
+ {
+   "CommonName": "Peregrine Falcon",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Philadelphia Vireo",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Vireo philadelphicus"
+ },
+ {
+   "CommonName": "Pied Flycatcher",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Ficedula hypoleuca"
+ },
+ {
+   "CommonName": "Pied Wheatear",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Oenanthe pleschanka"
+ },
+ {
+   "CommonName": "Pied-billed Grebe",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Podilymbus podiceps"
+ },
+ {
+   "CommonName": "Pine Grosbeak",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Pinicola enucleator"
+ },
+ {
+   "CommonName": "Pink-footed Goose",
+   "Rarity": "Common",
+   "Status": "Winter Migrant",
+   "LatinName": "Anser brachyrhynchus"
+ },
+ {
+   "CommonName": "Pomarine Skua",
+   "Rarity": "Local",
+   "Status": "Passage Visitor",
+   "LatinName": "Stercorarius pomarinus"
+ },
+ {
+   "CommonName": "Ptarmigan",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Lagopus muta"
+ },
+ {
+   "CommonName": "Puffin",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Fratercula arctica"
+ },
+ {
+   "CommonName": "Purple Gallinule",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Purple Heron",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor, Has Bred",
+   "LatinName": "Ardea purpurea"
+ },
+ {
+   "CommonName": "Purple Martin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Progne subis"
+ },
+ {
+   "CommonName": "Purple Sandpiper",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Calidris maritima"
+ },
+ {
+   "CommonName": "Radde's Warbler",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Raven",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Corvus corax"
+ },
+ {
+   "CommonName": "Razorbill",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Alca torda"
+ },
+ {
+   "CommonName": "Red Kite",
+   "Rarity": "Common",
+   "Status": "Resident/Introduced Breeder, Passage Visitor",
+   "LatinName": "Milvus milvus"
+ },
+ {
+   "CommonName": "Red Knot",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Red-backed Shrike",
+   "Rarity": "Scarce",
+   "Status": "Former Breeder, Scarce Visitor",
+   "LatinName": "Lanius collurio"
+ },
+ {
+   "CommonName": "Red-billed Tropicbird",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Phaethon aethereus"
+ },
+ {
+   "CommonName": "Red-breasted Flycatcher",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Ficedula parva"
+ },
+ {
+   "CommonName": "Red-breasted Goose",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Branta ruficollis"
+ },
+ {
+   "CommonName": "Red-breasted Merganser",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Mergus serrator"
+ },
+ {
+   "CommonName": "Red-breasted Nuthatch",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sitta canadensis"
+ },
+ {
+   "CommonName": "Red-crested Pochard",
+   "Rarity": "Local",
+   "Status": "Escaped Breeder, Scarce Visitor",
+   "LatinName": "Netta rufina"
+ },
+ {
+   "CommonName": "Red-eyed Vireo",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Vireo olivaceus"
+ },
+ {
+   "CommonName": "Red-flanked Bluetail",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Tarsiger cyanurus"
+ },
+ {
+   "CommonName": "Red-footed Booby",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sula sula"
+ },
+ {
+   "CommonName": "Red-footed Falcon",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Falco vespertinus"
+ },
+ {
+   "CommonName": "Red-legged Partridge",
+   "Rarity": "Common",
+   "Status": "Introduced Breeder",
+   "LatinName": "Alectoris rufa"
+ },
+ {
+   "CommonName": "Red-necked Grebe",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Winter Visitor",
+   "LatinName": "Podiceps grisegena"
+ },
+ {
+   "CommonName": "Red-necked Nightjar",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Red-necked Phalarope",
+   "Rarity": "Scarce",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Phalaropus lobatus"
+ },
+ {
+   "CommonName": "Red-necked Stint",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calidris ruficollis"
+ },
+ {
+   "CommonName": "Red-tailed Shrike",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Red-throated Diver",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Gavia stellata"
+ },
+ {
+   "CommonName": "Red-throated Pipit",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Anthus cervinus"
+ },
+ {
+   "CommonName": "Red-throated Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Turdus ruficollis"
+ },
+ {
+   "CommonName": "Redhead",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Aythya americana"
+ },
+ {
+   "CommonName": "Redpoll",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Redwing",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Turdus iliacus"
+ },
+ {
+   "CommonName": "Reed Bunting",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Emberiza schoeniclus"
+ },
+ {
+   "CommonName": "Reed Warbler",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Acrocephalus scirpaceus"
+ },
+ {
+   "CommonName": "Richard's Pipit",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ring Ouzel",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Turdus torquatus"
+ },
+ {
+   "CommonName": "Ring-billed Gull",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Larus delawarensis"
+ },
+ {
+   "CommonName": "Ring-necked Duck",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Aythya collaris"
+ },
+ {
+   "CommonName": "Ring-necked Parakeet",
+   "Rarity": "Common",
+   "Status": "Introduced Breeder",
+   "LatinName": "Psittacula krameri"
+ },
+ {
+   "CommonName": "Ringed Plover",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Charadrius hiaticula"
+ },
+ {
+   "CommonName": "River Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Locustella fluviatilis"
+ },
+ {
+   "CommonName": "Rock Dove",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Columba livia"
+ },
+ {
+   "CommonName": "Rock Pipit",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Anthus petrosus"
+ },
+ {
+   "CommonName": "Rock Sparrow",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Petronia petronia"
+ },
+ {
+   "CommonName": "Rook",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Corvus frugilegus"
+ },
+ {
+   "CommonName": "Roseate Tern",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Sterna dougallii"
+ },
+ {
+   "CommonName": "Ross's Goose",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ross's Gull",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Rosy Starling",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Rough-legged Buzzard",
+   "Rarity": "Scarce",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Buteo lagopus"
+ },
+ {
+   "CommonName": "Royal Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Thalasseus maximus"
+ },
+ {
+   "CommonName": "Ruby-crowned Kinglet",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ruddy Duck",
+   "Rarity": "Scarce",
+   "Status": "Introduced Breeder",
+   "LatinName": "Oxyura jamaicensis"
+ },
+ {
+   "CommonName": "Ruddy Shelduck",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ruddy Turnstone",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Ruff",
+   "Rarity": "Common",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Calidris pugnax"
+ },
+ {
+   "CommonName": "Rufous-tailed Robin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Larvivora sibilans"
+ },
+ {
+   "CommonName": "Rufous-tailed Scrub Robin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Cercotrichas galactotes"
+ },
+ {
+   "CommonName": "Rüppell's Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Sabine's Gull",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Sand Martin",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Riparia riparia"
+ },
+ {
+   "CommonName": "Sanderling",
+   "Rarity": "Common",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Calidris alba"
+ },
+ {
+   "CommonName": "Sandhill Crane",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Antigone canadensis"
+ },
+ {
+   "CommonName": "Sandwich Tern",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Thalasseus sandvicensis"
+ },
+ {
+   "CommonName": "Sardinian Warbler",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Sylvia melanocephala"
+ },
+ {
+   "CommonName": "Savi's Warbler",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Scopoli's Shearwater",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Calonectris diomedea"
+ },
+ {
+   "CommonName": "Scottish Crossbill",
+   "Rarity": "Local",
+   "Status": "Endemic Breeder",
+   "LatinName": "Loxia scotica"
+ },
+ {
+   "CommonName": "Sedge Warbler",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Acrocephalus schoenobaenus"
+ },
+ {
+   "CommonName": "Semipalmated Plover",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Charadrius semipalmatus"
+ },
+ {
+   "CommonName": "Semipalmated Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Calidris pusilla"
+ },
+ {
+   "CommonName": "Sharp-tailed Sandpiper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calidris acuminata"
+ },
+ {
+   "CommonName": "Shore Lark",
+   "Rarity": "Scarce",
+   "Status": "Scarce Breeder, Winter Visitor",
+   "LatinName": "Eremophila alpestris"
+ },
+ {
+   "CommonName": "Short-billed Dowitcher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Limnodromus griseus"
+ },
+ {
+   "CommonName": "Short-eared Owl",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Asio flammeus"
+ },
+ {
+   "CommonName": "Short-toed Snake Eagle",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Short-toed Treecreeper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Certhia brachydactyla"
+ },
+ {
+   "CommonName": "Siberian Accentor",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Prunella montanella"
+ },
+ {
+   "CommonName": "Siberian Blue Robin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Larvivora cyane"
+ },
+ {
+   "CommonName": "Siberian Rubythroat",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calliope calliope"
+ },
+ {
+   "CommonName": "Siberian Sand Plover",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Siberian Stonechat",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Saxicola maurus"
+ },
+ {
+   "CommonName": "Siberian Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Geokichla sibirica"
+ },
+ {
+   "CommonName": "Slaty-backed Gull",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Larus schistisagus"
+ },
+ {
+   "CommonName": "Slavonian Grebe",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Podiceps auritus"
+ },
+ {
+   "CommonName": "Slender-billed Gull",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Chroicocephalus genei"
+ },
+ {
+   "CommonName": "Smew",
+   "Rarity": "Scarce",
+   "Status": "Winter Visitor",
+   "LatinName": "Mergellus albellus"
+ },
+ {
+   "CommonName": "Snow Bunting",
+   "Rarity": "Local",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Plectrophenax nivalis"
+ },
+ {
+   "CommonName": "Snow Goose",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Anser caerulescens"
+ },
+ {
+   "CommonName": "Snowy Egret",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Egretta thula"
+ },
+ {
+   "CommonName": "Snowy Owl",
+   "Rarity": "Rare",
+   "Status": "Accidental, Former Breeder",
+   "LatinName": "Bubo scandiacus"
+ },
+ {
+   "CommonName": "Sociable Lapwing",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Vanellus gregarius"
+ },
+ {
+   "CommonName": "Soft-plumaged Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Solitary Sandpiper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tringa solitaria"
+ },
+ {
+   "CommonName": "Song Thrush",
+   "Rarity": "Common",
+   "Status": "Migrant/Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Turdus philomelos"
+ },
+ {
+   "CommonName": "Sooty Shearwater",
+   "Rarity": "Local",
+   "Status": "Passage Visitor",
+   "LatinName": "Ardenna grisea"
+ },
+ {
+   "CommonName": "Sooty Tern",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Onychoprion fuscatus"
+ },
+ {
+   "CommonName": "Sora",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Porzana carolina"
+ },
+ {
+   "CommonName": "Spanish Sparrow",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Passer hispaniolensis"
+ },
+ {
+   "CommonName": "Spectacled Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sylvia conspicillata"
+ },
+ {
+   "CommonName": "Spotted Crake",
+   "Rarity": "Scarce",
+   "Status": "Scarce Breeder, Passage Visitor",
+   "LatinName": "Porzana porzana"
+ },
+ {
+   "CommonName": "Spotted Flycatcher",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Muscicapa striata"
+ },
+ {
+   "CommonName": "Spotted Redshank",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Tringa erythropus"
+ },
+ {
+   "CommonName": "Spotted Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental, Has Bred",
+   "LatinName": "Actitis macularius"
+ },
+ {
+   "CommonName": "Squacco Heron",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Ardeola ralloides"
+ },
+ {
+   "CommonName": "Stejneger's Scoter",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Steller's Eider",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Stilt Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Calidris himantopus"
+ },
+ {
+   "CommonName": "Stock Dove",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Columba oenas"
+ },
+ {
+   "CommonName": "Sulphur-bellied Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Surf Scoter",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Melanitta perspicillata"
+ },
+ {
+   "CommonName": "Swainson's Thrush",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Swallow",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Hirundo rustica"
+ },
+ {
+   "CommonName": "Swinhoe's Storm Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Sykes's Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Taiga Bean Goose",
+   "Rarity": "Scarce",
+   "Status": "Winter Migrant",
+   "LatinName": "Anser fabalis"
+ },
+ {
+   "CommonName": "Taiga Flycatcher",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Ficedula albicilla"
+ },
+ {
+   "CommonName": "Tawny Owl",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Strix aluco"
+ },
+ {
+   "CommonName": "Tawny Pipit",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Anthus campestris"
+ },
+ {
+   "CommonName": "Temminck's Stint",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Tengmalm's Owl",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Tennessee Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Leiothlypis peregrina"
+ },
+ {
+   "CommonName": "Terek Sandpiper",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Xenus cinereus"
+ },
+ {
+   "CommonName": "Thick-billed Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Arundinax aedon"
+ },
+ {
+   "CommonName": "Thrush Nightingale",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Luscinia luscinia"
+ },
+ {
+   "CommonName": "Tree Pipit",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Anthus trivialis"
+ },
+ {
+   "CommonName": "Tree Sparrow",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage Visitor",
+   "LatinName": "Passer montanus"
+ },
+ {
+   "CommonName": "Tree Swallow",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tachycineta bicolor"
+ },
+ {
+   "CommonName": "Trumpeter Finch",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Bucanetes githagineus"
+ },
+ {
+   "CommonName": "Tufted Duck",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Aythya fuligula"
+ },
+ {
+   "CommonName": "Tufted Puffin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Fratercula cirrhata"
+ },
+ {
+   "CommonName": "Tundra Bean Goose",
+   "Rarity": "Scarce",
+   "Status": "Winter Migrant",
+   "LatinName": "Anser serrirostris"
+ },
+ {
+   "CommonName": "Tundra Swan",
+   "Rarity": "Ungraded",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Twite",
+   "Rarity": "Local",
+   "Status": "Migrant/Resident Breeder, Winter Visitor",
+   "LatinName": "Linaria flavirostris"
+ },
+ {
+   "CommonName": "Two-barred Crossbill",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Loxia leucoptera"
+ },
+ {
+   "CommonName": "Two-barred Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Upland Sandpiper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Bartramia longicauda"
+ },
+ {
+   "CommonName": "Varied Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Ixoreus naevius"
+ },
+ {
+   "CommonName": "Veery",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Catharus fuscescens"
+ },
+ {
+   "CommonName": "Velvet Scoter",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Melanitta fusca"
+ },
+ {
+   "CommonName": "Wallcreeper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Tichodroma muraria"
+ },
+ {
+   "CommonName": "Water Pipit",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Anthus spinoletta"
+ },
+ {
+   "CommonName": "Water Rail",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Rallus aquaticus"
+ },
+ {
+   "CommonName": "Waxwing",
+   "Rarity": "Local",
+   "Status": "Winter Visitor",
+   "LatinName": "Bombycilla garrulus"
+ },
+ {
+   "CommonName": "Western Black-eared Wheatear",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Bonelli's Warbler",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Capercaillie",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Cattle Egret",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Marsh Harrier",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Olivaceous Warbler",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Western Orphean Warbler",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sylvia hortensis"
+ },
+ {
+   "CommonName": "Western Sandpiper",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Calidris mauri"
+ },
+ {
+   "CommonName": "Western Subalpine Warbler",
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Sylvia cantillans"
+ },
+ {
+   "CommonName": "Western Swamphen",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Porphyrio porphyrio"
+ },
+ {
+   "CommonName": "Whimbrel",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Numenius phaeopus"
+ },
+ {
+   "CommonName": "Whinchat",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Saxicola rubetra"
+ },
+ {
+   "CommonName": "Whiskered Tern",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Chlidonias hybrida"
+ },
+ {
+   "CommonName": "White Stork",
+   "Rarity": "Scarce",
+   "Status": "Former Breeder, Scarce Visitor",
+   "LatinName": "Ciconia ciconia"
+ },
+ {
+   "CommonName": "White Wagtail",
+   "Rarity": "Local",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "White-billed Diver",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Gavia adamsii"
+ },
+ {
+   "CommonName": "White-chinned Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "White-crowned Wheatear",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "White-faced Storm Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "White-rumped Sandpiper",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Calidris fuscicollis"
+ },
+ {
+   "CommonName": "White-rumped Swift",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Apus caffer"
+ },
+ {
+   "CommonName": "White-tailed Eagle",
+   "Rarity": "Scarce",
+   "Status": "Re-introduced Breeder, Accidental",
+   "LatinName": "Haliaeetus albicilla"
+ },
+ {
+   "CommonName": "White-tailed Lapwing",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Vanellus leucurus"
+ },
+ {
+   "CommonName": "White-throated Needletail",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Hirundapus caudacutus"
+ },
+ {
+   "CommonName": "White-throated Robin",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Irania gutturalis"
+ },
+ {
+   "CommonName": "White-winged Lark",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Alauda leucoptera"
+ },
+ {
+   "CommonName": "White-winged Scoter",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Melanitta deglandi"
+ },
+ {
+   "CommonName": "White-winged Tern",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "White's Thrush",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Whooper Swan",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Winter Migrant",
+   "LatinName": "Cygnus cygnus"
+ },
+ {
+   "CommonName": "Willow Ptarmigan",
+   "Rarity": "Common",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Willow Tit",
+   "Rarity": "Local",
+   "Status": "Resident Breeder",
+   "LatinName": "Poecile montanus"
+ },
+ {
+   "CommonName": "Willow Warbler",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Phylloscopus trochilus"
+ },
+ {
+   "CommonName": "Wilson's Phalarope",
+   "Rarity": "Rare",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Wilson's Snipe",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Gallinago delicata"
+ },
+ {
+   "CommonName": "Wilson's Storm Petrel",
+   "Rarity": "Scarce",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Wood Sandpiper",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Passage Visitor",
+   "LatinName": "Tringa glareola"
+ },
+ {
+   "CommonName": "Wood Thrush",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Hylocichla mustelina"
+ },
+ {
+   "CommonName": "Wood Warbler",
+   "Rarity": "Local",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Phylloscopus sibilatrix"
+ },
+ {
+   "CommonName": "Woodchat Shrike",
+   "Rarity": "Scarce",
+   "Status": "Scarce Visitor",
+   "LatinName": "Lanius senator"
+ },
+ {
+   "CommonName": "Woodlark",
+   "Rarity": "Local",
+   "Status": "Resident/Migrant Breeder, Passage Visitor",
+   "LatinName": "Lullula arborea"
+ },
+ {
+   "CommonName": "Woodpigeon",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Winter Visitor",
+   "LatinName": "Columba palumbus"
+ },
+ {
+   "CommonName": "Wryneck",
+   "Rarity": "Scarce",
+   "Status": "Former Breeder, Scarce Visitor",
+   "LatinName": "Jynx torquilla"
+ },
+ {
+   "CommonName": "Yelkouan Shearwater",
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Puffinus yelkouan"
+ },
+ {
+   "CommonName": "Yellow Wagtail",
+   "Rarity": "Common",
+   "Status": "Migrant Breeder, Passage Visitor",
+   "LatinName": "Motacilla flava"
+ },
+ {
+   "CommonName": "Yellow-bellied Flycatcher",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Yellow-bellied Sapsucker",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Sphyrapicus varius"
+ },
+ {
+   "CommonName": "Yellow-billed Cuckoo",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Coccyzus americanus"
+ },
+ {
+   "CommonName": "Yellow-browed Warbler",
+   "Rarity": "Local",
+   "Status": "Passage/Winter Visitor",
+   "LatinName": "Phylloscopus inornatus"
+ },
+ {
+   "CommonName": "Yellow-legged Gull",
+   "Rarity": "Local",
+   "Status": "Scarce Breeder, Passage/Winter Visitor",
+   "LatinName": "Larus michahellis"
+ },
+ {
+   "CommonName": "Yellow-throated Vireo",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Vireo flavifrons"
+ },
+ {
+   "CommonName": "Yellowhammer",
+   "Rarity": "Common",
+   "Status": "Resident Breeder, Passage/Winter Visitor",
+   "LatinName": "Emberiza citrinella"
+ },
+ {
+   "CommonName": "Zino's Petrel",
+   "Rarity": "Mega",
+   "Status": "No Data",
+   "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Zitting Cisticola",
+   "Rarity": "Mega",
+   "Status": "Accidental",
+   "LatinName": "Cisticola juncidis"
+ }
+]
