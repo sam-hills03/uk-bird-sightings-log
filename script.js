@@ -1,8 +1,8 @@
 // ============================================
 // SUPABASE CONFIGURATION
 // ============================================
-const SUPABASE_URL = 'https://vpfoyxvkkttzlitfajgf.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZm95eHZra3R0emxpdGZhamdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDAxMTQsImV4cCI6MjA3NjUxNjExNH0._vyK8s2gXPSu18UqEEWujLU2tAqNZEh3mNwVQcbskxA';
+const SUPABASE_URL = 'YOUR_PROJECT_URL_HERE';
+const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -24,6 +24,19 @@ const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
 const sightingForm = document.getElementById('sighting-form');
 
+// Make deleteSighting global
+window.deleteSighting = async function(idToDelete) {
+    if (confirm("Are you sure you want to delete this sighting?")) {
+        await deleteSightingFromDB(idToDelete);
+        
+        // Adjust current page if needed
+        const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
+        if (currentPage > totalPages && currentPage > 1) {
+            currentPage = totalPages;
+        }
+    }
+};
+
 // ============================================
 // A. INITIAL LOAD FUNCTIONS
 // ============================================
@@ -33,6 +46,7 @@ async function loadUKBirds() {
         const response = await fetch('uk_birds.json');
         if (response.ok) {
             allUKBirds = await response.json();
+            console.log("Loaded", allUKBirds.length, "UK birds");
         } else {
             console.error("uk_birds.json not found");
             document.getElementById('bird-list').innerHTML = 
@@ -63,6 +77,7 @@ async function loadSightings() {
         if (error) throw error;
         
         mySightings = data || [];
+        console.log("Loaded", mySightings.length, "sightings");
         updateAllDisplays();
     } catch (error) {
         console.error("Error loading sightings:", error);
@@ -168,34 +183,62 @@ function setupPagination() {
     const prevBtnBottom = document.getElementById('prev-page-btn-bottom');
     const nextBtnBottom = document.getElementById('next-page-btn-bottom');
     
-    prevBtn.addEventListener('click', () => changePage(-1));
-    nextBtn.addEventListener('click', () => changePage(1));
-    prevBtnBottom.addEventListener('click', () => changePage(-1));
-    nextBtnBottom.addEventListener('click', () => changePage(1));
+    if (prevBtn) prevBtn.addEventListener('click', () => changePage(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
+    if (prevBtnBottom) prevBtnBottom.addEventListener('click', () => changePage(-1));
+    if (nextBtnBottom) nextBtnBottom.addEventListener('click', () => changePage(1));
+    
+    console.log("Pagination setup complete");
 }
 
 function changePage(direction) {
-    currentPage += direction;
+    const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
+    const newPage = currentPage + direction;
+    
+    // Validate page bounds
+    if (newPage < 1 || newPage > totalPages) {
+        console.log("Invalid page:", newPage);
+        return;
+    }
+    
+    currentPage = newPage;
+    console.log("Changed to page", currentPage);
     displaySightings();
     
     // Scroll to top of checklist
-    document.getElementById('checklist-view').scrollIntoView({ behavior: 'smooth' });
+    const checklistView = document.getElementById('checklist-view');
+    if (checklistView) {
+        checklistView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function displaySightings() {
     const list = document.getElementById('sightings-list');
+    if (!list) return;
+    
     list.innerHTML = ''; 
 
     if (mySightings.length === 0) {
         list.innerHTML = 'No sightings recorded yet.';
-        updatePaginationControls(0, 0);
+        updatePaginationControls(0, 0, 0);
         return;
     }
 
     // Calculate pagination
     const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
+    
+    // Ensure current page is valid
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+    
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, mySightings.length);
+    
+    console.log(`Displaying page ${currentPage} of ${totalPages} (items ${startIndex}-${endIndex})`);
     
     // Get the sightings for current page
     const pageSightings = mySightings.slice(startIndex, endIndex);
@@ -219,10 +262,15 @@ function displaySightings() {
 }
 
 function updatePaginationControls(totalPages, startIndex, endIndex) {
-    const pageInfo = `Page ${currentPage} of ${totalPages} (Showing ${startIndex + 1}-${endIndex} of ${mySightings.length})`;
+    const pageInfo = totalPages > 0 
+        ? `Page ${currentPage} of ${totalPages} (Showing ${startIndex + 1}-${endIndex} of ${mySightings.length})`
+        : 'No sightings';
     
-    document.getElementById('page-info').textContent = pageInfo;
-    document.getElementById('page-info-bottom').textContent = pageInfo;
+    const pageInfoEl = document.getElementById('page-info');
+    const pageInfoBottomEl = document.getElementById('page-info-bottom');
+    
+    if (pageInfoEl) pageInfoEl.textContent = pageInfo;
+    if (pageInfoBottomEl) pageInfoBottomEl.textContent = pageInfo;
     
     // Enable/disable buttons
     const prevBtn = document.getElementById('prev-page-btn');
@@ -230,22 +278,15 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
     const prevBtnBottom = document.getElementById('prev-page-btn-bottom');
     const nextBtnBottom = document.getElementById('next-page-btn-bottom');
     
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage >= totalPages;
-    prevBtnBottom.disabled = currentPage === 1;
-    nextBtnBottom.disabled = currentPage >= totalPages;
-}
-
-async function deleteSighting(idToDelete) {
-    if (confirm("Are you sure you want to delete this sighting?")) {
-        await deleteSightingFromDB(idToDelete);
-        
-        // Adjust current page if needed
-        const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
-        if (currentPage > totalPages && currentPage > 1) {
-            currentPage = totalPages;
-        }
-    }
+    const isFirstPage = currentPage === 1;
+    const isLastPage = currentPage >= totalPages || totalPages === 0;
+    
+    if (prevBtn) prevBtn.disabled = isFirstPage;
+    if (nextBtn) nextBtn.disabled = isLastPage;
+    if (prevBtnBottom) prevBtnBottom.disabled = isFirstPage;
+    if (nextBtnBottom) nextBtnBottom.disabled = isLastPage;
+    
+    console.log(`Pagination: page ${currentPage}/${totalPages}, prev disabled: ${isFirstPage}, next disabled: ${isLastPage}`);
 }
 
 // ============================================
@@ -254,14 +295,19 @@ async function deleteSighting(idToDelete) {
 
 function setupSummaryFilter() {
     const filter = document.getElementById('summary-rarity-filter');
-    filter.addEventListener('change', (e) => {
-        currentSummaryRarityFilter = e.target.value;
-        displaySeenBirdsSummary();
-    });
+    if (filter) {
+        filter.addEventListener('change', (e) => {
+            currentSummaryRarityFilter = e.target.value;
+            console.log("Summary filter changed to:", currentSummaryRarityFilter);
+            displaySeenBirdsSummary();
+        });
+    }
 }
 
 function displaySeenBirdsSummary() {
     const summaryContainer = document.getElementById('seen-birds-summary');
+    if (!summaryContainer) return;
+    
     summaryContainer.innerHTML = '';
 
     const speciesMap = new Map();
@@ -288,12 +334,21 @@ function displaySeenBirdsSummary() {
     // Filter by rarity if needed
     let filteredSpecies = Array.from(speciesMap.keys());
     
+    console.log("Filtering species by rarity:", currentSummaryRarityFilter);
+    console.log("Total species before filter:", filteredSpecies.length);
+    
     if (currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(species => {
             const birdData = allUKBirds.find(b => b.CommonName === species);
-            return birdData && birdData.Rarity === currentSummaryRarityFilter;
+            const matches = birdData && birdData.Rarity === currentSummaryRarityFilter;
+            if (matches) {
+                console.log(`  ${species} matches (${birdData.Rarity})`);
+            }
+            return matches;
         });
     }
+    
+    console.log("Species after filter:", filteredSpecies.length);
     
     if (filteredSpecies.length === 0) {
         summaryContainer.innerHTML = `<p>No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
@@ -314,7 +369,7 @@ function displaySeenBirdsSummary() {
         const heading = document.createElement('h3');
         heading.innerHTML = `
             <span class="species-name">${species}</span> 
-            <span class="sighting-count">(${count} times seen - ${rarity})</span>
+            <span class="sighting-count">(${count} time${count === 1 ? '' : 's'} - ${rarity})</span>
         `;
         summaryItem.appendChild(heading);
 
@@ -617,18 +672,27 @@ function calculateAndDisplayStats() {
     percentageElement.textContent = `${percentage.toFixed(2)}%`;
     
     // Stats excluding Mega rarities
-    const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega');
+    const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega' && bird.Rarity !== '');
     const nonMegaCount = nonMegaBirds.length;
+    
+    console.log("Total UK birds:", totalUKBirds);
+    console.log("Non-mega UK birds:", nonMegaCount);
+    console.log("Unique species seen:", totalUniqueSeen);
     
     const seenNonMega = Array.from(uniqueSpeciesSeen).filter(species => {
         const bird = allUKBirds.find(b => b.CommonName === species);
-        return bird && bird.Rarity !== 'Mega';
+        const isNonMega = bird && bird.Rarity !== 'Mega' && bird.Rarity !== '';
+        return isNonMega;
     });
+    
+    console.log("Non-mega species seen:", seenNonMega.length);
     
     let percentageNoMega = 0;
     if (nonMegaCount > 0) {
         percentageNoMega = (seenNonMega.length / nonMegaCount) * 100;
     }
+    
+    console.log("Percentage excluding megas:", percentageNoMega.toFixed(2) + "%");
     
     percentageNoMegaElement.textContent = `${percentageNoMega.toFixed(2)}%`;
 }
@@ -640,6 +704,19 @@ function calculateAndDisplayStats() {
 let monthlyChartInstance = null;
 
 function createMonthlyChart() {
+    console.log("Creating monthly chart with", mySightings.length, "sightings");
+    
+    if (mySightings.length === 0) {
+        console.log("No sightings, skipping chart");
+        return;
+    }
+    
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        console.error("Chart.js not loaded!");
+        return;
+    }
+    
     // Group sightings by month
     const monthlyCounts = {};
     
@@ -652,11 +729,20 @@ function createMonthlyChart() {
         }
         
         // Only count unique species per month
-        monthlyCounts[monthKey].add(sighting.species);
+        if (isSpeciesValid(sighting.species)) {
+            monthlyCounts[monthKey].add(sighting.species);
+        }
     });
     
     // Sort months chronologically
     const sortedMonths = Object.keys(monthlyCounts).sort();
+    
+    console.log("Months with data:", sortedMonths.length);
+    
+    if (sortedMonths.length === 0) {
+        console.log("No valid months, skipping chart");
+        return;
+    }
     
     // Convert to chart data
     const labels = sortedMonths.map(key => {
@@ -667,13 +753,22 @@ function createMonthlyChart() {
     
     const data = sortedMonths.map(key => monthlyCounts[key].size);
     
+    console.log("Chart labels:", labels);
+    console.log("Chart data:", data);
+    
     // Destroy previous chart if exists
     if (monthlyChartInstance) {
         monthlyChartInstance.destroy();
     }
     
     // Create new chart
-    const ctx = document.getElementById('monthly-chart').getContext('2d');
+    const canvas = document.getElementById('monthly-chart');
+    if (!canvas) {
+        console.error("Chart canvas not found!");
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     monthlyChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -685,7 +780,9 @@ function createMonthlyChart() {
                 backgroundColor: 'rgba(76, 175, 80, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.3
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -721,6 +818,8 @@ function createMonthlyChart() {
             }
         }
     });
+    
+    console.log("Chart created successfully!");
 }
 
 // ============================================
