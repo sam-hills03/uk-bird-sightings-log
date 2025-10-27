@@ -34,15 +34,22 @@
         <h2>UK Bird Database</h2>
 
         <div id="filters">
-            <label for="rarity-filter">Filter by Rarity:</label>
-            <select id="rarity-filter">
-                <option value="All">All Birds</option>
-                <option value="Mega">Mega</option>
-                <option value="Rare">Rare</option>
-                <option value="Scarce">Scarce</option>
-                <option value="Local">Local</option>
-                <option value="Common">Common</option>
-            </select>
+            <div class="filter-group">
+                <label for="search-bar">Search:</label>
+                <input type="text" id="search-bar" placeholder="Search by name, latin name, or rarity...">
+            </div>
+            
+            <div class="filter-group">
+                <label for="rarity-filter">Filter by Rarity:</label>
+                <select id="rarity-filter">
+                    <option value="All">All Birds</option>
+                    <option value="Mega">Mega</option>
+                    <option value="Rare">Rare</option>
+                    <option value="Scarce">Scarce</option>
+                    <option value="Local">Local</option>
+                    <option value="Common">Common</option>
+                </select>
+            </div>
         </div>
 
         <div id="bird-list">
@@ -109,6 +116,17 @@
             No unique birds seen yet.
         </div>
     </section>
+
+    <!-- Modal for sighting details -->
+    <div id="sighting-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="modal-species-name"></h2>
+            <p id="modal-species-info"></p>
+            <h3>Your Sightings:</h3>
+            <ul id="modal-sightings-list"></ul>
+        </div>
+    </div>
 
     <section id="stats-view" class="tab-content">
         <h2>My Birding Statistics</h2>
