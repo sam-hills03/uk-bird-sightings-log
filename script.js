@@ -15,7 +15,7 @@ let savedLocations = [];
 
 // Pagination variables
 let currentPage = 1;
-const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 150;
 
 // Summary filter
 let currentSummaryRarityFilter = 'All';
