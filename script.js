@@ -63,7 +63,7 @@ async function loadUKBirds() {
         await loadLocations(); 
         addSightingEntry(); 
         setupTabSwitching();
-        setupPagination();
+        setupPagion();
         setupSummaryFilter();
         setupSearchBar();
         setupModal();
@@ -618,11 +618,11 @@ function getUniqueSeenSpecies() {
 async function getiNaturalistImage(commonName, latinName) {
     const searchTerms = [latinName, commonName].filter(name => name && name.trim() !== 'No Data');
     
+    // Try iNaturalist first
     for (const searchTerm of searchTerms) {
         try {
             const response = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=5`);
             const data = await response.json();
-
             if (data.results && data.results.length > 0) {
                 let result = null;
                 
@@ -643,7 +643,6 @@ async function getiNaturalistImage(commonName, latinName) {
                 // If no exact match but we have results, try partial match
                 if (!result && data.results[0]) {
                     const firstResult = data.results[0];
-                    // Check if it's a reasonable match (contains search term or vice versa)
                     const resultName = (firstResult.preferred_common_name || firstResult.name || '').toLowerCase();
                     const searchLower = searchTerm.toLowerCase();
                     
@@ -655,17 +654,59 @@ async function getiNaturalistImage(commonName, latinName) {
                 
                 // If we found a result with an image, return it
                 if (result && result.default_photo && result.default_photo.medium_url) {
-                    console.log(`Image found for ${commonName} using search: ${searchTerm}`);
+                    console.log(`Image found for ${commonName} using iNaturalist: ${searchTerm}`);
                     return result.default_photo.medium_url;
                 }
             }
         } catch (error) {
-            // Silently fail and try next search term
-            console.log(`Search failed for "${searchTerm}", trying next...`);
+            console.log(`iNaturalist search failed for "${searchTerm}", trying next...`);
         }
     }
     
+    // If iNaturalist fails, try Wikipedia
+    console.log(`No iNaturalist image found, trying Wikipedia for ${commonName || latinName}`);
+    const wikiImage = await getWikipediaImage(latinName, commonName);
+    if (wikiImage) {
+        return wikiImage;
+    }
+    
     console.log(`No image found for ${commonName}`);
+    return null;
+}
+
+async function getWikipediaImage(latinName, commonName) {
+    const searchTerms = [latinName, commonName].filter(name => name && name.trim() !== 'No Data');
+    
+    for (const searchTerm of searchTerms) {
+        try {
+            // First, search for the page
+            const searchResponse = await fetch(
+                `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*`
+            );
+            const searchData = await searchResponse.json();
+            
+            if (searchData.query && searchData.query.search.length > 0) {
+                const pageTitle = searchData.query.search[0].title;
+                
+                // Get the main image from the page
+                const imageResponse = await fetch(
+                    `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=500&origin=*`
+                );
+                const imageData = await imageResponse.json();
+                
+                const pages = imageData.query.pages;
+                const page = Object.values(pages)[0];
+                
+                if (page.thumbnail && page.thumbnail.source) {
+                    console.log(`Image found for ${searchTerm} using Wikipedia`);
+                    return page.thumbnail.source;
+                }
+            }
+        } catch (error) {
+            console.log(`Wikipedia search failed for "${searchTerm}", trying next...`);
+        }
+    }
+    
     return null;
 }
 
