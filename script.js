@@ -74,23 +74,36 @@ async function loadUKBirds() {
 
 async function loadSightings() {
     try {
-        // Fetch ALL sightings by setting a high limit
-        const { data, error } = await supabase
-            .from('sightings')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10000);  // Set limit to 10,000 (way more than you'll ever need)
+        let allSightings = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
         
-        if (error) throw error;
-        
-        mySightings = data || [];
-        console.log("Loaded", mySightings.length, "sightings");
-        
-        // Warning if getting close to limit
-        if (mySightings.length >= 9000) {
-            console.warn("Warning: Approaching sighting limit! Consider pagination.");
+        // Fetch in batches until we get everything
+        while (hasMore) {
+            const { data, error } = await supabase
+                .from('sightings')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .range(from, from + batchSize - 1);
+            
+            if (error) throw error;
+            
+            if (data && data.length > 0) {
+                allSightings = allSightings.concat(data);
+                from += batchSize;
+                
+                // If we got less than a full batch, we're done
+                if (data.length < batchSize) {
+                    hasMore = false;
+                }
+            } else {
+                hasMore = false;
+            }
         }
         
+        mySightings = allSightings;
+        console.log("Loaded", mySightings.length, "sightings in batches");
         updateAllDisplays();
     } catch (error) {
         console.error("Error loading sightings:", error);
