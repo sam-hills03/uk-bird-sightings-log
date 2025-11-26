@@ -858,7 +858,7 @@ sightingForm.addEventListener('submit', async (e) => {
                 
                 // Add 200ms delay between each submission to avoid rate limiting
                 if (currentEntry < totalEntries) {
-                    await delay(200);
+                    await delay(400);
                 }
             } else {
                 speciesInput.value = ''; 
