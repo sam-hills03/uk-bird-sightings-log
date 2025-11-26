@@ -3647,4 +3647,10 @@
    "Status": "Accidental",
    "LatinName": "Cisticola juncidis"
  }
+ {
+   "CommonName": "Common Starling",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Sturnus vulgaris"
+ }
 ]
