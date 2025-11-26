@@ -15,7 +15,7 @@ let savedLocations = [];
 
 // Pagination variables
 let currentPage = 1;
-const ITEMS_PER_PAGE = 150;
+const ITEMS_PER_PAGE = 100;
 
 // Summary filter
 let currentSummaryRarityFilter = 'All';
@@ -74,15 +74,23 @@ async function loadUKBirds() {
 
 async function loadSightings() {
     try {
+        // Fetch ALL sightings by setting a high limit
         const { data, error } = await supabase
             .from('sightings')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(10000);  // Set limit to 10,000 (way more than you'll ever need)
         
         if (error) throw error;
         
         mySightings = data || [];
         console.log("Loaded", mySightings.length, "sightings");
+        
+        // Warning if getting close to limit
+        if (mySightings.length >= 9000) {
+            console.warn("Warning: Approaching sighting limit! Consider pagination.");
+        }
+        
         updateAllDisplays();
     } catch (error) {
         console.error("Error loading sightings:", error);
