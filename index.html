@@ -11,7 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
     
+    <!-- Load Supabase library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load Chart.js for the monthly chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -75,6 +77,7 @@
     <section id="checklist-view" class="tab-content">
         <h2>Raw Sighting Checklist</h2>
         
+        <!-- Pagination controls -->
         <div id="pagination-controls">
             <button id="prev-page-btn" disabled>← Previous</button>
             <span id="page-info">Page 1</span>
@@ -85,6 +88,7 @@
             No sightings recorded yet.
         </ul>
         
+        <!-- Pagination controls at bottom too -->
         <div id="pagination-controls-bottom">
             <button id="prev-page-btn-bottom" disabled>← Previous</button>
             <span id="page-info-bottom">Page 1</span>
@@ -95,9 +99,8 @@
     <section id="summary-view" class="tab-content">
         <h2>Seen Bird Species Summary</h2>
         
+        <!-- Rarity filter for summary -->
         <div id="summary-filters">
-            <input type="text" id="summary-search-bar" placeholder="Search by common name, Latin name, or rarity..." style="margin-bottom: 10px;">
-            
             <label for="summary-rarity-filter">Filter by Rarity:</label>
             <select id="summary-rarity-filter">
                 <option value="All">All Rarities</option>
@@ -114,6 +117,7 @@
         </div>
     </section>
 
+    <!-- Modal for sighting details -->
     <div id="sighting-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
