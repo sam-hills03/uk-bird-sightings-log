@@ -20,9 +20,8 @@ const ITEMS_PER_PAGE = 100;
 // Summary filter
 let currentSummaryRarityFilter = 'All';
 
-// Search filters
-let currentSearchQuery = ''; 
-let currentSummarySearchQuery = ''; // <-- ADDED FOR SUMMARY SEARCH
+// Search filter
+let currentSearchQuery = '';
 
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
@@ -67,7 +66,6 @@ async function loadUKBirds() {
         setupPagion();
         setupSummaryFilter();
         setupSearchBar();
-        setupSummarySearchBar(); // <-- ADDED CALL
         setupModal();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
@@ -318,7 +316,7 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 }
 
 // ============================================
-// D. SUMMARY RARITY FILTER & SEARCH
+// D. SUMMARY RARITY FILTER
 // ============================================
 
 function setupSummaryFilter() {
@@ -331,25 +329,6 @@ function setupSummaryFilter() {
         });
     }
 }
-
-// NEW FUNCTION FOR SUMMARY SEARCH
-function setupSummarySearchBar() {
-    const searchBar = document.getElementById('summary-search-bar');
-    if (!searchBar) return;
-    
-    let searchTimeout;
-    
-    searchBar.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        
-        searchTimeout = setTimeout(() => {
-            currentSummarySearchQuery = e.target.value;
-            console.log("Summary searching for:", currentSummarySearchQuery);
-            displaySeenBirdsSummary(); 
-        }, 300);
-    });
-}
-
 
 function displaySeenBirdsSummary() {
     const summaryContainer = document.getElementById('seen-birds-summary');
@@ -378,7 +357,7 @@ function displaySeenBirdsSummary() {
         return;
     }
 
-    // Filter by rarity
+    // Filter by rarity if needed
     let filteredSpecies = Array.from(speciesMap.keys());
     
     console.log("Filtering species by rarity:", currentSummaryRarityFilter);
@@ -392,42 +371,10 @@ function displaySeenBirdsSummary() {
         });
     }
     
-    // SEARCH FILTER LOGIC ADDED HERE
-    if (currentSummarySearchQuery.trim() !== '') {
-        const query = currentSummarySearchQuery.toLowerCase();
-        
-        filteredSpecies = filteredSpecies.filter(species => {
-            const commonName = species.toLowerCase(); 
-            
-            // Get bird data to search Latin name and Rarity too
-            const birdData = allUKBirds.find(b => b.CommonName === species);
-            const latinName = (birdData ? birdData.LatinName : '').toLowerCase();
-            const rarity = (birdData ? birdData.Rarity : '').toLowerCase();
-            
-            return commonName.includes(query) || latinName.includes(query) || rarity.includes(query);
-        });
-        
-        // Display a count message
-        const resultCount = document.createElement('p');
-        resultCount.style.padding = '10px';
-        resultCount.style.backgroundColor = 'var(--color-background-soft)';
-        resultCount.style.borderRadius = '6px';
-        resultCount.style.marginBottom = '15px';
-        resultCount.style.fontWeight = 'bold';
-        resultCount.textContent = `Found ${filteredSpecies.length} bird${filteredSpecies.length === 1 ? '' : 's'} matching "${currentSummarySearchQuery}"`;
-        summaryContainer.prepend(resultCount); // Prepend so it appears at the top
-    }
-    
-    console.log("Species after all filters:", filteredSpecies.length);
+    console.log("Species after filter:", filteredSpecies.length);
     
     if (filteredSpecies.length === 0) {
-        let message = '';
-        if (currentSummarySearchQuery.trim() !== '') {
-             message = `No seen birds found matching your search: "${currentSummarySearchQuery}"`;
-        } else {
-            message = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
-        }
-        summaryContainer.innerHTML = message;
+        summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
         return;
     }
 
@@ -798,7 +745,7 @@ function filterAndDisplayBirds() {
         resultCount.style.marginBottom = '15px';
         resultCount.style.fontWeight = 'bold';
         resultCount.textContent = `Found ${filteredBirds.length} bird${filteredBirds.length === 1 ? '' : 's'} matching "${currentSearchQuery}"`;
-        listContainer.prepend(resultCount);
+        listContainer.appendChild(resultCount);
     }
     
     if (filteredBirds.length === 0) {
@@ -949,143 +896,222 @@ sightingForm.addEventListener('submit', async (e) => {
                     failedEntries++;
                     console.error(`Failed to save: ${species}`);
                 }
+                
+                // Add 200ms delay between each submission to avoid rate limiting
+                if (currentEntry < totalEntries) {
+                    await delay(400);
+                }
             } else {
+                speciesInput.value = ''; 
                 invalidEntries++;
-                console.warn(`Invalid species skipped: ${species}`);
+                console.warn(`Invalid species name: ${species}`);
             }
         }
     }
+
+    // Clear form after submission
+    entriesContainer.innerHTML = ''; 
+    addSightingEntry(); 
+    document.getElementById('location').value = location;
+    
+    // Show comprehensive results
+    let message = '';
     
     if (successCount > 0) {
-        alert(`Successfully recorded ${successCount} sighting(s)!`);
-        
-        // Clear form fields
-        document.getElementById('sighting-date').value = '';
-        document.getElementById('location').value = '';
-        entriesContainer.innerHTML = '';
-        addSightingEntry();
-        
-    } else if (failedEntries > 0) {
-        alert(`Finished submitting. ${failedEntries} sighting(s) failed to save. Check the console for details.`);
-    } else if (invalidEntries > 0) {
-         alert(`Finished submitting. ${invalidEntries} invalid species were skipped.`);
-    } else {
-        alert("No species were entered to submit.");
+        message = `✅ Successfully recorded ${successCount} sighting${successCount === 1 ? '' : 's'}!`;
     }
+    
+    if (failedEntries > 0) {
+        message += `\n\n⚠️ ${failedEntries} sighting${failedEntries === 1 ? '' : 's'} failed to save. This may be due to rate limiting. Please try submitting them again.`;
+    }
+    
+    if (invalidEntries > 0) {
+        message += `\n\n❌ ${invalidEntries} entr${invalidEntries === 1 ? 'y was' : 'ies were'} cleared because the species name did not match the UK Bird database.`;
+    }
+    
+    if (successCount === 0 && failedEntries === 0 && invalidEntries === 0) {
+        message = "Please enter at least one bird species.";
+    }
+    
+    alert(message);
 });
 
 // ============================================
-// I. STATS & CHARTING FUNCTIONS
+// I. STATS CALCULATIONS
 // ============================================
 
 function calculateAndDisplayStats() {
-    const seenSpecies = getUniqueSeenSpecies();
-    const totalSpecies = seenSpecies.size;
-    
-    // Total official UK birds
-    const totalUKBirds = allUKBirds.length; 
-    let percentageSeen = 0;
+    const totalSpeciesElement = document.getElementById('total-species');
+    const percentageElement = document.getElementById('percentage-seen');
+    const percentageNoMegaElement = document.getElementById('percentage-no-mega');
+
+    const uniqueSpeciesSeen = getUniqueSeenSpecies();
+    const totalUniqueSeen = uniqueSpeciesSeen.size;
+
+    // Total stats
+    const totalUKBirds = allUKBirds.length;
+    let percentage = 0;
     
     if (totalUKBirds > 0) {
-        percentageSeen = (totalSpecies / totalUKBirds) * 100;
+        percentage = (totalUniqueSeen / totalUKBirds) * 100;
     }
+
+    totalSpeciesElement.textContent = totalUniqueSeen;
+    percentageElement.textContent = `${percentage.toFixed(2)}%`;
     
-    // Calculate percentage excluding Megas
-    const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega');
-    const seenNonMegaSpecies = Array.from(seenSpecies).filter(species => {
-        const birdData = allUKBirds.find(b => b.CommonName === species);
-        return birdData && birdData.Rarity !== 'Mega';
+    // Stats excluding Mega rarities
+    const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega' && bird.Rarity !== '');
+    const nonMegaCount = nonMegaBirds.length;
+    
+    console.log("Total UK birds:", totalUKBirds);
+    console.log("Non-mega UK birds:", nonMegaCount);
+    console.log("Unique species seen:", totalUniqueSeen);
+    
+    const seenNonMega = Array.from(uniqueSpeciesSeen).filter(species => {
+        const bird = allUKBirds.find(b => b.CommonName === species);
+        const isNonMega = bird && bird.Rarity !== 'Mega' && bird.Rarity !== '';
+        return isNonMega;
     });
+    
+    console.log("Non-mega species seen:", seenNonMega.length);
     
     let percentageNoMega = 0;
-    if (nonMegaBirds.length > 0) {
-        percentageNoMega = (seenNonMegaSpecies.length / nonMegaBirds.length) * 100;
+    if (nonMegaCount > 0) {
+        percentageNoMega = (seenNonMega.length / nonMegaCount) * 100;
     }
     
-    document.getElementById('total-species').textContent = totalSpecies;
-    document.getElementById('percentage-seen').textContent = percentageSeen.toFixed(2) + '%';
-    document.getElementById('percentage-no-mega').textContent = percentageNoMega.toFixed(2) + '%';
+    console.log("Percentage excluding megas:", percentageNoMega.toFixed(2) + "%");
     
-    console.log(`Stats updated: ${totalSpecies} unique species seen.`);
+    percentageNoMegaElement.textContent = `${percentageNoMega.toFixed(2)}%`;
 }
 
-let monthlyChartInstance = null; // Variable to hold the Chart.js instance
+// ============================================
+// J. MONTHLY CHART
+// ============================================
+
+let monthlyChartInstance = null;
 
 function createMonthlyChart() {
-    const ctx = document.getElementById('monthly-chart').getContext('2d');
+    console.log("Creating monthly chart with", mySightings.length, "sightings");
     
-    // 1. Prepare data
-    const monthlyCounts = {}; // Key: YYYY-MM, Value: count
+    if (mySightings.length === 0) {
+        console.log("No sightings, skipping chart");
+        return;
+    }
+    
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        console.error("Chart.js not loaded!");
+        return;
+    }
+    
+    // Group sightings by month
+    const monthlyCounts = {};
     
     mySightings.forEach(sighting => {
-        if (!sighting.date) return;
+        const date = new Date(sighting.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        // Date format is YYYY-MM-DD
-        const monthYear = sighting.date.substring(0, 7); 
+        if (!monthlyCounts[monthKey]) {
+            monthlyCounts[monthKey] = new Set();
+        }
         
-        if (monthlyCounts[monthYear]) {
-            monthlyCounts[monthYear]++;
-        } else {
-            monthlyCounts[monthYear] = 1;
+        // Only count unique species per month
+        if (isSpeciesValid(sighting.species)) {
+            monthlyCounts[monthKey].add(sighting.species);
         }
     });
-
-    // 2. Sort and format for Chart.js
+    
+    // Sort months chronologically
     const sortedMonths = Object.keys(monthlyCounts).sort();
     
-    const labels = sortedMonths.map(my => {
-        const parts = my.split('-');
-        const year = parts[0];
-        const monthIndex = parseInt(parts[1]) - 1;
-        const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][monthIndex];
-        return `${monthName} ${year}`;
+    console.log("Months with data:", sortedMonths.length);
+    
+    if (sortedMonths.length === 0) {
+        console.log("No valid months, skipping chart");
+        return;
+    }
+    
+    // Convert to chart data
+    const labels = sortedMonths.map(key => {
+        const [year, month] = key.split('-');
+        const date = new Date(year, month - 1);
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     });
-
-    const dataPoints = sortedMonths.map(my => monthlyCounts[my]);
-
-    // 3. Destroy existing chart instance if it exists
+    
+    const data = sortedMonths.map(key => monthlyCounts[key].size);
+    
+    console.log("Chart labels:", labels);
+    console.log("Chart data:", data);
+    
+    // Destroy previous chart if exists
     if (monthlyChartInstance) {
         monthlyChartInstance.destroy();
     }
-
-    // 4. Create new chart
+    
+    // Create new chart
+    const canvas = document.getElementById('monthly-chart');
+    if (!canvas) {
+        console.error("Chart canvas not found!");
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     monthlyChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Sightings',
-                data: dataPoints,
-                backgroundColor: 'rgba(128, 182, 60, 0.6)', // Green
-                borderColor: 'rgba(128, 182, 60, 1)',
-                borderWidth: 1
+                label: 'Unique Species Seen',
+                data: data,
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
-                    precision: 0, // Ensure integer ticks
+                    ticks: {
+                        stepSize: 1
+                    },
                     title: {
                         display: true,
-                        text: 'Number of Sightings'
+                        text: 'Number of Unique Species'
                     }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
                 },
-                title: {
-                    display: true,
-                    text: 'Sightings Logged Per Month'
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
                 }
             }
         }
     });
+    
+    console.log("Chart created successfully!");
 }
 
+// ============================================
+// START THE APPLICATION
+// ============================================
 
-// Initialize application
-window.onload = loadUKBirds;
+loadUKBirds();
