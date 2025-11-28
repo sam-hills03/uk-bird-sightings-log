@@ -97,25 +97,26 @@
     </section>
 
     <section id="summary-view" class="tab-content">
-        <h2>Seen Bird Species Summary</h2>
+    <h2>Seen Bird Species Summary</h2>
+    
+    <div id="summary-filters">
+        <input type="text" id="summary-search-bar" placeholder="Search by common name, Latin name, or rarity..." style="margin-bottom: 10px;">
         
-        <!-- Rarity filter for summary -->
-        <div id="summary-filters">
-            <label for="summary-rarity-filter">Filter by Rarity:</label>
-            <select id="summary-rarity-filter">
-                <option value="All">All Rarities</option>
-                <option value="Mega">Mega</option>
-                <option value="Rare">Rare</option>
-                <option value="Scarce">Scarce</option>
-                <option value="Local">Local</option>
-                <option value="Common">Common</option>
-            </select>
-        </div>
-        
-        <div id="seen-birds-summary">
-            No unique birds seen yet.
-        </div>
-    </section>
+        <label for="summary-rarity-filter">Filter by Rarity:</label>
+        <select id="summary-rarity-filter">
+            <option value="All">All Rarities</option>
+            <option value="Mega">Mega</option>
+            <option value="Rare">Rare</option>
+            <option value="Scarce">Scarce</option>
+            <option value="Local">Local</option>
+            <option value="Common">Common</option>
+        </select>
+    </div>
+    
+    <div id="seen-birds-summary">
+        No unique birds seen yet.
+    </div>
+</section>
 
     <!-- Modal for sighting details -->
     <div id="sighting-modal" class="modal">
