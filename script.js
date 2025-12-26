@@ -589,6 +589,114 @@ if (sightingForm) {
         addSightingEntry();
     });
 }
+      // Only count unique species per month
+        if (isSpeciesValid(sighting.species)) {
+            monthlyCounts[monthKey].add(sighting.species);
+        }
+    });
+    
+    // Sort months chronologically
+    const sortedMonths = Object.keys(monthlyCounts).sort();
+    
+    console.log("Months with data:", sortedMonths.length);
+    
+    if (sortedMonths.length === 0) {
+        console.log("No valid months, skipping chart");
+        return;
+    }
+    
+    // Convert to chart data
+    const labels = sortedMonths.map(key => {
+        const [year, month] = key.split('-');
+        const date = new Date(year, month - 1);
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    });
+    
+    const data = sortedMonths.map(key => monthlyCounts[key].size);
+    
+    console.log("Chart labels:", labels);
+    console.log("Chart data:", data);
+    
+    // Destroy previous chart if exists
+    if (monthlyChartInstance) {
+        monthlyChartInstance.destroy();
+    }
+    
+    // Create new chart
+    const canvas = document.getElementById('monthly-chart');
+    if (!canvas) {
+        console.error("Chart canvas not found!");
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    monthlyChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Unique Species Seen',
+                data: data,
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Unique Species'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+        for (const group of entryGroups) {
+            const speciesInput = group.querySelector('.species-input');
+            const species = speciesInput?.value.trim();
+            
+            if (species && isSpeciesValid(species)) {
+                await saveSighting({ species, date, location });
+            }
+        }
+        
+        alert("Sightings recorded successfully!");
+        sightingForm.reset();
+        entriesContainer.innerHTML = '';
+        addSightingEntry();
+    });
+    
+    console.log("Chart created successfully!");
+}
+
+// ============================================
+// START THE APPLICATION
+// ============================================
 
 // Start the app
 loadUKBirds();
