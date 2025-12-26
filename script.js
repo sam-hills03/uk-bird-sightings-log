@@ -649,7 +649,7 @@ function createMonthlyChart() {
 
     // Create the bar chart using Chart.js
     birdChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: sortedLabels,
             datasets: [{
