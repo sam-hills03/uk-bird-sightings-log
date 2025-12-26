@@ -154,9 +154,9 @@ async function deleteSightingFromDB(idToDelete) {
 function updateAllDisplays() {
     displaySightings();
     displaySeenBirdsSummary(); 
-    if (typeof calculateAndDisplayStats === 'function') calculateAndDisplayStats();
+    calculateAndDisplayStats();
     filterAndDisplayBirds();
-    if (typeof createMonthlyChart === 'function') createMonthlyChart();
+    createMonthlyChart();
 }
 
 // ============================================
@@ -589,115 +589,91 @@ if (sightingForm) {
         addSightingEntry();
     });
 }
-      // Only count unique species per month
-        if (isSpeciesValid(sighting.species)) {
-            monthlyCounts[monthKey].add(sighting.species);
-        }
+// ============================================
+// I. STATISTICS & CHARTS
+// ============================================
+
+function calculateAndDisplayStats() {
+    if (allUKBirds.length === 0) return;
+
+    const seenSpecies = getUniqueSeenSpecies();
+    const totalSeenCount = seenSpecies.size;
+    
+    // 1. Update Total Unique Species Count
+    const totalSpeciesEl = document.getElementById('total-species');
+    if (totalSpeciesEl) totalSpeciesEl.textContent = totalSeenCount;
+
+    // 2. Calculate Percentage of UK List Seen
+    const totalUKSpeciesCount = allUKBirds.length;
+    const percentage = (totalSeenCount / totalUKSpeciesCount) * 100;
+    const percentageSeenEl = document.getElementById('percentage-seen');
+    if (percentageSeenEl) percentageSeenEl.textContent = percentage.toFixed(2) + '%';
+
+    // 3. Calculate Percentage Excluding Megas
+    const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega');
+    const nonMegaTotalCount = nonMegaBirds.length;
+    
+    const seenNonMegaCount = Array.from(seenSpecies).filter(speciesName => {
+        const bird = allUKBirds.find(b => b.CommonName === speciesName);
+        return bird && bird.Rarity !== 'Mega';
+    }).length;
+
+    const percentageNoMega = (seenNonMegaCount / nonMegaTotalCount) * 100;
+    const percentageNoMegaEl = document.getElementById('percentage-no-mega');
+    if (percentageNoMegaEl) percentageNoMegaEl.textContent = percentageNoMega.toFixed(2) + '%';
+}
+
+let birdChart = null; // Global variable to track the chart instance
+
+function createMonthlyChart() {
+    const ctx = document.getElementById('monthly-chart');
+    if (!ctx || mySightings.length === 0) return;
+
+    // Process data: Group sightings by Month-Year
+    const monthCounts = {};
+    
+    mySightings.forEach(sighting => {
+        const date = new Date(sighting.date);
+        const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+        monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
     });
-    
-    // Sort months chronologically
-    const sortedMonths = Object.keys(monthlyCounts).sort();
-    
-    console.log("Months with data:", sortedMonths.length);
-    
-    if (sortedMonths.length === 0) {
-        console.log("No valid months, skipping chart");
-        return;
+
+    // Sort the months chronologically
+    const sortedLabels = Object.keys(monthCounts).sort((a, b) => new Date(a) - new Date(b));
+    const sortedData = sortedLabels.map(label => monthCounts[label]);
+
+    // If a chart already exists, destroy it before creating a new one (prevents overlap)
+    if (birdChart) {
+        birdChart.destroy();
     }
-    
-    // Convert to chart data
-    const labels = sortedMonths.map(key => {
-        const [year, month] = key.split('-');
-        const date = new Date(year, month - 1);
-        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    });
-    
-    const data = sortedMonths.map(key => monthlyCounts[key].size);
-    
-    console.log("Chart labels:", labels);
-    console.log("Chart data:", data);
-    
-    // Destroy previous chart if exists
-    if (monthlyChartInstance) {
-        monthlyChartInstance.destroy();
-    }
-    
-    // Create new chart
-    const canvas = document.getElementById('monthly-chart');
-    if (!canvas) {
-        console.error("Chart canvas not found!");
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    monthlyChartInstance = new Chart(ctx, {
-        type: 'line',
+
+    // Create the bar chart using Chart.js
+    birdChart = new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: labels,
+            labels: sortedLabels,
             datasets: [{
-                label: 'Unique Species Seen',
-                data: data,
-                borderColor: '#4CAF50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.3,
-                pointRadius: 5,
-                pointHoverRadius: 7
+                label: 'Sightings',
+                data: sortedData,
+                backgroundColor: 'rgba(45, 66, 45, 0.6)',
+                borderColor: 'rgba(45, 66, 45, 1)',
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    },
-                    title: {
-                        display: true,
-                        text: 'Number of Unique Species'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Month'
-                    }
+                    ticks: { stepSize: 1 }
                 }
-        for (const group of entryGroups) {
-            const speciesInput = group.querySelector('.species-input');
-            const species = speciesInput?.value.trim();
-            
-            if (species && isSpeciesValid(species)) {
-                await saveSighting({ species, date, location });
+            },
+            plugins: {
+                legend: { display: false }
             }
         }
-        
-        alert("Sightings recorded successfully!");
-        sightingForm.reset();
-        entriesContainer.innerHTML = '';
-        addSightingEntry();
     });
-    
-    console.log("Chart created successfully!");
 }
-
-// ============================================
-// START THE APPLICATION
-// ============================================
-
 // Start the app
 loadUKBirds();
 document.getElementById('rarity-filter').addEventListener('change', filterAndDisplayBirds);
