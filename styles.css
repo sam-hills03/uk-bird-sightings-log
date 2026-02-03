@@ -673,3 +673,20 @@ h3 {
     margin-top: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
+.upload-trigger-btn {
+    background-color: #f0f7f0;
+    border: 1px dashed #2d422d !important;
+    color: #2d422d;
+    font-weight: bold;
+    margin-top: 10px !important;
+}
+
+.upload-trigger-btn:hover {
+    background-color: #e0eee0;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 10px 0;
+}
