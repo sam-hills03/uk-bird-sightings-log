@@ -563,6 +563,8 @@ if (addEntryBtn) addEntryBtn.addEventListener('click', addSightingEntry);
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
         e.preventDefault(); 
+        
+        // 1. Grab the values we want to keep
         const date = document.getElementById('sighting-date').value;
         const location = document.getElementById('location').value.trim();
         
@@ -571,22 +573,36 @@ if (sightingForm) {
             return;
         }
 
+        // 2. Save the location to your history
         await saveNewLocation(location);
-        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
         
+        // 3. Process the birds
+        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
+        let savedCount = 0;
+
         for (const group of entryGroups) {
             const speciesInput = group.querySelector('.species-input');
             const species = speciesInput?.value.trim();
             
             if (species && isSpeciesValid(species)) {
                 await saveSighting({ species, date, location });
+                savedCount++;
             }
         }
         
-        alert("Sightings recorded successfully!");
-        sightingForm.reset();
-        entriesContainer.innerHTML = '';
-        addSightingEntry();
+        if (savedCount > 0) {
+            alert(`Successfully recorded ${savedCount} sighting(s)!`);
+            
+            // --- THE CHANGE IS HERE ---
+            // Instead of sightingForm.reset(), we only clear the birds:
+            entriesContainer.innerHTML = ''; // Remove all current bird rows
+            addSightingEntry();              // Add one fresh, empty bird row
+            
+            // Note: The 'date' and 'location' inputs are NOT cleared, 
+            // so they stay ready for your next entry.
+        } else {
+            alert("No valid bird names were entered.");
+        }
     });
 }
 // ============================================
