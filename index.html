@@ -19,6 +19,23 @@
 </head>
 <body>
     <header>
+        <div id="auth-section" class="vintage-panel">
+    <div id="logged-out-view">
+        <p>Log in to save your personal sightings to your field journal.</p>
+        <div class="auth-inputs">
+            <input type="email" id="auth-email" placeholder="Email Address">
+            <input type="password" id="auth-password" placeholder="Password">
+            <div class="auth-buttons">
+                <button id="login-btn">Sign In</button>
+                <button id="signup-btn">Create Account</button>
+            </div>
+        </div>
+    </div>
+    <div id="logged-in-view" style="display: none;">
+        <p>Welcome back, <span id="user-display-name">Naturalist</span>!</p>
+        <button id="logout-btn">Close Journal (Logout)</button>
+    </div>
+</div>
         <h1>UK Bird Sighting Log</h1>
         <p>A simple log for tracking your UK bird sightings and statistics.</p>
     </header>
