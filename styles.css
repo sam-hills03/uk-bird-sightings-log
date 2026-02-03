@@ -1,5 +1,5 @@
-/* VINTAGE NATURALIST FIELD GUIDE 
-   Full CSS Update - Includes all original functionality 
+/* VINTAGE NATURALIST FIELD GUIDE - COMPLETE STYLESHEET
+   Includes Image Containment Fixes & Full Layout Logic
 */
 
 :root {
@@ -126,7 +126,7 @@ h3 {
 
 .filter-group { flex: 1; min-width: 250px; }
 
-#search-bar, #sighting-form input, select, #rarity-filter {
+#search-bar, #sighting-form input, select, #rarity-filter, #summary-rarity-filter {
     background-color: #fdfdfd;
     border: 1px solid var(--color-border);
     border-radius: 0;
@@ -143,56 +143,89 @@ h3 {
     border-radius: 0;
     text-transform: uppercase;
     letter-spacing: 1px;
+    transition: background-color 0.2s;
 }
 
 #add-entry-btn { background-color: var(--color-secondary); color: white; width: 100%; }
 #submit-all-btn { background-color: var(--color-success); color: white; width: 100%; }
 .remove-entry-btn { background-color: var(--color-danger); color: white; width: 100px; }
 
-/* BIRD CARDS */
+/* DATABASE CARDS & GRID */
 #bird-list, #seen-birds-summary {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
+    margin-top: 20px;
 }
 
 .bird-card {
     background-color: #fff;
     border: 1px solid var(--color-border);
     border-radius: 0;
-    padding: 10px;
+    padding: 12px;
     position: relative;
-    transition: border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+.bird-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 4px 4px 0px var(--color-border);
+}
+
+/* IMAGE CONTAINMENT FIX */
 .card-image-container {
     width: 100%;
     height: 200px;
     background-color: #eee;
-    overflow: visible !important;
+    overflow: hidden !important; /* Forces image to stay inside */
     border: 1px solid var(--color-border);
+    position: relative;
     filter: sepia(15%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Centers bird and prevents stretching */
+    display: block;
 }
 
 .card-common-name {
     font-family: 'Playfair Display', serif;
     font-weight: 900;
     font-size: 1.4em;
-    margin: 10px 0 0 0;
+    margin: 15px 0 2px 0;
+    color: var(--color-primary);
 }
 
 .card-latin-name {
     font-style: italic;
     font-size: 0.9em;
     color: var(--color-secondary);
-    border-bottom: 1px solid #eee;
     display: block;
     margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 5px;
+}
+
+.card-details {
+    border-top: 1px double var(--color-border);
+    margin-top: auto; /* Pushes tags to the bottom of card */
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .card-rarity-tag {
-    padding: 5px 10px;
-    font-size: 0.75em;
+    padding: 4px 8px;
+    font-size: 0.7em;
     font-weight: bold;
     text-transform: uppercase;
     background-color: var(--color-background-accent) !important;
@@ -200,37 +233,52 @@ h3 {
     border: 1px solid var(--color-border);
 }
 
-/* BADGES & OVERLAYS (Including original verified logic) */
-.seen-badge {
-    position: absolute;
-    top: 15px; right: 45px;
-    background-color: var(--color-success);
-    color: white;
-    padding: 2px 10px;
-    z-index: 10;
-}
-
-.verified-check-badge {
-    position: absolute;
-    top: 165px; left: 5px;
-    background: rgba(85, 107, 47, 0.9); /* Olive green */
-    color: white;
-    padding: 2px 8px;
-    font-size: 10px;
-    z-index: 5;
-}
-
+/* OVERLAYS & BADGES */
 .image-verify-overlay {
     position: absolute;
-    top: 8px; right: 8px;
+    top: 8px;
+    right: 8px;
     z-index: 150;
+    display: flex;
+    gap: 5px;
 }
 
 .verify-edit-btn {
     background: white;
     border: 1px solid var(--color-primary);
-    width: 30px; height: 30px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.verified-check-badge {
+    position: absolute;
+    top: 170px;
+    left: 8px;
+    background: rgba(85, 107, 47, 0.9); /* Olive green */
+    color: white;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.seen-badge {
+    position: absolute;
+    top: 15px;
+    right: 50px;
+    background-color: var(--color-success);
+    color: white;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 
 /* MODAL */
@@ -239,14 +287,16 @@ h3 {
     background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
     border: 3px double var(--color-border);
     border-radius: 0;
-    padding: 30px;
+    max-width: 600px;
+    box-shadow: 15px 15px 0px rgba(0,0,0,0.1);
 }
 
-/* INPUTS & LISTS */
+/* FORM ELEMENTS */
 #entries-container {
     border: 1px solid var(--color-border);
     padding: 15px;
     background-color: #fff;
+    margin-bottom: 20px;
 }
 
 .sighting-entry-group {
@@ -254,18 +304,11 @@ h3 {
     grid-template-columns: 1fr auto;
     gap: 10px;
     border-bottom: 1px dotted var(--color-border);
-    padding: 10px 0;
-}
-
-#sightings-list li {
-    padding: 12px;
-    border-bottom: 1px dashed var(--color-border);
-    display: flex;
-    justify-content: space-between;
+    padding: 15px 0;
 }
 
 hr {
     border: 0;
     border-top: 1px solid var(--color-border);
-    margin: 15px 0;
+    margin: 20px 0;
 }
