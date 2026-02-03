@@ -285,6 +285,10 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 // D. SUMMARY & MODALS
 // ============================================
 
+// ============================================
+// D. SUMMARY & MODALS
+// ============================================
+
 function setupSummaryFilter() {
     const filter = document.getElementById('summary-rarity-filter');
     if (filter) {
@@ -362,6 +366,7 @@ function displaySeenBirdsSummary() {
         rarityTagEl.textContent = birdData.Rarity;
         rarityTagEl.classList.add(`rarity-${birdData.Rarity}`);
 
+        // --- UPDATED IMAGE LOGIC ---
         const imageEl = card.querySelector('.card-image');
         const imageContainer = card.querySelector('.card-image-container');
         const placeholderDiv = document.createElement('div');
@@ -369,22 +374,33 @@ function displaySeenBirdsSummary() {
         placeholderDiv.textContent = 'Loading...';
         imageContainer.appendChild(placeholderDiv);
         
-        getiNaturalistImage(birdData.CommonName, birdData.LatinName).then(imageUrl => {
+        // We now call getBirdImage which checks your Supabase cache first
+        getBirdImage(birdData.CommonName, birdData.LatinName).then(imageUrl => {
             if (imageUrl) {
                 imageEl.src = imageUrl;
                 imageEl.onload = () => placeholderDiv.remove();
+                
+                // This connects the pencil icon and the keep/refresh buttons
+                handleImageVerification(card, birdData, imageUrl);
             } else {
                 imageEl.style.display = 'none';
                 placeholderDiv.textContent = 'No Image';
             }
         });
+        // ---------------------------
         
-        card.addEventListener('click', () => showSightingModal(species, birdData, sightingsData.sightings));
+        // Modal trigger remains the same, but we prevent it 
+        // if clicking the verification buttons
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                showSightingModal(species, birdData, sightingsData.sightings);
+            }
+        });
+        
         card.style.cursor = 'pointer';
         summaryContainer.appendChild(card);
     });
 }
-
 function showSightingModal(species, birdData, sightings) {
     const modal = document.getElementById('sighting-modal');
     document.getElementById('modal-species-name').textContent = species;
@@ -532,13 +548,62 @@ function isSpeciesValid(name) {
 // G. IMAGE FETCHING
 // ============================================
 
-async function getiNaturalistImage(commonName, latinName) {
-    const searchTerm = latinName !== 'No Data' ? latinName : commonName;
-    try {
-        const resp = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1`);
-        const data = await resp.json();
-        return data.results[0]?.default_photo?.medium_url || null;
-    } catch { return null; }
+// Global cache to avoid hitting Supabase too many times in one session
+const verifiedImageCache = new Map();
+
+async function getBirdImage(commonName, latinName) {
+    // 1. Check local cache first
+    if (verifiedImageCache.has(commonName)) return verifiedImageCache.get(commonName);
+
+    // 2. Check Supabase for a verified image
+    const { data, error } = await supabaseClient
+        .from('verified_images')
+        .select('image_url')
+        .eq('species', commonName)
+        .single();
+
+    if (data) {
+        verifiedImageCache.set(commonName, data.image_url);
+        return data.image_url;
+    }
+
+    // 3. Fallback to iNaturalist if not verified yet
+    return await getiNaturalistImage(commonName, latinName);
+}
+
+// Logic for the "Keep" and "Refresh" buttons
+async function handleImageVerification(card, birdData, currentUrl) {
+    const editBtn = card.querySelector('.verify-edit-btn');
+    const controls = card.querySelector('.verify-controls');
+    const imageEl = card.querySelector('.card-image');
+
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        controls.style.display = controls.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // "KEEP" - Save to Supabase
+    card.querySelector('.keep-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const { error } = await supabaseClient
+            .from('verified_images')
+            .upsert({ species: birdData.CommonName, image_url: imageEl.src });
+        
+        if (!error) {
+            verifiedImageCache.set(birdData.CommonName, imageEl.src);
+            controls.style.display = 'none';
+            alert(`Verified image for ${birdData.CommonName} saved!`);
+        }
+    });
+
+    // "REFRESH" - Get a different random image from iNaturalist
+    card.querySelector('.refresh-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        // We add a random page number to try and get a different result
+        const randomPage = Math.floor(Math.random() * 5) + 1;
+        const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
+        if (newUrl) imageEl.src = newUrl;
+    });
 }
 
 // ============================================
