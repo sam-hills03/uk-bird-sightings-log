@@ -690,3 +690,22 @@ hr {
     border-top: 1px solid #eee;
     margin: 10px 0;
 }
+/* A subtle blue badge for verified images */
+.verified-badge {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: #3498db;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Optional: change the border of verified cards */
+.bird-card.verified {
+    border-color: #3498db;
+}
