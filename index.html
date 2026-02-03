@@ -151,20 +151,20 @@
     </template>
     
     <template id="bird-card-template">
-        <div class="bird-card">
-            <div class="card-image-container">
-                <img class="card-image" alt="Bird photo">
-            </div>
-            <div class="card-content">
-                <h3 class="card-common-name"></h3>
-                <p class="card-latin-name"></p>
-                <div class="card-details">
-                    <span class="card-rarity-tag"></span>
-                    <span class="card-status-text"></span>
+    <div class="bird-card">
+        <div class="card-image-container">
+            <img class="card-image" alt="Bird photo">
+            <div class="image-verify-overlay">
+                <button class="verify-edit-btn" title="Verify Image">✏️</button>
+                <div class="verify-controls" style="display: none;">
+                    <p>Is this correct?</p>
+                    <button class="keep-btn">✅ Keep</button>
+                    <button class="refresh-btn">🔄 New</button>
                 </div>
             </div>
         </div>
-    </template>
+        </div>
+</template>
 
     <script src="script.js"></script>
 </body>
