@@ -350,17 +350,21 @@ h3 {
 }
 
 .bird-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensures all cards in a row are the same height */
     background-color: var(--color-background-soft);
     border: 1px solid var(--color-border);
-    /* Add this for the stamp effect */
-    padding: 10px;
-    position: relative;
-    filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2));
-    background-image: 
-        radial-gradient(circle at 0 0, transparent 8px, var(--color-background-soft) 8px),
-        radial-gradient(circle at 100% 0, transparent 8px, var(--color-background-soft) 8px),
-        radial-gradient(circle at 0 100%, transparent 8px, var(--color-background-soft) 8px),
-        radial-gradient(circle at 100% 100%, transparent 8px, var(--color-background-soft) 8px);
+    border-radius: 0; /* Square corners look more like stamps/old books */
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-content {
+    padding: 12px;
+    flex-grow: 1; /* Pushes the details to the bottom if names are short */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .bird-card:hover {
@@ -368,27 +372,23 @@ h3 {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.card-image-container::after {
-    content: "SPECIMEN";
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border: 2px solid var(--color-danger);
-    color: var(--color-danger);
-    padding: 2px 5px;
-    font-size: 0.7em;
-    font-weight: bold;
-    transform: rotate(-15deg);
-    opacity: 0.4;
-    border-radius: 3px;
-    pointer-events: none;
+.card-image-container {
+    width: 100%;
+    aspect-ratio: 4 / 3; /* Keeps all images the same size (landscape) */
+    background-color: var(--color-background-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .card-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    filter: sepia(0.3) contrast(0.9); /* Gives the photo an aged look */
+    object-fit: cover; /* Prevents distortion */
+    filter: sepia(0.2) contrast(1.1); /* Subtle vintage tint */
 }
 
 .image-placeholder {
@@ -426,20 +426,22 @@ h3 {
 }
 
 .card-rarity-tag {
-    background-color: #fffde7; /* Worn paper color */
-    color: #444;
-    border: 1px solid #d1c4a9;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
-    transform: rotate(-1deg);
-    padding: 3px 8px;
-    font-family: monospace; /* Typewriter feel */
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: var(--color-text-light) !important; /* Cream text */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2); /* Inset shadow for a "pressed" look */
 }
 
+/* Ensure the specific rarity colors remain deep enough for white text readability */
 .rarity-Mega { background-color: #682d1f; }
 .rarity-Rare { background-color: #a4523a; }
 .rarity-Scarce { background-color: #416863; }
 .rarity-Local { background-color: #8a9575; }
-.rarity-Common { background-color: #ddc8a9; }
+.rarity-Common { background-color: #bca88a; } /* Darkened slightly for contrast */
 
 .card-status-text {
     font-size: 0.9em;
