@@ -594,7 +594,8 @@ h3 {
     color: var(--color-secondary);
 }
 .card-image-container {
-    position: relative; /* Allows the overlay to sit on top of the image */
+    position: relative;
+    overflow: visible !important;/* Allows the overlay to sit on top of the image */
 }
 
 .image-verify-overlay {
