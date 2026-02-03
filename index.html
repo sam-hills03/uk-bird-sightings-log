@@ -70,8 +70,8 @@
 
             <div id="entries-container"></div>
 
-            <button type="button" id="add-entry-btn">➕ Add Another Bird</button>
-            <button type="submit" id="submit-all-btn">✅ Record All Sightings</button>
+            <button type="button" id="add-entry-btn">+ Add Another Bird</button>
+            <button type="submit" id="submit-all-btn">✓ Record All Sightings</button>
         </form>
     </section>
 
@@ -147,7 +147,7 @@
         <div class="sighting-entry-group">
             <label>Species Name:</label>
             <input type="text" class="species-input" list="species-datalist"> 
-            <button type="button" class="remove-entry-btn">❌ Remove</button>
+            <button type="button" class="remove-entry-btn">✕ Remove</button>
         </div>
     </template>
     
@@ -156,13 +156,13 @@
         <div class="card-image-container">
             <img class="card-image" alt="Bird photo">
             <div class="image-verify-overlay">
-                <button type="button" class="verify-edit-btn" title="Verify Image">✏️</button>
+                <button type="button" class="verify-edit-btn" title="Verify Image">✎</button>
                 <div class="verify-controls" style="display: none;">
     <p>Is this correct?</p>
-    <button type="button" class="keep-btn">✅ Keep</button>
-    <button type="button" class="refresh-btn">🔄 New</button>
+    <button type="button" class="keep-btn">✓ Keep</button>
+    <button type="button" class="refresh-btn">⟳ New</button>
     
-    <hr> <button type="button" class="upload-trigger-btn">📤 Upload My Own</button>
+    <hr> <button type="button" class="upload-trigger-btn">⇮ Upload My Own</button>
     <input type="file" class="bird-image-upload" accept="image/*" style="display: none;">
 </div>
             </div>
