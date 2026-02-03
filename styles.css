@@ -645,7 +645,7 @@ h3 {
 /* Ensure the overlay is clickable and visible */
 .image-verify-overlay {
     position: absolute;
-    top: 150px;
+    top: 200px;
     right: 8px;
     z-index: 150; /* Higher than anything else in the card */
 }
@@ -697,7 +697,7 @@ hr {
     position: absolute;
     top: 165px;
     left: 5px;
-    background: rgba(139, 137, 102); /* Nice bird-egg blue */
+    background: rgba(139, 137, 102); 
     color: white;
     padding: 2px 8px;
     border-radius: 12px;
