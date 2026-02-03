@@ -487,9 +487,10 @@ function populateSpeciesDatalist() {
 }
 
 function filterAndDisplayBirds() {
-    const filterValue = document.getElementById('rarity-filter').value;
+    const filterValue = document.getElementById('rarity-filter')?.value || 'All';
     const listContainer = document.getElementById('bird-list');
     if (!listContainer) return;
+    
     listContainer.innerHTML = ''; 
 
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
@@ -509,15 +510,27 @@ function filterAndDisplayBirds() {
         const card = cardClone.querySelector('.bird-card');
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
-        card.querySelector('.card-common-name').textContent = bird.CommonName;
-        card.querySelector('.card-rarity-tag').textContent = bird.Rarity;
-        card.querySelector('.card-rarity-tag').classList.add(`rarity-${bird.Rarity}`);
+        // Robust text setting with optional chaining to prevent crashes
+        const commonNameEl = card.querySelector('.card-common-name');
+        if (commonNameEl) commonNameEl.textContent = bird.CommonName;
+
+        const rarityTagEl = card.querySelector('.card-rarity-tag');
+        if (rarityTagEl) {
+            rarityTagEl.textContent = bird.Rarity;
+            rarityTagEl.className = `card-rarity-tag rarity-${bird.Rarity}`;
+        }
 
         const imageEl = card.querySelector('.card-image');
-        getiNaturalistImage(bird.CommonName, bird.LatinName).then(url => {
-            if (url) imageEl.src = url;
-            else imageEl.style.display = 'none';
-        });
+        if (imageEl) {
+            getBirdImage(bird.CommonName, bird.LatinName).then(url => {
+                if (url) {
+                    imageEl.src = url;
+                    handleImageVerification(card, bird, url);
+                } else {
+                    imageEl.style.display = 'none';
+                }
+            });
+        }
 
         listContainer.appendChild(card);
     });
