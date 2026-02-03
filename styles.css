@@ -673,6 +673,8 @@ h3 {
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 8px;
+    position: absolute;
+    bottom: 35px;
     margin-top: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
