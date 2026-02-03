@@ -357,13 +357,11 @@ h3 {
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     /* ... keep your existing properties ... */
-    border: 1px solid var(--color-border);
-    padding: 10px; /* Space for the inner line */
-    background-color: var(--color-background-soft);
-    
-    /* The Inner Frame */
-    box-shadow: inset 0 0 0 1px var(--color-border);
-    outline: 4px solid transparent; /* Buffer */
+    border: 2px solid var(--color-primary);
+    /* Creates a slightly organic, non-perfect rectangle */
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+    border-style: double; /* Gives it that classic "official document" look */
+    border-width: 4px;
 }
 
 .bird-card:hover {
