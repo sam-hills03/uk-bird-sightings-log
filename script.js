@@ -72,35 +72,24 @@ async function loadUKBirds() {
 
 async function loadSightings() {
     try {
-        let allSightings = [];
-        let from = 0;
-        const batchSize = 1000;
-        let hasMore = true;
+        const { data: { user } } = await supabaseClient.auth.getUser();
         
-        // Fetch in batches until we get everything
-        while (hasMore) {
-            const { data, error } = await supabaseClient
-                .from('sightings')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .range(from, from + batchSize - 1);
-            
-            if (error) throw error;
-            
-            if (data && data.length > 0) {
-                allSightings = allSightings.concat(data);
-                from += batchSize;
-                
-                if (data.length < batchSize) {
-                    hasMore = false;
-                }
-            } else {
-                hasMore = false;
-            }
+        // If no user is logged in, clear the list and exit
+        if (!user) {
+            mySightings = [];
+            updateAllDisplays();
+            return;
         }
+
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
         
-        mySightings = allSightings;
-        console.log("Loaded", mySightings.length, "sightings");
+        mySightings = data || [];
+        console.log("Loaded", mySightings.length, "sightings for user:", user.email);
         updateAllDisplays();
     } catch (error) {
         console.error("Error loading sightings:", error);
@@ -109,12 +98,22 @@ async function loadSightings() {
 
 async function saveSighting(sighting) {
     try {
+        // Get the current logged-in user session
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
+        // If no user is logged in, we shouldn't save (or handle as guest)
+        if (!user) {
+            console.error("No authenticated user found. Sighting not saved.");
+            return false;
+        }
+
         const { data, error } = await supabaseClient
             .from('sightings')
             .insert([{
                 species: sighting.species,
                 date: sighting.date,
-                location: sighting.location
+                location: sighting.location,
+                user_id: user.id  // <--- This is the key change!
             }])
             .select();
         
@@ -982,18 +981,20 @@ async function handleLogout() {
 
 // 4. State Listener (This runs every time someone logs in or out)
 supabaseClient.auth.onAuthStateChange((event, session) => {
+    const submitBtn = document.getElementById('submit-all-btn');
+    
     if (session) {
-        // User is LOGGED IN
-        loggedOutView.style.display = 'none';
-        loggedInView.style.display = 'block';
-        document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
-        
-        // Refresh sightings to show ONLY this user's data
-        loadSightings(); 
+        // ... existing logged-in logic ...
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Record All Sightings";
+        }
     } else {
-        // User is GUEST
-        loggedOutView.style.display = 'block';
-        loggedInView.style.display = 'none';
+        // ... existing logged-out logic ...
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Log in to record sightings";
+        }
     }
 });
 
