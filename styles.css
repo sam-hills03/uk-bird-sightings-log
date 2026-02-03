@@ -357,11 +357,10 @@ h3 {
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     /* ... keep your existing properties ... */
-    border: 2px solid var(--color-primary);
-    /* Creates a slightly organic, non-perfect rectangle */
-    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-    border-style: double; /* Gives it that classic "official document" look */
-    border-width: 4px;
+    border: 12px solid var(--color-border);
+    border-image: radial-gradient(#0000 70%, var(--color-border) 72%) 20% repeat;
+    border-image-outset: 2px;
+    border-radius: 0; /* Stamps are usually sharp-cornered */
 }
 
 .bird-card:hover {
