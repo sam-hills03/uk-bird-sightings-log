@@ -350,21 +350,13 @@ h3 {
 }
 
 .bird-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Ensures all cards in a row are the same height */
     background-color: var(--color-background-soft);
     border: 1px solid var(--color-border);
-    border-radius: 0; /* Square corners look more like stamps/old books */
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-}
-
-.card-content {
-    padding: 12px;
-    flex-grow: 1; /* Pushes the details to the bottom if names are short */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .bird-card:hover {
@@ -374,21 +366,18 @@ h3 {
 
 .card-image-container {
     width: 100%;
-    aspect-ratio: 4 / 3; /* Keeps all images the same size (landscape) */
-    background-color: var(--color-background-accent);
+    height: 200px;
+    background-color: var(--color-border);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    position: relative;
-    border-bottom: 1px solid var(--color-border);
 }
 
 .card-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Prevents distortion */
-    filter: sepia(0.2) contrast(1.1); /* Subtle vintage tint */
+    object-fit: cover;
 }
 
 .image-placeholder {
@@ -427,21 +416,18 @@ h3 {
 
 .card-rarity-tag {
     padding: 5px 10px;
-    border-radius: 4px;
+    border-radius: 5px;
     font-size: 0.75em;
     font-weight: bold;
-    color: var(--color-text-light) !important; /* Cream text */
+    color: var(--color-text-light);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2); /* Inset shadow for a "pressed" look */
 }
 
-/* Ensure the specific rarity colors remain deep enough for white text readability */
 .rarity-Mega { background-color: #682d1f; }
 .rarity-Rare { background-color: #a4523a; }
 .rarity-Scarce { background-color: #416863; }
 .rarity-Local { background-color: #8a9575; }
-.rarity-Common { background-color: #bca88a; } /* Darkened slightly for contrast */
+.rarity-Common { background-color: #ddc8a9; }
 
 .card-status-text {
     font-size: 0.9em;
@@ -722,4 +708,3 @@ hr {
     z-index: 5;
     pointer-events: none;
 }
-
