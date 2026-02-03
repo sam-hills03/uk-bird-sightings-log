@@ -423,11 +423,11 @@ h3 {
     text-transform: uppercase;
 }
 
-.rarity-Mega { background-color: #C0392B; }
-.rarity-Rare { background-color: #E67E22; }
-.rarity-Scarce { background-color: #F1C40F; }
-.rarity-Local { background-color: #27AE60; }
-.rarity-Common { background-color: #3498DB; }
+.rarity-Mega { background-color: #682d1f; }
+.rarity-Rare { background-color: #a4523a; }
+.rarity-Scarce { background-color: #416863; }
+.rarity-Local { background-color: #8a9575; }
+.rarity-Common { background-color: #ddc8a9; }
 
 .card-status-text {
     font-size: 0.9em;
