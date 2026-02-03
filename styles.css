@@ -352,11 +352,15 @@ h3 {
 .bird-card {
     background-color: var(--color-background-soft);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    /* Add this for the stamp effect */
+    padding: 10px;
     position: relative;
+    filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2));
+    background-image: 
+        radial-gradient(circle at 0 0, transparent 8px, var(--color-background-soft) 8px),
+        radial-gradient(circle at 100% 0, transparent 8px, var(--color-background-soft) 8px),
+        radial-gradient(circle at 0 100%, transparent 8px, var(--color-background-soft) 8px),
+        radial-gradient(circle at 100% 100%, transparent 8px, var(--color-background-soft) 8px);
 }
 
 .bird-card:hover {
@@ -364,20 +368,27 @@ h3 {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.card-image-container {
-    width: 100%;
-    height: 200px;
-    background-color: var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+.card-image-container::after {
+    content: "SPECIMEN";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 2px solid var(--color-danger);
+    color: var(--color-danger);
+    padding: 2px 5px;
+    font-size: 0.7em;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    opacity: 0.4;
+    border-radius: 3px;
+    pointer-events: none;
 }
 
 .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: sepia(0.3) contrast(0.9); /* Gives the photo an aged look */
 }
 
 .image-placeholder {
@@ -415,12 +426,13 @@ h3 {
 }
 
 .card-rarity-tag {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.75em;
-    font-weight: bold;
-    color: var(--color-text-light);
-    text-transform: uppercase;
+    background-color: #fffde7; /* Worn paper color */
+    color: #444;
+    border: 1px solid #d1c4a9;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+    transform: rotate(-1deg);
+    padding: 3px 8px;
+    font-family: monospace; /* Typewriter feel */
 }
 
 .rarity-Mega { background-color: #682d1f; }
