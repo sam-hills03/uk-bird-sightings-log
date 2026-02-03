@@ -504,6 +504,7 @@ function filterAndDisplayBirds() {
     
     listContainer.innerHTML = ''; 
 
+    // 1. Filter the list
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
     
     if (currentSearchQuery.trim() !== '') {
@@ -516,32 +517,45 @@ function filterAndDisplayBirds() {
     const seenSpecies = getUniqueSeenSpecies();
     const cardTemplate = document.getElementById('bird-card-template');
 
+    // 2. Build the cards
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
+        const imageContainer = card.querySelector('.card-image-container');
+        const imageEl = card.querySelector('.card-image');
+
+        // Mark as seen if in your sightings
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
-        // Robust text setting with optional chaining to prevent crashes
-        const commonNameEl = card.querySelector('.card-common-name');
-        if (commonNameEl) commonNameEl.textContent = bird.CommonName;
+        // Set Text Data
+        card.querySelector('.card-common-name').textContent = bird.CommonName;
+        const rarityTag = card.querySelector('.card-rarity-tag');
+        rarityTag.textContent = bird.Rarity;
+        rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        const rarityTagEl = card.querySelector('.card-rarity-tag');
-        if (rarityTagEl) {
-            rarityTagEl.textContent = bird.Rarity;
-            rarityTagEl.className = `card-rarity-tag rarity-${bird.Rarity}`;
-        }
-
-        const imageEl = card.querySelector('.card-image');
-        if (imageEl) {
-            getBirdImage(bird.CommonName, bird.LatinName).then(url => {
-                if (url) {
-                    imageEl.src = url;
-                    handleImageVerification(card, bird, url);
-                } else {
-                    imageEl.style.display = 'none';
+        // Handle Images (Check Cache/Supabase first)
+        getBirdImage(bird.CommonName, bird.LatinName).then(result => {
+            if (result && result.url) {
+                imageEl.src = result.url;
+                
+                // Add Verified Checkmark if saved in DB
+                if (result.isVerified) {
+                    card.classList.add('verified-card');
+                    const vBadge = document.createElement('div');
+                    vBadge.className = 'verified-check-badge';
+                    vBadge.innerHTML = '✔️ Verified';
+                    imageContainer.appendChild(vBadge);
+                    
+                    const keepBtn = card.querySelector('.keep-btn');
+                    if (keepBtn) keepBtn.style.display = 'none';
                 }
-            });
-        }
+
+                // Initialize the pencil menu logic
+                handleImageVerification(card, bird);
+            } else {
+                imageEl.style.display = 'none';
+            }
+        });
 
         listContainer.appendChild(card);
     });
