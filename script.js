@@ -375,19 +375,30 @@ function displaySeenBirdsSummary() {
         imageContainer.appendChild(placeholderDiv);
         
         // We now call getBirdImage which checks your Supabase cache first
-        getBirdImage(birdData.CommonName, birdData.LatinName).then(imageUrl => {
-            if (imageUrl) {
-                imageEl.src = imageUrl;
-                imageEl.onload = () => placeholderDiv.remove();
-                
-                // This connects the pencil icon and the keep/refresh buttons
-                handleImageVerification(card, birdData, imageUrl);
-            } else {
-                imageEl.style.display = 'none';
-                placeholderDiv.textContent = 'No Image';
-            }
-        });
-        // ---------------------------
+        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+    if (result.url) {
+        imageEl.src = result.url;
+        imageEl.onload = () => placeholderDiv.remove();
+        
+        // Add the verified badge if it's from your database
+        if (result.isVerified) {
+            card.classList.add('verified');
+            const vBadge = document.createElement('div');
+            vBadge.classList.add('verified-badge');
+            vBadge.textContent = 'Verified';
+            imageContainer.appendChild(vBadge);
+            
+            // Optional: Hide the "Keep" button if already verified
+            const keepBtn = card.querySelector('.keep-btn');
+            if (keepBtn) keepBtn.style.display = 'none';
+        }
+
+        handleImageVerification(card, birdData);
+    } else {
+        imageEl.style.display = 'none';
+        placeholderDiv.textContent = 'No Image Found';
+    }
+});--------------------------
         
         // Modal trigger remains the same, but we prevent it 
         // if clicking the verification buttons
@@ -565,27 +576,29 @@ function isSpeciesValid(name) {
 const verifiedImageCache = new Map();
 
 async function getBirdImage(commonName, latinName) {
-    // 1. Local Cache Check
-    if (verifiedImageCache.has(commonName)) return verifiedImageCache.get(commonName);
+    // Check local cache
+    if (verifiedImageCache.has(commonName)) {
+        return { url: verifiedImageCache.get(commonName), isVerified: true };
+    }
 
     try {
-        // 2. Database Check
-        const { data, error } = await supabaseClient
+        const { data } = await supabaseClient
             .from('verified_images')
             .select('image_url')
             .eq('species', commonName)
-            .maybeSingle(); // maybeSingle is safer than single()
+            .maybeSingle();
 
         if (data && data.image_url) {
             verifiedImageCache.set(commonName, data.image_url);
-            return data.image_url;
+            return { url: data.image_url, isVerified: true };
         }
     } catch (err) {
-        console.warn("Verified images table not ready, falling back to API.");
+        console.warn("Storage check failed", err);
     }
 
-    // 3. API Fallback
-    return await getiNaturalistImage(commonName, latinName);
+    // Fallback to API
+    const apiUrl = await getiNaturalistImage(commonName, latinName);
+    return { url: apiUrl, isVerified: false };
 }
 
 async function getiNaturalistImage(commonName, latinName, page = 1) {
