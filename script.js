@@ -953,56 +953,74 @@ async function fetchBirdDescription(speciesName) {
         return "Field notes are currently unavailable.";
     }
 }
-// --- AUTHENTICATION LOGIC ---
+// --- UPDATED AUTHENTICATION LOGIC ---
 
-const authSection = document.getElementById('auth-section');
-const loggedOutView = document.getElementById('logged-out-view');
-const loggedInView = document.getElementById('logged-in-view');
-
-// 1. Sign Up Function
+// 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     
+    if (!email || !password) return alert("Please enter both email and password.");
+
     const { data, error } = await supabaseClient.auth.signUp({ email, password });
     
     if (error) alert("Error: " + error.message);
-    else alert("Success! Check your email for a confirmation link (if enabled).");
+    else alert("Success! Check your email for a confirmation link.");
 }
 
-// 2. Login Function
+// 2. LOGIN
 async function handleLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     
+    if (!email || !password) return alert("Please enter both email and password.");
+
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     
     if (error) alert("Login Failed: " + error.message);
-    // On success, Supabase automatically triggers the 'onAuthStateChange' below
+    // Success is handled by onAuthStateChange below
 }
 
-// 3. Logout Function
+// 3. LOGOUT
 async function handleLogout() {
     await supabaseClient.auth.signOut();
-    location.reload(); // Refresh to clear the private data
+    // Clear local data and refresh
+    mySightings = [];
+    location.reload(); 
 }
 
-// 4. State Listener (This runs every time someone logs in or out)
+// 4. ATTACH LISTENERS (Step 4 & 5 Fix)
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'login-btn') {
+        e.preventDefault();
+        handleLogin();
+    }
+    if (e.target.id === 'signup-btn') {
+        e.preventDefault();
+        handleSignUp();
+    }
+    if (e.target.id === 'logout-btn') {
+        e.preventDefault();
+        handleLogout();
+    }
+});
+
+// 5. STATE LISTENER
 supabaseClient.auth.onAuthStateChange((event, session) => {
-    const submitBtn = document.getElementById('submit-all-btn');
-    
+    const loggedOutView = document.getElementById('logged-out-view');
+    const loggedInView = document.getElementById('logged-in-view');
+    const userDisplay = document.getElementById('user-display-name');
+
     if (session) {
-        // ... existing logged-in logic ...
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Record All Sightings";
-        }
+        if (loggedOutView) loggedOutView.style.display = 'none';
+        if (loggedInView) loggedInView.style.display = 'block';
+        if (userDisplay) userDisplay.textContent = session.user.email.split('@')[0];
+        
+        // Reload sightings now that we have a user_id
+        loadSightings(); 
     } else {
-        // ... existing logged-out logic ...
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Log in to record sightings";
-        }
+        if (loggedOutView) loggedOutView.style.display = 'block';
+        if (loggedInView) loggedInView.style.display = 'none';
     }
 });
 
