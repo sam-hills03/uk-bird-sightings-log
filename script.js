@@ -946,6 +946,61 @@ async function fetchBirdDescription(speciesName) {
         return "Field notes are currently unavailable.";
     }
 }
+// --- AUTHENTICATION LOGIC ---
+
+const authSection = document.getElementById('auth-section');
+const loggedOutView = document.getElementById('logged-out-view');
+const loggedInView = document.getElementById('logged-in-view');
+
+// 1. Sign Up Function
+async function handleSignUp() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    
+    if (error) alert("Error: " + error.message);
+    else alert("Success! Check your email for a confirmation link (if enabled).");
+}
+
+// 2. Login Function
+async function handleLogin() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
+    if (error) alert("Login Failed: " + error.message);
+    // On success, Supabase automatically triggers the 'onAuthStateChange' below
+}
+
+// 3. Logout Function
+async function handleLogout() {
+    await supabaseClient.auth.signOut();
+    location.reload(); // Refresh to clear the private data
+}
+
+// 4. State Listener (This runs every time someone logs in or out)
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        // User is LOGGED IN
+        loggedOutView.style.display = 'none';
+        loggedInView.style.display = 'block';
+        document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
+        
+        // Refresh sightings to show ONLY this user's data
+        loadSightings(); 
+    } else {
+        // User is GUEST
+        loggedOutView.style.display = 'block';
+        loggedInView.style.display = 'none';
+    }
+});
+
+// Attach Event Listeners
+document.getElementById('signup-btn').addEventListener('click', handleSignUp);
+document.getElementById('login-btn').addEventListener('click', handleLogin);
+document.getElementById('logout-btn').addEventListener('click', handleLogout);
 // Start the app
 loadUKBirds();
 document.getElementById('rarity-filter').addEventListener('change', filterAndDisplayBirds);
