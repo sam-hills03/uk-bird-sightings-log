@@ -593,3 +593,49 @@ h3 {
 #modal-sightings-list .sighting-location {
     color: var(--color-secondary);
 }
+.card-image-container {
+    position: relative; /* Allows the overlay to sit on top of the image */
+}
+
+.image-verify-overlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+}
+
+.verify-edit-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.verify-controls {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: absolute;
+    right: 0;
+    width: 120px;
+    text-align: center;
+}
+
+.verify-controls p {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.verify-controls button {
+    display: block;
+    width: 100%;
+    margin: 4px 0;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
