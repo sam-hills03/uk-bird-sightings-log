@@ -606,19 +606,20 @@ function handleImageVerification(card, birdData) {
     const editBtn = card.querySelector('.verify-edit-btn');
     const controls = card.querySelector('.verify-controls');
     const imageEl = card.querySelector('.card-image');
+    const uploadTrigger = card.querySelector('.upload-trigger-btn');
+    const fileInput = card.querySelector('.bird-image-upload');
 
     if (!editBtn || !controls || !imageEl) return;
 
-    // Toggle the menu
+    // 1. Toggle the menu
     editBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevents the modal from opening
+        e.stopPropagation(); // Prevents the sighting modal from opening
         const isHidden = controls.style.display === 'none';
         controls.style.display = isHidden ? 'block' : 'none';
-        console.log("Menu toggled for:", birdData.CommonName);
     });
 
-    // KEEP BUTTON
+    // 2. KEEP BUTTON (Verify the current API image)
     card.querySelector('.keep-btn').addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -633,21 +634,84 @@ function handleImageVerification(card, birdData) {
             alert(`Verified image for ${birdData.CommonName} saved!`);
         } else {
             console.error("Save failed:", error);
+            alert("Could not save verification. Check console.");
         }
     });
 
-    // REFRESH BUTTON
+    // 3. REFRESH BUTTON (Try another random API image)
     card.querySelector('.refresh-btn').addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
         const randomPage = Math.floor(Math.random() * 10) + 1;
         const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
+        
         if (newUrl) {
             imageEl.src = newUrl;
         } else {
-            alert("No more images found.");
+            alert("No more images found on iNaturalist.");
         }
     });
+
+    // 4. UPLOAD TRIGGER (Open the file picker)
+    if (uploadTrigger && fileInput) {
+        uploadTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        // 5. FILE UPLOAD LOGIC
+        fileInput.addEventListener('change', async (e) => {
+            e.stopPropagation();
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Sanitize filename: replace spaces with underscores and add timestamp
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${birdData.CommonName.replace(/\s+/g, '_')}_${Date.now()}.${fileExt}`;
+            
+            uploadTrigger.textContent = "Uploading...";
+            uploadTrigger.disabled = true;
+
+            try {
+                // A. Upload to Supabase Storage Bucket 'bird-images'
+                const { data: uploadData, error: uploadError } = await supabaseClient
+                    .storage
+                    .from('bird-images')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                // B. Get the permanent Public URL
+                const { data: urlData } = supabaseClient
+                    .storage
+                    .from('bird-images')
+                    .getPublicUrl(fileName);
+
+                const publicUrl = urlData.publicUrl;
+
+                // C. Save that URL to our 'verified_images' database table
+                const { error: dbError } = await supabaseClient
+                    .from('verified_images')
+                    .upsert({ species: birdData.CommonName, image_url: publicUrl });
+
+                if (dbError) throw dbError;
+
+                // D. Update the UI and Cache
+                imageEl.src = publicUrl;
+                verifiedImageCache.set(birdData.CommonName, publicUrl);
+                controls.style.display = 'none';
+                alert(`Success! Custom photo for ${birdData.CommonName} is now live.`);
+
+            } catch (error) {
+                console.error("Upload process failed:", error);
+                alert("Upload failed. Make sure your 'bird-images' bucket is set to 'Public'.");
+            } finally {
+                uploadTrigger.textContent = "📤 Upload My Own";
+                uploadTrigger.disabled = false;
+            }
+        });
+    }
 }
 
 // ============================================
