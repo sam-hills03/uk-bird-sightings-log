@@ -412,19 +412,32 @@ getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
         summaryContainer.appendChild(card);
     });
 }
-function showSightingModal(species, birdData, sightings) {
+async function showSightingModal(species, birdData, sightings) {
     const modal = document.getElementById('sighting-modal');
+    
+    // Set Names
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData.LatinName || ''} • ${birdData.Rarity || ''}`;
     
+    // 1. CLEAR & FETCH FIELD NOTES
+    const descriptionBox = document.getElementById('modal-description-text');
+    descriptionBox.textContent = "Consulting the archives...";
+    const description = await fetchBirdDescription(species);
+    descriptionBox.textContent = description;
+    
+    // 2. BUILD SIGHTINGS LIST
     const modalList = document.getElementById('modal-sightings-list');
     modalList.innerHTML = '';
     
-    sightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span>${new Date(sighting.date).toLocaleDateString()}</span> - <span>${sighting.location}</span>`;
-        modalList.appendChild(li);
-    });
+    if (sightings && sightings.length > 0) {
+        sightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${new Date(sighting.date).toLocaleDateString()}</span> - <span>${sighting.location}</span>`;
+            modalList.appendChild(li);
+        });
+    } else {
+        modalList.innerHTML = '<li style="border:none; background:none; font-style:italic;">No personal sightings recorded yet.</li>';
+    }
     
     modal.style.display = 'block';
 }
@@ -556,7 +569,16 @@ function filterAndDisplayBirds() {
                 imageEl.style.display = 'none';
             }
         });
+// Add click listener to open the info modal
+card.addEventListener('click', (e) => {
+    // Only open if you didn't click the "Pencil" icon or its menu
+    if (!e.target.closest('.image-verify-overlay')) {
+        const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
+        showSightingModal(bird.CommonName, bird, birdSightings);
+    }
+});
 
+card.style.cursor = 'pointer'; // Show hand icon on hover
         listContainer.appendChild(card);
     });
 }
@@ -912,6 +934,17 @@ function createMonthlyChart() {
             }
         }
     });
+}
+// Function to get a summary from Wikipedia
+async function fetchBirdDescription(speciesName) {
+    try {
+        const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(speciesName)}`);
+        const data = await response.json();
+        return data.extract || "No detailed field notes found for this species.";
+    } catch (error) {
+        console.error("Wiki fetch error:", error);
+        return "Field notes are currently unavailable.";
+    }
 }
 // Start the app
 loadUKBirds();
