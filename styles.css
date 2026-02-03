@@ -715,3 +715,51 @@ hr {
     z-index: 5;
     pointer-events: none;
 }
+#auth-section {
+    background-color: var(--color-background-accent);
+    border: 2px solid var(--color-primary);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.auth-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.auth-inputs input {
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    font-family: 'EB Garamond', serif;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#login-btn, #signup-btn, #logout-btn {
+    flex: 1;
+    padding: 8px;
+    cursor: pointer;
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border: none;
+    font-family: 'DM Serif Display', serif;
+    transition: opacity 0.2s;
+}
+
+#signup-btn {
+    background-color: var(--color-secondary);
+}
+
+#logout-btn {
+    background-color: var(--color-danger);
+    max-width: 200px;
+}
