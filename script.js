@@ -668,16 +668,27 @@ function handleImageVerification(card, birdData) {
     }
 
     // REFRESH BUTTON: Try a different image from the API
-    const refreshBtn = card.querySelector('.refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const randomPage = Math.floor(Math.random() * 10) + 1;
-            const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
-            if (newUrl) imageEl.src = newUrl;
-        });
-    }
+    // Inside handleImageVerification(card, birdData)
+const refreshBtn = card.querySelector('.refresh-btn');
+if (refreshBtn) {
+    refreshBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // CRITICAL: Stop the card click from triggering
+        
+        console.log("Refreshing image for:", birdData.CommonName);
+        
+        // Use a random page to get a different result from iNaturalist
+        const randomPage = Math.floor(Math.random() * 20) + 1;
+        const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
+        
+        if (newUrl) {
+            const imageEl = card.querySelector('.card-image');
+            imageEl.src = newUrl;
+        } else {
+            alert("Couldn't find another image for this species.");
+        }
+    });
+}
 
     // UPLOAD LOGIC
     if (uploadTrigger && fileInput) {
