@@ -351,12 +351,17 @@ h3 {
 
 .bird-card {
     background-color: var(--color-background-soft);
-    border: 1px solid var(--color-border);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
+    /* ... keep your existing properties ... */
+    border: 2px solid var(--color-primary);
+    /* Creates a slightly organic, non-perfect rectangle */
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+    border-style: double; /* Gives it that classic "official document" look */
+    border-width: 4px;
 }
 
 .bird-card:hover {
@@ -378,6 +383,8 @@ h3 {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border: 1px solid var(--color-border);
+    filter: sepia(0.1) contrast(1.1); /* Subtle "aged print" effect */
 }
 
 .image-placeholder {
