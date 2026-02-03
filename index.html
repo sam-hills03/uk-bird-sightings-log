@@ -155,15 +155,23 @@
         <div class="card-image-container">
             <img class="card-image" alt="Bird photo">
             <div class="image-verify-overlay">
-                <button class="verify-edit-btn" title="Verify Image">✏️</button>
+                <button type="button" class="verify-edit-btn" title="Verify Image">✏️</button>
                 <div class="verify-controls" style="display: none;">
                     <p>Is this correct?</p>
-                    <button class="keep-btn">✅ Keep</button>
-                    <button class="refresh-btn">🔄 New</button>
+                    <button type="button" class="keep-btn">✅ Keep</button>
+                    <button type="button" class="refresh-btn">🔄 New</button>
                 </div>
             </div>
         </div>
+        <div class="card-content">
+            <h3 class="card-common-name"></h3>
+            <p class="card-latin-name"></p>
+            <div class="card-details">
+                <span class="card-rarity-tag"></span>
+                <span class="card-status-text"></span>
+            </div>
         </div>
+    </div>
 </template>
 
     <script src="script.js"></script>
