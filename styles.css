@@ -441,7 +441,7 @@ h3 {
 .seen-badge {
     position: absolute;
     top: 15px;
-    right: 35px;
+    right: 45px;
     background-color: var(--color-success);
     color: white;
     font-size: 1.5em;
@@ -644,7 +644,7 @@ h3 {
     position: absolute;
     top: 8px;
     right: 8px;
-    z-index: 100; /* Higher than anything else in the card */
+    z-index: 150; /* Higher than anything else in the card */
 }
 
 .verify-edit-btn {
@@ -692,7 +692,7 @@ hr {
 }
 .verified-check-badge {
     position: absolute;
-    top: 5px;
+    top: 70px;
     left: 5px;
     background: rgba(52, 152, 219, 0.9); /* Nice bird-egg blue */
     color: white;
@@ -704,6 +704,3 @@ hr {
     pointer-events: none;
 }
 
-.verified-card {
-    border: 2px solid #3498db !important;
-}
