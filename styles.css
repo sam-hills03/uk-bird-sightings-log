@@ -645,7 +645,7 @@ h3 {
 /* Ensure the overlay is clickable and visible */
 .image-verify-overlay {
     position: absolute;
-    top: 200px;
+    top: 220px;
     right: 8px;
     z-index: 150; /* Higher than anything else in the card */
 }
