@@ -565,39 +565,64 @@ function isSpeciesValid(name) {
 const verifiedImageCache = new Map();
 
 async function getBirdImage(commonName, latinName) {
-    // 1. Check local cache first
+    // 1. Local Cache Check
     if (verifiedImageCache.has(commonName)) return verifiedImageCache.get(commonName);
 
-    // 2. Check Supabase for a verified image
-    const { data, error } = await supabaseClient
-        .from('verified_images')
-        .select('image_url')
-        .eq('species', commonName)
-        .single();
+    try {
+        // 2. Database Check
+        const { data, error } = await supabaseClient
+            .from('verified_images')
+            .select('image_url')
+            .eq('species', commonName)
+            .maybeSingle(); // maybeSingle is safer than single()
 
-    if (data) {
-        verifiedImageCache.set(commonName, data.image_url);
-        return data.image_url;
+        if (data && data.image_url) {
+            verifiedImageCache.set(commonName, data.image_url);
+            return data.image_url;
+        }
+    } catch (err) {
+        console.warn("Verified images table not ready, falling back to API.");
     }
 
-    // 3. Fallback to iNaturalist if not verified yet
+    // 3. API Fallback
     return await getiNaturalistImage(commonName, latinName);
 }
 
-// Logic for the "Keep" and "Refresh" buttons
-async function handleImageVerification(card, birdData, currentUrl) {
+async function getiNaturalistImage(commonName, latinName, page = 1) {
+    // If Latin Name is missing or "No Data", use Common Name
+    const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
+    
+    try {
+        const resp = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1&page=${page}`);
+        const data = await resp.json();
+        return data.results[0]?.default_photo?.medium_url || null;
+    } catch (error) {
+        console.error("iNaturalist fetch failed:", error);
+        return null;
+    }
+}
+
+function handleImageVerification(card, birdData) {
     const editBtn = card.querySelector('.verify-edit-btn');
     const controls = card.querySelector('.verify-controls');
     const imageEl = card.querySelector('.card-image');
 
+    if (!editBtn || !controls || !imageEl) return;
+
+    // Toggle the menu
     editBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        controls.style.display = controls.style.display === 'none' ? 'block' : 'none';
+        e.preventDefault();
+        e.stopPropagation(); // Prevents the modal from opening
+        const isHidden = controls.style.display === 'none';
+        controls.style.display = isHidden ? 'block' : 'none';
+        console.log("Menu toggled for:", birdData.CommonName);
     });
 
-    // "KEEP" - Save to Supabase
+    // KEEP BUTTON
     card.querySelector('.keep-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        
         const { error } = await supabaseClient
             .from('verified_images')
             .upsert({ species: birdData.CommonName, image_url: imageEl.src });
@@ -606,16 +631,22 @@ async function handleImageVerification(card, birdData, currentUrl) {
             verifiedImageCache.set(birdData.CommonName, imageEl.src);
             controls.style.display = 'none';
             alert(`Verified image for ${birdData.CommonName} saved!`);
+        } else {
+            console.error("Save failed:", error);
         }
     });
 
-    // "REFRESH" - Get a different random image from iNaturalist
+    // REFRESH BUTTON
     card.querySelector('.refresh-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        // We add a random page number to try and get a different result
-        const randomPage = Math.floor(Math.random() * 5) + 1;
+        const randomPage = Math.floor(Math.random() * 10) + 1;
         const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
-        if (newUrl) imageEl.src = newUrl;
+        if (newUrl) {
+            imageEl.src = newUrl;
+        } else {
+            alert("No more images found.");
+        }
     });
 }
 
