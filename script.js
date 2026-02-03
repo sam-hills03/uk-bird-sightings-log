@@ -374,31 +374,31 @@ function displaySeenBirdsSummary() {
         placeholderDiv.textContent = 'Loading...';
         imageContainer.appendChild(placeholderDiv);
         
-        // We now call getBirdImage which checks your Supabase cache first
-        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+        // This goes inside your display loop
+getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
     if (result.url) {
         imageEl.src = result.url;
-        imageEl.onload = () => placeholderDiv.remove();
         
-        // Add the verified badge if it's from your database
+        // If result.isVerified is true, add the UI indicator
         if (result.isVerified) {
-            card.classList.add('verified');
-            const vBadge = document.createElement('div');
-            vBadge.classList.add('verified-badge');
-            vBadge.textContent = 'Verified';
-            imageContainer.appendChild(vBadge);
+            const imageContainer = card.querySelector('.card-image-container');
             
-            // Optional: Hide the "Keep" button if already verified
+            // Add a badge so you know it's verified
+            const badge = document.createElement('div');
+            badge.className = 'verified-check-badge';
+            badge.innerHTML = '✔️ Verified';
+            imageContainer.appendChild(badge);
+            
+            // Hide the "Keep" button since it's already done
             const keepBtn = card.querySelector('.keep-btn');
             if (keepBtn) keepBtn.style.display = 'none';
+            
+            card.classList.add('verified-card');
         }
 
         handleImageVerification(card, birdData);
-    } else {
-        imageEl.style.display = 'none';
-        placeholderDiv.textContent = 'No Image Found';
     }
-});--------------------------
+});
         
         // Modal trigger remains the same, but we prevent it 
         // if clicking the verification buttons
@@ -624,70 +624,65 @@ function handleImageVerification(card, birdData) {
 
     if (!editBtn || !controls || !imageEl) return;
 
-    // 1. Toggle the menu
+    // Toggle the verification menu
     editBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevents the sighting modal from opening
-        const isHidden = controls.style.display === 'none';
-        controls.style.display = isHidden ? 'block' : 'none';
-    });
-
-    // 2. KEEP BUTTON (Verify the current API image)
-    card.querySelector('.keep-btn').addEventListener('click', async (e) => {
-        e.preventDefault();
         e.stopPropagation();
-        
-        const { error } = await supabaseClient
-            .from('verified_images')
-            .upsert({ species: birdData.CommonName, image_url: imageEl.src });
-        
-        if (!error) {
-            verifiedImageCache.set(birdData.CommonName, imageEl.src);
-            controls.style.display = 'none';
-            alert(`Verified image for ${birdData.CommonName} saved!`);
-        } else {
-            console.error("Save failed:", error);
-            alert("Could not save verification. Check console.");
-        }
+        const isCurrentlyHidden = controls.style.display === 'none';
+        controls.style.display = isCurrentlyHidden ? 'block' : 'none';
     });
 
-    // 3. REFRESH BUTTON (Try another random API image)
-    card.querySelector('.refresh-btn').addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const randomPage = Math.floor(Math.random() * 10) + 1;
-        const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
-        
-        if (newUrl) {
-            imageEl.src = newUrl;
-        } else {
-            alert("No more images found on iNaturalist.");
-        }
-    });
+    // KEEP BUTTON: Save current API image as the "Verified" one
+    const keepBtn = card.querySelector('.keep-btn');
+    if (keepBtn) {
+        keepBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const { error } = await supabaseClient
+                .from('verified_images')
+                .upsert({ species: birdData.CommonName, image_url: imageEl.src });
+            
+            if (!error) {
+                verifiedImageCache.set(birdData.CommonName, imageEl.src);
+                controls.style.display = 'none';
+                alert("Image verified and saved!");
+                // Refresh the display to show the checkmark
+                updateAllDisplays();
+            }
+        });
+    }
 
-    // 4. UPLOAD TRIGGER (Open the file picker)
+    // REFRESH BUTTON: Try a different image from the API
+    const refreshBtn = card.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const randomPage = Math.floor(Math.random() * 10) + 1;
+            const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
+            if (newUrl) imageEl.src = newUrl;
+        });
+    }
+
+    // UPLOAD LOGIC
     if (uploadTrigger && fileInput) {
         uploadTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
             fileInput.click();
         });
 
-        // 5. FILE UPLOAD LOGIC
         fileInput.addEventListener('change', async (e) => {
             e.stopPropagation();
             const file = e.target.files[0];
             if (!file) return;
 
-            // Sanitize filename: replace spaces with underscores and add timestamp
             const fileExt = file.name.split('.').pop();
             const fileName = `${birdData.CommonName.replace(/\s+/g, '_')}_${Date.now()}.${fileExt}`;
             
             uploadTrigger.textContent = "Uploading...";
-            uploadTrigger.disabled = true;
 
             try {
-                // A. Upload to Supabase Storage Bucket 'bird-images'
                 const { data: uploadData, error: uploadError } = await supabaseClient
                     .storage
                     .from('bird-images')
@@ -695,33 +690,27 @@ function handleImageVerification(card, birdData) {
 
                 if (uploadError) throw uploadError;
 
-                // B. Get the permanent Public URL
                 const { data: urlData } = supabaseClient
                     .storage
                     .from('bird-images')
                     .getPublicUrl(fileName);
 
-                const publicUrl = urlData.publicUrl;
-
-                // C. Save that URL to our 'verified_images' database table
                 const { error: dbError } = await supabaseClient
                     .from('verified_images')
-                    .upsert({ species: birdData.CommonName, image_url: publicUrl });
+                    .upsert({ species: birdData.CommonName, image_url: urlData.publicUrl });
 
                 if (dbError) throw dbError;
 
-                // D. Update the UI and Cache
-                imageEl.src = publicUrl;
-                verifiedImageCache.set(birdData.CommonName, publicUrl);
+                imageEl.src = urlData.publicUrl;
+                verifiedImageCache.set(birdData.CommonName, urlData.publicUrl);
                 controls.style.display = 'none';
-                alert(`Success! Custom photo for ${birdData.CommonName} is now live.`);
-
-            } catch (error) {
-                console.error("Upload process failed:", error);
-                alert("Upload failed. Make sure your 'bird-images' bucket is set to 'Public'.");
+                alert("Custom photo uploaded successfully!");
+                updateAllDisplays();
+            } catch (err) {
+                console.error(err);
+                alert("Upload failed. Check Supabase storage policies.");
             } finally {
                 uploadTrigger.textContent = "📤 Upload My Own";
-                uploadTrigger.disabled = false;
             }
         });
     }
