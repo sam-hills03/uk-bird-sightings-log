@@ -386,7 +386,7 @@ getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
             // Add a badge so you know it's verified
             const badge = document.createElement('div');
             badge.className = 'verified-check-badge';
-            badge.innerHTML = '✔️ Verified';
+            badge.innerHTML = '  Verified';
             imageContainer.appendChild(badge);
             
             // Hide the "Keep" button since it's already done
@@ -543,7 +543,7 @@ function filterAndDisplayBirds() {
                     card.classList.add('verified-card');
                     const vBadge = document.createElement('div');
                     vBadge.className = 'verified-check-badge';
-                    vBadge.innerHTML = '✔️ Verified';
+                    vBadge.innerHTML = '  Verified';
                     imageContainer.appendChild(vBadge);
                     
                     const keepBtn = card.querySelector('.keep-btn');
