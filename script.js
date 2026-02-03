@@ -674,18 +674,41 @@ if (refreshBtn) {
     refreshBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation(); // CRITICAL: Stop the card click from triggering
-        
+
+        // 1. Set Loading State
+        const originalContent = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '⏳ Loading...';
+        refreshBtn.style.opacity = '0.7';
+        refreshBtn.style.pointerEvents = 'none';
+
         console.log("Refreshing image for:", birdData.CommonName);
-        
-        // Use a random page to get a different result from iNaturalist
-        const randomPage = Math.floor(Math.random() * 20) + 1;
-        const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
-        
-        if (newUrl) {
-            const imageEl = card.querySelector('.card-image');
-            imageEl.src = newUrl;
-        } else {
-            alert("Couldn't find another image for this species.");
+
+        try {
+            // 2. Fetch new image
+            // Use a random page to get a different result from iNaturalist
+            const randomPage = Math.floor(Math.random() * 20) + 1;
+            const newUrl = await getiNaturalistImage(birdData.CommonName, birdData.LatinName, randomPage);
+
+            if (newUrl) {
+                const imageEl = card.querySelector('.card-image');
+                imageEl.src = newUrl;
+                
+                // If there's a placeholder div currently visible, remove it
+                const placeholder = card.querySelector('.image-placeholder');
+                if (placeholder) placeholder.remove();
+                
+                imageEl.style.display = 'block';
+            } else {
+                alert("Couldn't find another image for this species.");
+            }
+        } catch (error) {
+            console.error("Refresh failed:", error);
+            alert("Error fetching new image.");
+        } finally {
+            // 3. Restore Button State
+            refreshBtn.innerHTML = originalContent;
+            refreshBtn.style.opacity = '1';
+            refreshBtn.style.pointerEvents = 'auto';
         }
     });
 }
