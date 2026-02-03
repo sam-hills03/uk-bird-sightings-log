@@ -306,7 +306,7 @@ h3 {
     color: var(--color-text-light);
     padding: 8px 10px;
     width: 100px;
-    margin-bottom: 0 !important;
+    margin-bottom: 15px !important;
 }
 
 #add-entry-btn:hover { background-color: #535757; }
