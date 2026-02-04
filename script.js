@@ -488,9 +488,11 @@ async function saveNewLocation(location) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         
         if (!user) {
-            console.warn("Guest mode: Location not saved to database.");
+            console.log("No user logged in - skipping location save.");
             return;
         }
+
+        console.log("Saving location:", location, "for user:", user.id);
 
         const { error } = await supabaseClient
             .from('saved_locations')
@@ -500,14 +502,14 @@ async function saveNewLocation(location) {
             }]);
         
         if (error) {
-            console.error("Supabase Location Error:", error.message);
+            console.error("Supabase Error:", error.message);
         } else {
-            console.log("Location saved to your journal!");
+            console.log("Location successfully saved!");
             savedLocations.push(location);
             populateLocationDatalist();
         }
     } catch (error) {
-        console.error("Critical error saving location:", error);
+        console.error("Error:", error);
     }
 }
 
