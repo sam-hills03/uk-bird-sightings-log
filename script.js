@@ -98,12 +98,11 @@ async function loadSightings() {
 
 async function saveSighting(sighting) {
     try {
-        // Get the current logged-in user session
+        // Get the logged-in user's data
         const { data: { user } } = await supabaseClient.auth.getUser();
 
-        // If no user is logged in, we shouldn't save (or handle as guest)
         if (!user) {
-            console.error("No authenticated user found. Sighting not saved.");
+            alert("You must be logged in to save sightings.");
             return false;
         }
 
@@ -113,20 +112,18 @@ async function saveSighting(sighting) {
                 species: sighting.species,
                 date: sighting.date,
                 location: sighting.location,
-                user_id: user.id  // <--- This is the key change!
-            }])
-            .select();
+                user_id: user.id // <--- Ensure this matches your column name exactly
+            }]);
         
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-            mySightings.unshift(data[0]);
-            updateAllDisplays();
+        if (error) {
+            console.error("Supabase Insert Error:", error.message);
+            throw error;
         }
         
+        console.log("Sighting saved successfully!");
         return true;
     } catch (error) {
-        console.error("Error saving sighting:", error);
+        alert("Failed to save: " + error.message);
         return false;
     }
 }
