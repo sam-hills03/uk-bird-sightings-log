@@ -483,25 +483,31 @@ async function loadLocations() {
 
 async function saveNewLocation(location) {
     if (!location || savedLocations.includes(location)) return;
+    
     try {
-        // Get the current user
         const { data: { user } } = await supabaseClient.auth.getUser();
         
-        if (!user) return; // Don't save if not logged in
+        if (!user) {
+            console.warn("Guest mode: Location not saved to database.");
+            return;
+        }
 
         const { error } = await supabaseClient
             .from('saved_locations')
             .insert([{ 
                 location: location, 
-                user_id: user.id // Attach the user's "key"
+                user_id: user.id 
             }]);
         
-        if (!error) {
+        if (error) {
+            console.error("Supabase Location Error:", error.message);
+        } else {
+            console.log("Location saved to your journal!");
             savedLocations.push(location);
             populateLocationDatalist();
         }
     } catch (error) {
-        console.error("Error saving location:", error);
+        console.error("Critical error saving location:", error);
     }
 }
 
@@ -829,6 +835,11 @@ if (addEntryBtn) addEntryBtn.addEventListener('click', addSightingEntry);
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
         e.preventDefault(); 
+        // Inside sightingForm.addEventListener('submit', ...)
+const location = document.getElementById('location').value.trim();
+
+// Ensure this is awaited!
+await saveNewLocation(location);
         
         // 1. Grab the values we want to keep
         const date = document.getElementById('sighting-date').value;
