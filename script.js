@@ -130,10 +130,18 @@ async function saveSighting(sighting) {
 
 async function deleteSightingFromDB(idToDelete) {
     try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (!user) {
+            alert("You must be logged in to delete sightings.");
+            return false;
+        }
+
         const { error } = await supabaseClient
             .from('sightings')
             .delete()
-            .eq('id', idToDelete);
+            .eq('id', idToDelete)
+            .eq('user_id', user.id); // Extra security: ensure the ID belongs to the user
         
         if (error) throw error;
         
