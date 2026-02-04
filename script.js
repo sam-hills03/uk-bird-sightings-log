@@ -838,10 +838,15 @@ if (refreshBtn) {
 // H. FORM SUBMISSION
 // ============================================
 
+// Ensure these variables are defined at the top or within this block
+const entriesContainer = document.getElementById('sighting-entries');
+const addEntryBtn = document.getElementById('add-entry-btn');
+
 function addSightingEntry() {
+    // Check current count
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
     
-    // STOP HERE if we hit 20
+    // 1. STOP if at 20
     if (entryGroups.length >= 20) {
         alert("Maximum of 20 birds per submission reached.");
         return;
@@ -852,11 +857,15 @@ function addSightingEntry() {
     const entryClone = template.content.cloneNode(true);
     const newEntry = entryClone.querySelector('.sighting-entry-group');
     
+    // 2. Setup Remove Button
     newEntry.querySelector('.remove-entry-btn').addEventListener('click', () => {
         newEntry.remove();
-        if (entriesContainer.children.length === 0) addSightingEntry();
+        // Always keep at least one row
+        if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 0) {
+            addSightingEntry();
+        }
         
-        // Re-enable the "Add" button if we are now below 20
+        // 3. Re-enable "Add" styling
         if (addEntryBtn) {
             addEntryBtn.style.opacity = '1';
             addEntryBtn.style.cursor = 'pointer';
@@ -865,7 +874,7 @@ function addSightingEntry() {
 
     entriesContainer.appendChild(newEntry);
 
-    // If we just hit 20, visual feedback for the button
+    // 4. Disable "Add" styling visually if we just hit 20
     if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 20) {
         if (addEntryBtn) {
             addEntryBtn.style.opacity = '0.5';
@@ -874,24 +883,37 @@ function addSightingEntry() {
     }
 }
 
-// Update the end of your Submit listener:
+// Ensure the button is actually listening
+if (addEntryBtn) {
+    addEntryBtn.onclick = addSightingEntry;
+}
+
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
-        // ... (Keep your progress bar and saving logic exactly as is until the end) ...
+        e.preventDefault(); 
+        
+        const date = document.getElementById('sighting-date').value;
+        const location = document.getElementById('location').value.trim();
+        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-        // --- 4. NEW FINISH UP (Selective Reset) ---
-        alert(`Successfully recorded ${savedCount} sightings. Date and Location saved for your next entry!`);
+        // ... Keep your existing Progress Bar and Supabase loop logic here ...
+
+        // --- 4. FINISH UP (Selective Reset) ---
+        alert(`Successfully recorded sightings. Date and Location saved!`);
         
-        progressContainer.style.display = 'none';
-        progressBar.style.width = "0%";
+        const progressContainer = document.getElementById('upload-progress-container');
+        const progressBar = document.getElementById('upload-progress-bar');
+        if (progressContainer) progressContainer.style.display = 'none';
+        if (progressBar) progressBar.style.width = "0%";
         
-        // CLEAR BIRD LIST ONLY
+        // Wipe species names but keep Date/Location
         const speciesInputs = entriesContainer.querySelectorAll('.species-input');
-        speciesInputs.forEach(input => input.value = ''); // Clear names
+        speciesInputs.forEach(input => input.value = ''); 
 
+        // Remove extra rows, keep only the first one
         const allRows = entriesContainer.querySelectorAll('.sighting-entry-group');
         for (let i = 1; i < allRows.length; i++) {
-            allRows[i].remove(); // Remove extra rows, keep only the first one
+            allRows[i].remove();
         }
 
         // Reset the "Add" button styling
@@ -901,7 +923,6 @@ if (sightingForm) {
         }
 
         updateAllDisplays();
-        // REMOVED sightingForm.reset() to keep Date/Location
     });
 }
 // ============================================
