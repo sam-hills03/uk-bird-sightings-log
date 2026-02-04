@@ -915,6 +915,22 @@ function calculateAndDisplayStats() {
     const percentageNoMega = (seenNonMegaCount / nonMegaTotalCount) * 100;
     const percentageNoMegaEl = document.getElementById('percentage-no-mega');
     if (percentageNoMegaEl) percentageNoMegaEl.textContent = percentageNoMega.toFixed(2) + '%';
+
+    // --- ADD THIS LINE TO TRIGGER THE RANK UPDATE ---
+    updateNaturalistRank(totalSeenCount);
+}
+
+// Keep this function outside so it's clean and reusable
+function updateNaturalistRank(uniqueSpeciesCount) {
+    const rankElement = document.getElementById('naturalist-rank');
+    if (!rankElement) return;
+
+    let rank = "Novice Observer";
+    if (uniqueSpeciesCount >= 100) rank = "Master of the Skies";
+    else if (uniqueSpeciesCount >= 50) rank = "Resident Ornithologist";
+    else if (uniqueSpeciesCount >= 10) rank = "Field Naturalist";
+
+    rankElement.textContent = rank;
 }
 
 let birdChart = null; // Global variable to track the chart instance
