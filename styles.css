@@ -763,3 +763,15 @@ hr {
     background-color: var(--color-danger);
     max-width: 200px;
 }
+.rank-badge {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: #d4af37; /* Gold */
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    font-weight: bold;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
