@@ -838,10 +838,6 @@ if (refreshBtn) {
 // H. FORM SUBMISSION
 // ============================================
 
-// Ensure these variables are defined at the top or within this block
-const entriesContainer = document.getElementById('sighting-entries');
-const addEntryBtn = document.getElementById('add-entry-btn');
-
 function addSightingEntry() {
     // Check current count
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
