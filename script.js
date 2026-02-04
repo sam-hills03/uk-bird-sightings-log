@@ -167,21 +167,21 @@ function updateAllDisplays() {
 // B. TAB SWITCHING LOGIC
 // ============================================
 
-function setupTabSwitching() {
+function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    function switchTab(targetTabId) {
-        tabContents.forEach(content => content.classList.remove('active-content'));
-        tabButtons.forEach(button => button.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active-content'));
+    tabButtons.forEach(button => button.classList.remove('active'));
 
-        const targetContent = document.getElementById(targetTabId);
-        if (targetContent) {
-            targetContent.classList.add('active-content');
-            const activeTabButton = document.querySelector(`.tab-button[data-tab="${targetTabId}"]`);
-            if (activeTabButton) activeTabButton.classList.add('active');
-        }
+    const targetContent = document.getElementById(targetTabId);
+    const targetButton = document.querySelector(`.tab-button[data-tab="${targetTabId}"]`);
+
+    if (targetContent && targetButton) {
+        targetContent.classList.add('active-content');
+        targetButton.classList.add('active');
     }
+}
 
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -1011,22 +1011,23 @@ async function handleLogout() {
     location.reload(); 
 }
 
-// 4. ATTACH LISTENERS (Step 4 & 5 Fix)
 document.addEventListener('click', function(e) {
-    if (e.target.id === 'login-btn') {
-        e.preventDefault();
-        handleLogin();
+    // --- Auth Buttons ---
+    if (e.target.id === 'login-btn') { e.preventDefault(); handleLogin(); }
+    if (e.target.id === 'signup-btn') { e.preventDefault(); handleSignUp(); }
+    if (e.target.id === 'logout-btn') { e.preventDefault(); handleLogout(); }
+
+    // --- Tab Switching ---
+    if (e.target.classList.contains('tab-button')) {
+        const targetTabId = e.target.getAttribute('data-tab');
+        switchTab(targetTabId); // We'll make sure this function exists below
     }
-    if (e.target.id === 'signup-btn') {
-        e.preventDefault();
-        handleSignUp();
-    }
-    if (e.target.id === 'logout-btn') {
-        e.preventDefault();
-        handleLogout();
+
+    // --- Modal Close Button ---
+    if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
+        document.getElementById('sighting-modal').style.display = 'none';
     }
 });
-
 // 5. STATE LISTENER
 supabaseClient.auth.onAuthStateChange((event, session) => {
     const loggedOutView = document.getElementById('logged-out-view');
