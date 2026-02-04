@@ -451,9 +451,18 @@ function setupModal() {
 
 async function loadLocations() {
     try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (!user) {
+            savedLocations = [];
+            populateLocationDatalist();
+            return;
+        }
+
         const { data, error } = await supabaseClient
             .from('saved_locations')
             .select('location')
+            .eq('user_id', user.id) // Filter by the user's ID
             .order('location', { ascending: true });
         
         if (error) throw error;
@@ -467,9 +476,17 @@ async function loadLocations() {
 async function saveNewLocation(location) {
     if (!location || savedLocations.includes(location)) return;
     try {
+        // Get the current user
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (!user) return; // Don't save if not logged in
+
         const { error } = await supabaseClient
             .from('saved_locations')
-            .insert([{ location: location }]);
+            .insert([{ 
+                location: location, 
+                user_id: user.id // Attach the user's "key"
+            }]);
         
         if (!error) {
             savedLocations.push(location);
