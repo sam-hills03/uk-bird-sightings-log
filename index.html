@@ -109,6 +109,15 @@
 
             <button type="button" id="add-entry-btn">+ Add Another Bird</button>
             <button type="submit" id="submit-all-btn">Record All Sightings</button>
+            <div id="upload-progress-container" style="display: none; margin-top: 15px;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+        <span>Recording Sightings...</span>
+        <span id="upload-progress-text">0 / 0</span>
+    </div>
+    <div style="background: #e9e5d9; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #d1ccbc;">
+        <div id="upload-progress-bar" style="background: #416863; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+</div>
         </form>
     </section>
 
