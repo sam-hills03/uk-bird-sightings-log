@@ -839,6 +839,14 @@ if (refreshBtn) {
 // ============================================
 
 function addSightingEntry() {
+    const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
+    
+    // STOP HERE if we hit 20
+    if (entryGroups.length >= 20) {
+        alert("Maximum of 20 birds per submission reached.");
+        return;
+    }
+
     const template = document.getElementById('sighting-template');
     if (!template) return;
     const entryClone = template.content.cloneNode(true);
@@ -847,67 +855,53 @@ function addSightingEntry() {
     newEntry.querySelector('.remove-entry-btn').addEventListener('click', () => {
         newEntry.remove();
         if (entriesContainer.children.length === 0) addSightingEntry();
+        
+        // Re-enable the "Add" button if we are now below 20
+        if (addEntryBtn) {
+            addEntryBtn.style.opacity = '1';
+            addEntryBtn.style.cursor = 'pointer';
+        }
     });
+
     entriesContainer.appendChild(newEntry);
+
+    // If we just hit 20, visual feedback for the button
+    if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 20) {
+        if (addEntryBtn) {
+            addEntryBtn.style.opacity = '0.5';
+            addEntryBtn.style.cursor = 'not-allowed';
+        }
+    }
 }
 
-if (addEntryBtn) addEntryBtn.addEventListener('click', addSightingEntry);
-
+// Update the end of your Submit listener:
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
+        // ... (Keep your progress bar and saving logic exactly as is until the end) ...
+
+        // --- 4. NEW FINISH UP (Selective Reset) ---
+        alert(`Successfully recorded ${savedCount} sightings. Date and Location saved for your next entry!`);
         
-        const date = document.getElementById('sighting-date').value;
-        const location = document.getElementById('location').value.trim();
-        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
-
-        // --- 1. SET THE LIMIT (20) ---
-        if (entryGroups.length > 20) {
-            alert("To ensure accuracy, please limit uploads to 20 birds per entry. You have " + entryGroups.length + ".");
-            return;
-        }
-
-        if (!date || !location) {
-            alert("Please enter both a Date and a Location.");
-            return;
-        }
-
-        // --- 2. SHOW PROGRESS BAR ---
-        const progressContainer = document.getElementById('upload-progress-container');
-        const progressBar = document.getElementById('upload-progress-bar');
-        const progressText = document.getElementById('upload-progress-text');
-        
-        progressContainer.style.display = 'block';
-        let savedCount = 0;
-        const totalToSave = entryGroups.length;
-
-        // Save the location first
-        await saveNewLocation(location);
-        
-        // --- 3. PROCESS WITH PROGRESS ---
-        for (const group of entryGroups) {
-            const speciesInput = group.querySelector('.species-input');
-            const species = speciesInput?.value.trim();
-            
-            if (species && isSpeciesValid(species)) {
-                await saveSighting({ species, date, location });
-                savedCount++;
-                
-                // Update the progress bar visually
-                const percent = (savedCount / totalToSave) * 100;
-                progressBar.style.width = percent + "%";
-                progressText.textContent = `${savedCount} / ${totalToSave}`;
-            }
-        }
-
-        // --- 4. FINISH UP ---
-        alert(`Successfully recorded ${savedCount} sightings in your journal.`);
         progressContainer.style.display = 'none';
         progressBar.style.width = "0%";
         
-        // Reset form or redirect if needed
-        sightingForm.reset();
+        // CLEAR BIRD LIST ONLY
+        const speciesInputs = entriesContainer.querySelectorAll('.species-input');
+        speciesInputs.forEach(input => input.value = ''); // Clear names
+
+        const allRows = entriesContainer.querySelectorAll('.sighting-entry-group');
+        for (let i = 1; i < allRows.length; i++) {
+            allRows[i].remove(); // Remove extra rows, keep only the first one
+        }
+
+        // Reset the "Add" button styling
+        if (addEntryBtn) {
+            addEntryBtn.style.opacity = '1';
+            addEntryBtn.style.cursor = 'pointer';
+        }
+
         updateAllDisplays();
+        // REMOVED sightingForm.reset() to keep Date/Location
     });
 }
 // ============================================
