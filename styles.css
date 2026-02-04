@@ -775,3 +775,99 @@ hr {
     font-weight: bold;
     box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
 }
+.naturalist-profile-card {
+    background: #fdfaf3;
+    border: 2px solid #dcd1b3;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 350px;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.05);
+    font-family: 'EB Garamond', serif;
+    position: relative;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.profile-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8c7d6b;
+    display: block;
+}
+
+#user-display-name {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #3e362e;
+}
+
+/* Wax Seal Rank Style */
+.rank-stamp {
+    background: #682d1f;
+    color: #fdfaf3;
+    padding: 10px;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
+    transform: rotate(-10deg);
+    border: 2px dashed rgba(255,255,255,0.2);
+}
+
+.progress-section {
+    margin: 15px 0;
+}
+
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: #5d544b;
+    font-style: italic;
+}
+
+.progress-track {
+    background: #e9e5d9;
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #d1ccbc;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #8a9575, #a3ad8d);
+    height: 100%;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vintage-btn {
+    background: none;
+    border: 1px solid #8c7d6b;
+    color: #8c7d6b;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.vintage-btn:hover {
+    background: #8c7d6b;
+    color: #fff;
+}
