@@ -947,9 +947,9 @@ function updateNaturalistRank(count) {
     let rank = "Novice";
     let target = 50;
     let nextRank = "Field Naturalist";
-    let color = "#682d1f"; // Default wax red/brown
+    let color = "#8c2e1b"; // Default wax red
 
-    // Updated Parameters & Colors
+    // Level Parameters & Colors
     if (count >= 300) {
         rank = "Master";
         target = 300;
@@ -969,37 +969,24 @@ function updateNaturalistRank(count) {
         rank = "Novice";
         target = 50;
         nextRank = "Field Naturalist";
-        color = "#8c2e1b"; // Deep Red
+        color = "#8c2e1b"; 
     }
 
-    // Update the "Wax Seal" text and color
+    // 1. Update the "Wax Seal"
     rankElement.textContent = rank;
     rankElement.style.backgroundColor = color;
 
-    // Update helper text
+    // 2. Update helper text
     if (nextLevelEl) nextLevelEl.textContent = "Next: " + nextRank;
     if (currentDisplay) currentDisplay.textContent = count;
     if (targetDisplay) targetDisplay.textContent = target;
 
-    // Smooth Progress Bar Update
+    // 3. Smooth Progress Bar Update
     if (progressBar) {
         const percentage = Math.min((count / target) * 100, 100);
         progressBar.style.width = percentage + "%";
     }
 }
-    // Update Text
-    rankElement.textContent = rank;
-    if (nextLevelEl) nextLevelEl.textContent = nextRank;
-    if (currentDisplay) currentDisplay.textContent = count;
-    if (targetDisplay) targetDisplay.textContent = target;
-
-    // Update Progress Bar %
-    if (progressBar) {
-        const percentage = Math.min((count / target) * 100, 100);
-        progressBar.style.width = percentage + "%";
-    }
-}
-
 let birdChart = null; // Global variable to track the chart instance
 
 function createMonthlyChart() {
