@@ -944,29 +944,49 @@ function updateNaturalistRank(count) {
 
     if (!rankElement) return;
 
-    let rank = "Novice Observer";
-    let target = 10;
+    let rank = "Novice";
+    let target = 50;
     let nextRank = "Field Naturalist";
+    let color = "#682d1f"; // Default wax red/brown
 
-    // New Level Parameters
+    // Updated Parameters & Colors
     if (count >= 300) {
-        rank = "Master of the Skies";
+        rank = "Master";
         target = 300;
-        nextRank = "Max Rank Reached!";
+        nextRank = "Elite Status";
+        color = "#d4af37"; // Gold
     } else if (count >= 150) {
-        rank = "Resident Ornithologist";
+        rank = "Resident";
         target = 300;
-        nextRank = "Master of the Skies";
+        nextRank = "Master of Skies";
+        color = "#416863"; // Deep Green
     } else if (count >= 50) {
-        rank = "Field Naturalist";
+        rank = "Naturalist";
         target = 150;
-        nextRank = "Resident Ornithologist";
+        nextRank = "Resident Ornith.";
+        color = "#5d544b"; // Vintage Grey/Brown
     } else {
-        rank = "Novice Observer";
+        rank = "Novice";
         target = 50;
         nextRank = "Field Naturalist";
+        color = "#8c2e1b"; // Deep Red
     }
 
+    // Update the "Wax Seal" text and color
+    rankElement.textContent = rank;
+    rankElement.style.backgroundColor = color;
+
+    // Update helper text
+    if (nextLevelEl) nextLevelEl.textContent = "Next: " + nextRank;
+    if (currentDisplay) currentDisplay.textContent = count;
+    if (targetDisplay) targetDisplay.textContent = target;
+
+    // Smooth Progress Bar Update
+    if (progressBar) {
+        const percentage = Math.min((count / target) * 100, 100);
+        progressBar.style.width = percentage + "%";
+    }
+}
     // Update Text
     rankElement.textContent = rank;
     if (nextLevelEl) nextLevelEl.textContent = nextRank;
