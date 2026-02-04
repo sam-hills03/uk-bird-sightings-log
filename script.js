@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://vpfoyxvkkttzlitfajgf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZm95eHZra3R0emxpdGZhamdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDAxMTQsImV4cCI6MjA3NjUxNjExNH0._vyK8s2gXPSu18UqEEWujLU2tAqNZEh3mNwVQcbskxA';
-
+const ADMIN_UID = 'ec7bdc5d-fff1-4708-b161-15315c402920';
 // Renamed to supabaseClient to avoid conflict with the library itself
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -293,9 +293,6 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 // D. SUMMARY & MODALS
 // ============================================
 
-// ============================================
-// D. SUMMARY & MODALS
-// ============================================
 
 function setupSummaryFilter() {
     const filter = document.getElementById('summary-rarity-filter');
@@ -531,6 +528,19 @@ function populateLocationDatalist() {
 // ============================================
 // F. BIRD LIST & SEARCH
 // ============================================
+
+function toggleAdminControls(isAdmin) {
+    // This looks for any element with the class 'pencil-icon'
+    const adminIcons = document.querySelectorAll('.pencil-icon'); 
+    
+    adminIcons.forEach(icon => {
+        if (isAdmin) {
+            icon.style.setProperty('display', 'inline-block', 'important');
+        } else {
+            icon.style.setProperty('display', 'none', 'important');
+        }
+    });
+}
 
 function populateSpeciesDatalist() {
     const datalist = document.getElementById('species-datalist');
@@ -1058,7 +1068,11 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
         if (loggedInView) loggedInView.style.display = 'block';
         document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
         
-        // CRITICAL: Load user-specific data now that we have a session
+        // --- STEP 3: ADMIN CHECK ---
+        const isAdmin = session.user.id === ADMIN_UID;
+        toggleAdminControls(isAdmin);
+        // ---------------------------
+
         loadSightings(); 
         loadLocations();
     } else {
@@ -1066,7 +1080,10 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
         if (loggedOutView) loggedOutView.style.display = 'block';
         if (loggedInView) loggedInView.style.display = 'none';
         
-        // Clear personal data so the Guest doesn't see the previous user's birds
+        // --- STEP 3: HIDE FOR GUESTS ---
+        toggleAdminControls(false);
+        // ------------------------------
+
         mySightings = [];
         savedLocations = [];
         updateAllDisplays();
