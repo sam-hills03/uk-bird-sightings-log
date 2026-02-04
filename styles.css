@@ -763,127 +763,40 @@ hr {
     background-color: var(--color-danger);
     max-width: 200px;
 }
-.rank-badge {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: #d4af37; /* Gold */
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-left: 10px;
-    font-weight: bold;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-.naturalist-profile-card {
-    background: #fdfaf3;
-    border: 2px solid #dcd1b3;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 350px;
-    box-shadow: 4px 4px 15px rgba(0,0,0,0.05);
-    font-family: 'EB Garamond', serif;
-    position: relative;
-}
-
-.profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.profile-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #8c7d6b;
-    display: block;
-}
-
-#user-display-name {
-    margin: 0;
-    font-size: 1.6rem;
-    color: #3e362e;
-}
-
-/* Wax Seal Rank Style */
-.rank-stamp {
-    background: #682d1f;
-    color: #fdfaf3;
-    padding: 10px;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.7rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
-    transform: rotate(-10deg);
-    border: 2px dashed rgba(255,255,255,0.2);
-}
-
-.progress-section {
-    margin: 15px 0;
-}
-
-.progress-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    color: #5d544b;
-    font-style: italic;
-}
-
-.progress-track {
-    background: #e9e5d9;
-    height: 12px;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid #d1ccbc;
-}
-
-.progress-fill {
-    background: linear-gradient(90deg, #8a9575, #a3ad8d);
-    height: 100%;
-    width: 0%;
-    transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.vintage-btn {
-    background: none;
-    border: 1px solid #8c7d6b;
-    color: #8c7d6b;
-    padding: 5px 12px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s;
-}
-
-.vintage-btn:hover {
-    background: #8c7d6b;
-    color: #fff;
-}
+/* --- Final Naturalist ID Card Styles --- */
 .naturalist-id-card {
-    background: #fdfaf3; /* Cream paper */
+    background: #fdfaf3;
     border: 1px solid #dcd1b3;
     padding: 8px;
     max-width: 400px;
     margin: 20px auto;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease-out;
+}
+
+.naturalist-id-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
 }
 
 .id-card-inner {
+    position: relative;
     border: 1px solid #dcd1b3;
     padding: 15px 25px;
     text-align: center;
+    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+    overflow: hidden;
+    z-index: 1;
+}
+
+.id-card-inner::before {
+    content: '🕊️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 150px;
+    opacity: 0.03;
+    z-index: -1;
 }
 
 .auth-text {
@@ -911,25 +824,27 @@ hr {
     font-family: 'EB Garamond', serif;
     font-size: 2.2rem;
     margin: 0;
-    color: #2c2621;
+    color: #3e362e;
+    text-shadow: 1px 1px 0px #fff;
+    letter-spacing: -1px;
     font-weight: 500;
 }
 
-/* The Stamp from your Image */
 .rank-stamp-seal {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     font-weight: bold;
     color: white;
     text-transform: uppercase;
-    transform: rotate(15deg);
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transform: rotate(12deg);
+    box-shadow: 2px 3px 6px rgba(0,0,0,0.2);
     border: 2px dashed rgba(255,255,255,0.3);
+    transition: background-color 0.5s ease;
 }
 
 .id-meta {
@@ -944,50 +859,33 @@ hr {
 
 .id-progress-track {
     background: #e9e5d9;
-    height: 8px;
-    border-radius: 4px;
+    height: 10px;
+    border-radius: 5px;
     overflow: hidden;
     margin-bottom: 15px;
+    border: 1px solid #d1ccbc;
 }
 
 .id-progress-fill {
-    background: linear-gradient(to right, #416863, #5a8a84);
+    background: linear-gradient(to right, #416863, #8a9575);
+    height: 100%;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
-    border-radius: 4px;
 }
 
 .id-close-btn {
     background: #682d1f;
     color: white;
     border: none;
-    padding: 6px 15px;
+    padding: 8px 20px;
     font-family: 'EB Garamond', serif;
     font-variant: small-caps;
     cursor: pointer;
     border-radius: 2px;
-}
-#user-display-name {
-    font-family: 'EB Garamond', serif;
-    font-size: 2.2rem;
-    margin: 0;
-    color: #3e362e;
-    text-shadow: 1px 1px 0px #fff; /* Creates a slight debossed effect */
-    letter-spacing: -1px;
-}
-.id-card-inner {
-    position: relative;
-    overflow: hidden;
-    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png'); /* Paper texture */
-    z-index: 1;
+    transition: filter 0.2s;
 }
 
-.id-card-inner::before {
-    content: '🕊️'; /* Or a feather icon */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 150px;
-    opacity: 0.03; /* Barely visible watermark */
-    z-index: -1;
+.id-close-btn:hover {
+    filter: brightness(1.2);
 }
