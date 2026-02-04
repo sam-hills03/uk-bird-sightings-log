@@ -621,8 +621,13 @@ card.addEventListener('click', (e) => {
     }
 });
 
-card.style.cursor = 'pointer'; // Show hand icon on hover
+        card.style.cursor = 'pointer'; // Show hand icon on hover
         listContainer.appendChild(card);
+    }); // This ends the filteredBirds.forEach loop
+
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        const isAdmin = session?.user?.id === ADMIN_UID;
+        toggleAdminControls(isAdmin);
     });
 }
 
