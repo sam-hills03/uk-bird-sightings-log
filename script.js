@@ -183,14 +183,18 @@ function switchTab(targetTabId) {
     }
 }
 
+// Ensure this part is inside your DOMContentLoaded or a setup function
+function setupTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             switchTab(button.getAttribute('data-tab'));
         });
     });
 
+    // Set the default view
     switchTab('database-view');
-}
+}s
 
 // ============================================
 // C. PAGINATION
