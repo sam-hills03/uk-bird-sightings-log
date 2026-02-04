@@ -190,7 +190,6 @@ function switchTab(targetTabId) {
     });
 
     switchTab('database-view');
-}
 
 // ============================================
 // C. PAGINATION
