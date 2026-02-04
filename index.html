@@ -36,6 +36,17 @@
         <button id="logout-btn">Close Journal (Logout)</button>
         <div class="rank-container">
     <span id="naturalist-rank" class="rank-badge">Novice Observer</span>
+            <div class="progress-container" style="margin-top: 10px; width: 200px;">
+    <div class="progress-label">
+        Next Level: <span id="next-level-name">Field Naturalist</span>
+    </div>
+    <div class="progress-bg" style="background: #e0ddd5; height: 10px; border-radius: 5px; overflow: hidden; border: 1px solid #c4bca6;">
+        <div id="level-progress-bar" style="background: #8a9575; height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+    </div>
+    <div class="progress-stats" style="font-size: 0.75rem; color: #666; margin-top: 4px;">
+        <span id="current-count-display">0</span> / <span id="target-count-display">10</span> species
+    </div>
+</div>
 </div>
     </div>
 </div>
