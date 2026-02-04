@@ -871,3 +871,99 @@ hr {
     background: #8c7d6b;
     color: #fff;
 }
+.naturalist-id-card {
+    background: #fdfaf3; /* Cream paper */
+    border: 1px solid #dcd1b3;
+    padding: 8px;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.id-card-inner {
+    border: 1px solid #dcd1b3;
+    padding: 15px 25px;
+    text-align: center;
+}
+
+.auth-text {
+    font-family: 'EB Garamond', serif;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: #a39684;
+}
+
+.vintage-hr {
+    border: 0;
+    border-top: 1px solid #dcd1b3;
+    margin: 5px 0 15px 0;
+}
+
+.id-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#user-display-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 2.2rem;
+    margin: 0;
+    color: #2c2621;
+    font-weight: 500;
+}
+
+/* The Stamp from your Image */
+.rank-stamp-seal {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    transform: rotate(15deg);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    border: 2px dashed rgba(255,255,255,0.3);
+}
+
+.id-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #5d544b;
+    margin-bottom: 5px;
+}
+
+.id-progress-track {
+    background: #e9e5d9;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.id-progress-fill {
+    background: #8a9575;
+    height: 100%;
+    width: 0%;
+    transition: width 1s ease-in-out;
+}
+
+.id-close-btn {
+    background: #682d1f;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    font-family: 'EB Garamond', serif;
+    font-variant: small-caps;
+    cursor: pointer;
+    border-radius: 2px;
+}
