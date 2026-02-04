@@ -31,26 +31,29 @@
             </div>
         </div>
     </div>
-    <div id="logged-in-view" class="naturalist-profile-card" style="display: none;">
-    <div class="profile-header">
-        <div class="profile-info">
-            <span class="profile-label">Authorized Naturalist</span>
+    <div id="logged-in-view" class="naturalist-id-card" style="display: none;">
+    <div class="id-card-inner">
+        <header class="id-header">
+            <span class="auth-text">Authorized Naturalist</span>
+            <hr class="vintage-hr">
+        </header>
+        
+        <div class="id-body">
             <h2 id="user-display-name">Observer</h2>
+            <div id="naturalist-rank" class="rank-stamp-seal">Novice</div>
         </div>
-        <div id="naturalist-rank" class="rank-stamp">Novice</div>
-    </div>
 
-    <div class="progress-section">
-        <div class="progress-meta">
-            <span id="next-level-name">Next: Field Naturalist</span>
-            <span class="progress-digits"><span id="current-count-display">0</span> / <span id="target-count-display">50</span></span>
-        </div>
-        <div class="progress-track">
-            <div id="level-progress-bar" class="progress-fill"></div>
+        <div class="id-footer">
+            <div class="id-meta">
+                <span id="next-level-name">Next: Field Naturalist</span>
+                <span class="species-ratio"><span id="current-count-display">0</span> / <span id="target-count-display">300</span></span>
+            </div>
+            <div class="id-progress-track">
+                <div id="level-progress-bar" class="id-progress-fill"></div>
+            </div>
+            <button id="logout-btn" class="id-close-btn">Close Journal</button>
         </div>
     </div>
-
-    <button id="logout-btn" class="vintage-btn">Close Journal</button>
 </div>
         <h1>UK Bird Sighting Log</h1>
         <p>A simple log for tracking your UK bird sightings and statistics.</p>
