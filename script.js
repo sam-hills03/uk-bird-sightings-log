@@ -890,35 +890,74 @@ if (sightingForm) {
         
         const date = document.getElementById('sighting-date').value;
         const location = document.getElementById('location').value.trim();
+        
+        // Use the existing entriesContainer variable
         const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-        // ... Keep your existing Progress Bar and Supabase loop logic here ...
+        if (!date || !location) {
+            alert("Please enter both a Date and a Location.");
+            return;
+        }
 
-        // --- 4. FINISH UP (Selective Reset) ---
-        alert(`Successfully recorded sightings. Date and Location saved!`);
-        
+        // 1. Prepare Progress Bar
         const progressContainer = document.getElementById('upload-progress-container');
         const progressBar = document.getElementById('upload-progress-bar');
-        if (progressContainer) progressContainer.style.display = 'none';
-        if (progressBar) progressBar.style.width = "0%";
+        const progressText = document.getElementById('upload-progress-text');
         
-        // Wipe species names but keep Date/Location
-        const speciesInputs = entriesContainer.querySelectorAll('.species-input');
-        speciesInputs.forEach(input => input.value = ''); 
+        if (progressContainer) progressContainer.style.display = 'block';
+        let savedCount = 0;
+        const totalToSave = entryGroups.length;
 
-        // Remove extra rows, keep only the first one
-        const allRows = entriesContainer.querySelectorAll('.sighting-entry-group');
-        for (let i = 1; i < allRows.length; i++) {
-            allRows[i].remove();
+        try {
+            // 2. Save Location
+            await saveNewLocation(location);
+            
+            // 3. The Save Loop (The part that actually talks to the database)
+            for (const group of entryGroups) {
+                const speciesInput = group.querySelector('.species-input');
+                const species = speciesInput?.value.trim();
+                
+                if (species && isSpeciesValid(species)) {
+                    // This sends the data to Supabase
+                    await saveSighting({ species, date, location });
+                    savedCount++;
+                    
+                    // Update progress bar
+                    if (progressBar && progressText) {
+                        const percent = (savedCount / totalToSave) * 100;
+                        progressBar.style.width = percent + "%";
+                        progressText.textContent = `${savedCount} / ${totalToSave}`;
+                    }
+                }
+            }
+
+            // 4. Selective Reset (Keeps Date/Location)
+            alert(`Successfully recorded ${savedCount} sightings!`);
+            
+            // Clear bird names
+            const speciesInputs = entriesContainer.querySelectorAll('.species-input');
+            speciesInputs.forEach(input => input.value = ''); 
+
+            // Remove extra rows, leave only the first one
+            const allRows = entriesContainer.querySelectorAll('.sighting-entry-group');
+            for (let i = 1; i < allRows.length; i++) {
+                allRows[i].remove();
+            }
+
+            // Reset UI states
+            if (progressContainer) progressContainer.style.display = 'none';
+            if (progressBar) progressBar.style.width = "0%";
+            if (addEntryBtn) {
+                addEntryBtn.style.opacity = '1';
+                addEntryBtn.style.cursor = 'pointer';
+            }
+
+            updateAllDisplays();
+
+        } catch (error) {
+            console.error("Upload failed:", error);
+            alert("There was an error saving your sightings. Check the console for details.");
         }
-
-        // Reset the "Add" button styling
-        if (addEntryBtn) {
-            addEntryBtn.style.opacity = '1';
-            addEntryBtn.style.cursor = 'pointer';
-        }
-
-        updateAllDisplays();
     });
 }
 // ============================================
