@@ -857,22 +857,34 @@ if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         
-        // 1. Grab the values we want to keep
         const date = document.getElementById('sighting-date').value;
         const location = document.getElementById('location').value.trim();
-        
+        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
+
+        // --- 1. SET THE LIMIT (20) ---
+        if (entryGroups.length > 20) {
+            alert("To ensure accuracy, please limit uploads to 20 birds per entry. You have " + entryGroups.length + ".");
+            return;
+        }
+
         if (!date || !location) {
             alert("Please enter both a Date and a Location.");
             return;
         }
 
-        // 2. Save the location to your history
+        // --- 2. SHOW PROGRESS BAR ---
+        const progressContainer = document.getElementById('upload-progress-container');
+        const progressBar = document.getElementById('upload-progress-bar');
+        const progressText = document.getElementById('upload-progress-text');
+        
+        progressContainer.style.display = 'block';
+        let savedCount = 0;
+        const totalToSave = entryGroups.length;
+
+        // Save the location first
         await saveNewLocation(location);
         
-        // 3. Process the birds
-        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
-        let savedCount = 0;
-
+        // --- 3. PROCESS WITH PROGRESS ---
         for (const group of entryGroups) {
             const speciesInput = group.querySelector('.species-input');
             const species = speciesInput?.value.trim();
@@ -880,22 +892,22 @@ if (sightingForm) {
             if (species && isSpeciesValid(species)) {
                 await saveSighting({ species, date, location });
                 savedCount++;
+                
+                // Update the progress bar visually
+                const percent = (savedCount / totalToSave) * 100;
+                progressBar.style.width = percent + "%";
+                progressText.textContent = `${savedCount} / ${totalToSave}`;
             }
         }
+
+        // --- 4. FINISH UP ---
+        alert(`Successfully recorded ${savedCount} sightings in your journal.`);
+        progressContainer.style.display = 'none';
+        progressBar.style.width = "0%";
         
-        if (savedCount > 0) {
-            alert(`Successfully recorded ${savedCount} sighting(s)!`);
-            
-            // --- THE CHANGE IS HERE ---
-            // Instead of sightingForm.reset(), we only clear the birds:
-            entriesContainer.innerHTML = ''; // Remove all current bird rows
-            addSightingEntry();              // Add one fresh, empty bird row
-            
-            // Note: The 'date' and 'location' inputs are NOT cleared, 
-            // so they stay ready for your next entry.
-        } else {
-            alert("No valid bird names were entered.");
-        }
+        // Reset form or redirect if needed
+        sightingForm.reset();
+        updateAllDisplays();
     });
 }
 // ============================================
