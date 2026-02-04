@@ -194,7 +194,7 @@ function setupTabs() {
 
     // Set the default view
     switchTab('database-view');
-}s
+}
 
 // ============================================
 // C. PAGINATION
