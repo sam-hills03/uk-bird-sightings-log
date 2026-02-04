@@ -1028,22 +1028,28 @@ document.addEventListener('click', function(e) {
         document.getElementById('sighting-modal').style.display = 'none';
     }
 });
-// 5. STATE LISTENER
 supabaseClient.auth.onAuthStateChange((event, session) => {
     const loggedOutView = document.getElementById('logged-out-view');
     const loggedInView = document.getElementById('logged-in-view');
-    const userDisplay = document.getElementById('user-display-name');
 
     if (session) {
+        // User is LOGGED IN
         if (loggedOutView) loggedOutView.style.display = 'none';
         if (loggedInView) loggedInView.style.display = 'block';
-        if (userDisplay) userDisplay.textContent = session.user.email.split('@')[0];
+        document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
         
-        // Reload sightings now that we have a user_id
+        // CRITICAL: Load user-specific data now that we have a session
         loadSightings(); 
+        loadLocations();
     } else {
+        // User is GUEST
         if (loggedOutView) loggedOutView.style.display = 'block';
         if (loggedInView) loggedInView.style.display = 'none';
+        
+        // Clear personal data so the Guest doesn't see the previous user's birds
+        mySightings = [];
+        savedLocations = [];
+        updateAllDisplays();
     }
 });
 
