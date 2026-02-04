@@ -58,7 +58,7 @@ async function loadUKBirds() {
         populateSpeciesDatalist(); 
         filterAndDisplayBirds();
         await loadSightings();
-        await loadLocations(); 
+        await loads(); 
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
@@ -835,11 +835,6 @@ if (addEntryBtn) addEntryBtn.addEventListener('click', addSightingEntry);
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
         e.preventDefault(); 
-        // Inside sightingForm.addEventListener('submit', ...)
-const location = document.getElementById('location').value.trim();
-
-// Ensure this is awaited!
-await saveNewLocation(location);
         
         // 1. Grab the values we want to keep
         const date = document.getElementById('sighting-date').value;
