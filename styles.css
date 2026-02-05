@@ -889,3 +889,65 @@ hr {
 .id-close-btn:hover {
     filter: brightness(1.2);
 }
+.bug-report-container {
+    position: absolute;
+    right: -50px; /* Adjust this based on your layout spacing */
+    top: 20px;
+    z-index: 100;
+}
+
+#bug-fab {
+    background: #fdfaf3;
+    border: 1px solid #dcd1b3;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+#bug-fab:hover {
+    transform: scale(1.1);
+}
+
+.bug-popup {
+    position: absolute;
+    right: 50px;
+    top: 0;
+    width: 250px;
+    background: #fdfaf3;
+    border: 1px solid #dcd1b3;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    text-align: left;
+}
+
+.bug-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.bug-popup-header h4 { margin: 0; font-family: 'EB Garamond', serif; }
+
+#close-bug-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #8c2e1b;
+}
+
+/* Form Styles */
+.bug-popup input, .bug-popup textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #dcd1b3;
+    background: #fff;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+}
