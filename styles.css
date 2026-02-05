@@ -951,3 +951,26 @@ hr {
     font-family: 'EB Garamond', serif;
     font-size: 0.9rem;
 }
+.milestones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.badge-card {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.2s;
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+
+.badge-card.bronze { border-color: #cd7f32; filter: none; opacity: 1; background: #fff5eb; }
+.badge-card.silver { border-color: #c0c0c0; filter: none; opacity: 1; background: #f2f2f2; }
+.badge-card.gold   { border-color: #ffd700; filter: none; opacity: 1; background: #fffdf0; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+
+.badge-card.gold .badge-icon { font-size: 2rem; }
