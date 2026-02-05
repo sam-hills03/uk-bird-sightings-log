@@ -1198,41 +1198,79 @@ let birdChart = null;
 
 function createMonthlyChart() {
     const ctx = document.getElementById('monthly-chart');
-    if (!ctx || mySightings.length === 0) return;
+    if (!ctx) return;
 
-    const monthCounts = {};
+    const sightingsToUse = getFilteredSightings();
     
-    mySightings.forEach(sighting => {
-        const date = new Date(sighting.date);
-        const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-        monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
-    });
+    // 1. Prepare Labels and Data
+    let labels = [];
+    let data = [];
 
-    const sortedLabels = Object.keys(monthCounts).sort((a, b) => new Date(a) - new Date(b));
-    const sortedData = sortedLabels.map(label => monthCounts[label]);
+    if (currentYearFilter !== 'Lifetime') {
+        // FIXED 12-MONTH VIEW for specific years
+        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        // Initialize an array of 12 zeros
+        const monthCounts = new Array(12).fill(0);
+        
+        sightingsToUse.forEach(sighting => {
+            const date = new Date(sighting.date);
+            // getMonth() returns 0 for Jan, 11 for Dec
+            monthCounts[date.getMonth()]++;
+        });
+        
+        data = monthCounts;
+    } else {
+        // CHRONOLOGICAL VIEW for Lifetime
+        const monthCounts = {};
+        mySightings.forEach(sighting => {
+            const date = new Date(sighting.date);
+            const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
+        });
 
+        labels = Object.keys(monthCounts).sort((a, b) => new Date(a) - new Date(b));
+        data = labels.map(label => monthCounts[label]);
+    }
+
+    // 2. Destroy old chart instance if it exists
     if (birdChart) {
         birdChart.destroy();
     }
 
+    // 3. Create the Chart
     birdChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: sortedLabels,
+            labels: labels,
             datasets: [{
-                label: 'Sightings',
-                data: sortedData,
-                backgroundColor: 'rgba(45, 66, 45, 0.6)',
-                borderColor: 'rgba(45, 66, 45, 1)',
-                borderWidth: 1
+                label: currentYearFilter === 'Lifetime' ? 'Lifetime Sightings' : `${currentYearFilter} Sightings`,
+                data: data,
+                backgroundColor: 'rgba(140, 46, 27, 0.2)', // Vintage Wax Red tint
+                borderColor: '#8c2e1b', // Vintage Wax Red
+                borderWidth: 2,
+                tension: 0.3, // Makes the line slightly curved/hand-drawn
+                pointBackgroundColor: '#8c2e1b',
+                fill: true
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { stepSize: 1 }
+                    ticks: { 
+                        stepSize: 1,
+                        font: { family: 'Courier New' }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    ticks: { 
+                        font: { family: 'Courier New' } 
+                    },
+                    grid: { display: false }
                 }
             },
             plugins: {
