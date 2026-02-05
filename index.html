@@ -189,6 +189,16 @@
             <h3>Sightings Over Time</h3>
             <canvas id="monthly-chart"></canvas>
 
+            <div class="year-filter-container vintage-panel">
+                <label for="year-selector">📊 Viewing Period:</label>
+                <select id="year-selector" onchange="handleYearChange(this.value)">
+                    <option value="Lifetime">Lifetime (All Time)</option>
+                    <option value="2026">2026 (Current Year)</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            
             <div class="milestones-container">
         <h3> Field Milestones</h3>
         <div id="milestones-grid" class="milestones-grid">
