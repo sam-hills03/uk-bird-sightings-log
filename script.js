@@ -317,7 +317,7 @@ function displaySeenBirdsSummary() {
     summaryContainer.innerHTML = '';
     const speciesMap = new Map();
     
-    // 1. Group sightings
+    // 1. Group sightings by species
     const validSightings = mySightings.filter(sighting => isSpeciesValid(sighting.species)); 
 
     validSightings.forEach(sighting => {
@@ -334,12 +334,13 @@ function displaySeenBirdsSummary() {
         return;
     }
 
-    // 2. Filter species
+    // 2. Filter species by rarity (Case-Insensitive)
     let filteredSpecies = Array.from(speciesMap.keys());
     
     if (currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(speciesName => {
             const birdData = allUKBirds.find(b => b.CommonName === speciesName);
+            // .toLowerCase() on both sides ensures "Rare" matches "rare"
             return birdData && 
                    birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
         });
@@ -347,11 +348,11 @@ function displaySeenBirdsSummary() {
     
     // 3. Handle No Results
     if (filteredSpecies.length === 0) {
-        summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
+        summaryContainer.innerHTML = `<p style="padding: 40px; text-align: center; color: #8c7d6b;">No <strong>${currentSummaryRarityFilter}</strong> species recorded in your journal yet.</p>`;
         return; 
     }
 
-    // 4. Render cards
+    // 4. Render cards with Photos
     const cardTemplate = document.getElementById('bird-card-template');
     
     filteredSpecies.forEach(species => {
@@ -359,15 +360,39 @@ function displaySeenBirdsSummary() {
         if (!birdData) return;
         
         const sightingsData = speciesMap.get(species);
+        const sightingCount = sightingsData.sightings.length;
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         
-        // ... (Render logic: name, latin name, badges, etc.) ...
+        card.classList.add('seen');
+
+        // Text & Data
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
+        card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
+        card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
+
+        const rarityTagEl = card.querySelector('.card-rarity-tag');
+        rarityTagEl.textContent = birdData.Rarity;
+        rarityTagEl.className = `card-rarity-tag rarity-${birdData.Rarity.toLowerCase()}`;
+
+        // Photo Logic (Re-added)
+        const imageEl = card.querySelector('.card-image');
+        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+            if (result && result.url) {
+                imageEl.src = result.url;
+            }
+        });
+        
+        // Modal Trigger
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                showSightingModal(species, birdData, sightingsData.sightings);
+            }
+        });
         
         summaryContainer.appendChild(card);
     });
-} // <--- NO CODE SHOULD BE AFTER THIS BRACE RELATED TO THE SUMMARY
+}
 async function showSightingModal(species, birdData, sightings) {
     const modal = document.getElementById('sighting-modal');
     
