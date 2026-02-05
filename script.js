@@ -339,10 +339,7 @@ function displaySeenBirdsSummary() {
     
     if (currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(speciesName => {
-            // Find the master data for this bird in your 609-bird list
             const birdData = allUKBirds.find(b => b.CommonName === speciesName);
-            
-            // Compare rarity using lowercase to avoid "Rare" vs "rare" bugs
             return birdData && 
                    birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
         });
@@ -350,26 +347,72 @@ function displaySeenBirdsSummary() {
     
     // 3. Handle "No Results" for that specific filter
     if (filteredSpecies.length === 0) {
-        summaryContainer.innerHTML = `
-            <div style="padding: 40px; text-align: center; color: #8c7d6b;">
-                <p>No <strong>${currentSummaryRarityFilter}</strong> species recorded in your journal yet.</p>
-            </div>`;
-        return;
+        summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
+        return; 
     }
 
     // 4. Render the filtered cards
     const cardTemplate = document.getElementById('bird-card-template');
+    
     filteredSpecies.forEach(species => {
         const birdData = allUKBirds.find(b => b.CommonName === species);
         if (!birdData) return;
         
         const sightingsData = speciesMap.get(species);
+        const sightingCount = sightingsData.sightings.length;
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         
-        // ... (Rest of your card rendering logic: badges, images, etc.) ...
+        card.classList.add('seen');
         
-        // Ensure the card is actually added to the container!
+        // Add badges
+        const badge = document.createElement('div');
+        badge.classList.add('seen-badge');
+        badge.textContent = '✓'; 
+        card.appendChild(badge);
+        
+        const countBadge = document.createElement('div');
+        countBadge.classList.add('sighting-count-badge');
+        countBadge.textContent = sightingCount;
+        card.appendChild(countBadge);
+
+        // Set text content
+        card.querySelector('.card-common-name').textContent = birdData.CommonName;
+        card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
+        card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
+
+        const rarityTagEl = card.querySelector('.card-rarity-tag');
+        rarityTagEl.textContent = birdData.Rarity;
+        rarityTagEl.classList.add(`rarity-${birdData.Rarity}`);
+
+        // Image Logic
+        const imageEl = card.querySelector('.card-image');
+        const imageContainer = card.querySelector('.card-image-container');
+        
+        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+            if (result.url) {
+                imageEl.src = result.url;
+                if (result.isVerified) {
+                    const vBadge = document.createElement('div');
+                    vBadge.className = 'verified-check-badge';
+                    vBadge.innerHTML = '✓ Verified';
+                    imageContainer.appendChild(vBadge);
+                    const keepBtn = card.querySelector('.keep-btn');
+                    if (keepBtn) keepBtn.style.display = 'none';
+                    card.classList.add('verified-card');
+                }
+                handleImageVerification(card, birdData);
+            }
+        });
+        
+        // Modal trigger
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                showSightingModal(species, birdData, sightingsData.sightings);
+            }
+        });
+        
+        card.style.cursor = 'pointer';
         summaryContainer.appendChild(card);
     });
 }
