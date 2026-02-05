@@ -364,6 +364,36 @@ function displaySeenBirdsSummary() {
         
         card.classList.add('seen');
 
+        // --- NEW LAZY LOADING LOGIC STARTS HERE ---
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Only fetch image when card is visible
+                    getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+                        if (result && result.url) {
+                            imageEl.src = result.url;
+                            
+                            if (result.isVerified) {
+                                card.classList.add('verified-card');
+                                const vBadge = document.createElement('div');
+                                vBadge.className = 'verified-check-badge';
+                                vBadge.innerHTML = '✓ Verified';
+                                imageContainer.appendChild(vBadge);
+                                const keepBtn = card.querySelector('.keep-btn');
+                                if (keepBtn) keepBtn.style.display = 'none';
+                            }
+                            handleImageVerification(card, birdData);
+                        }
+                    });
+                    // Stop watching once loaded
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '200px' }); // Pre-load when 200px from viewport
+
+        observer.observe(card);
+        // --- NEW LAZY LOADING LOGIC ENDS HERE ---
+
         // Set Text Data (Using your working Card logic)
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
         card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
@@ -681,7 +711,14 @@ async function getBirdImage(commonName, latinName) {
     return { url: apiUrl, isVerified: false };
 }
 
+// 1. Make sure this helper is somewhere at the top of your script.js
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 2. Updated function
 async function getiNaturalistImage(commonName, latinName, page = 1) {
+    // Wait 100ms before every single fetch to keep the API happy
+    await sleep(100); 
+
     // If Latin Name is missing or "No Data", use Common Name
     const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
     
@@ -694,7 +731,6 @@ async function getiNaturalistImage(commonName, latinName, page = 1) {
         return null;
     }
 }
-
 function handleImageVerification(card, birdData) {
     const editBtn = card.querySelector('.verify-edit-btn');
     const controls = card.querySelector('.verify-controls');
