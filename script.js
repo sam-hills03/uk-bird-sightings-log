@@ -1195,7 +1195,56 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
         updateAllDisplays();
     }
 });
+// --- BUG REPORT / HELP FORM LOGIC ---
 
+const bugFab = document.getElementById('bug-fab');
+const bugPopup = document.getElementById('bug-form-popup');
+const closeBugBtn = document.getElementById('close-bug-btn');
+const helpForm = document.getElementById('help-form');
+const formStatus = document.getElementById('form-status');
+
+// 1. Toggle the popup visibility
+if (bugFab && bugPopup) {
+    bugFab.addEventListener('click', () => {
+        const isHidden = bugPopup.style.display === 'none';
+        bugPopup.style.display = isHidden ? 'block' : 'none';
+    });
+
+    closeBugBtn.addEventListener('click', () => {
+        bugPopup.style.display = 'none';
+    });
+}
+
+// 2. Handle the Formspree submission
+if (helpForm) {
+    helpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(helpForm);
+        
+        try {
+            const response = await fetch(helpForm.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                formStatus.style.display = 'block';
+                formStatus.style.color = '#416863'; // Naturalist Green
+                formStatus.textContent = "Thank you. The report has been filed.";
+                helpForm.reset();
+                // Close popup after a short delay
+                setTimeout(() => { bugPopup.style.display = 'none'; }, 2000);
+            } else {
+                throw new Error("Failed to send");
+            }
+        } catch (error) {
+            formStatus.style.display = 'block';
+            formStatus.style.color = '#682d1f'; // Wax Seal Red
+            formStatus.textContent = "Submission failed. Please try again.";
+        }
+    });
+}
 // Attach Event Listeners
 document.getElementById('signup-btn').addEventListener('click', handleSignUp);
 document.getElementById('login-btn').addEventListener('click', handleLogin);
