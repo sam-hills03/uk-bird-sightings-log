@@ -1065,3 +1065,65 @@ hr {
 .vintage-seal.bronze .seal-inner::after { content: 'III'; color: rgba(255,255,255,0.7); font-weight: bold; }
 .vintage-seal.silver .seal-inner::after { content: 'II'; color: rgba(255,255,255,0.7); font-weight: bold; }
 .vintage-seal.gold .seal-inner::after   { content: 'I'; color: rgba(255,255,255,0.8); font-weight: bold; }
+.year-filter-container {
+    margin: 20px 0;
+    padding: 15px;
+    text-align: center;
+    background-color: #f4eee1; /* Light parchment */
+    border: 2px solid #d3c4a9;
+}
+
+.vintage-select-wrapper {
+    position: relative;
+    display: inline-block;
+    min-width: 250px;
+}
+
+.vintage-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #8c2e1b; /* Matches your wax seal red */
+    margin-bottom: 5px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.naturalist-select {
+    width: 100%;
+    padding: 10px 15px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #4a3f35;
+    background-color: transparent;
+    border: 2px solid #5d544b;
+    border-radius: 0; /* Keeps it sharp/vintage */
+    appearance: none; /* Hides default browser arrow */
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.naturalist-select:focus {
+    outline: none;
+    border-color: #8c2e1b;
+    box-shadow: 0 0 5px rgba(140, 46, 27, 0.2);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 32px; /* Adjusted for the label height */
+    pointer-events: none;
+    color: #5d544b;
+    font-size: 0.8rem;
+}
+
+/* Texture for the container to match the ID card */
+.year-filter-container::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+}
