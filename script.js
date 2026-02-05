@@ -345,10 +345,13 @@ function displaySeenBirdsSummary() {
         filteredSpecies = filteredSpecies.filter(species => {
     const birdData = allUKBirds.find(b => b.CommonName === species);
     if (!birdData) return false;
-            // We use .toLowerCase() on both sides to be 100% sure they match
-            return birdData && birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
-        });
-    }
+    
+    // This logs every bird to the console so you can see why it's being hidden or shown
+    console.log(`Checking ${species}: Database has ${birdData.Rarity}, Filter is ${currentSummaryRarityFilter}`);
+    
+    return currentSummaryRarityFilter === "All" || 
+           birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+});
     
     if (filteredSpecies.length === 0) {
         summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
