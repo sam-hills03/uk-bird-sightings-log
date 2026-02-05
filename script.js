@@ -685,12 +685,11 @@ function isSpeciesValid(name) {
 // Global cache to avoid hitting Supabase too many times in one session
 const verifiedImageCache = new Map();
 
+// Keep this exactly as it is (it handles your cache and Supabase check)
 async function getBirdImage(commonName, latinName) {
-    // Check local cache
     if (verifiedImageCache.has(commonName)) {
         return { url: verifiedImageCache.get(commonName), isVerified: true };
     }
-
     try {
         const { data } = await supabaseClient
             .from('verified_images')
@@ -706,28 +705,37 @@ async function getBirdImage(commonName, latinName) {
         console.warn("Storage check failed", err);
     }
 
-    // Fallback to API
     const apiUrl = await getiNaturalistImage(commonName, latinName);
     return { url: apiUrl, isVerified: false };
 }
 
-// 1. Make sure this helper is somewhere at the top of your script.js
+// Keep this helper too
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 2. Updated function
-async function getiNaturalistImage(commonName, latinName, page = 1) {
-    // Wait 100ms before every single fetch to keep the API happy
-    await sleep(100); 
+// REPLACED SECTION: The new, quieter, and smarter API fetcher
+async function getiNaturalistImage(commonName, latinName, page = 1, retries = 3) {
+    await sleep(150); 
 
-    // If Latin Name is missing or "No Data", use Common Name
     const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
-    
+    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1&page=${page}`;
+
     try {
-        const resp = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1&page=${page}`);
+        const resp = await fetch(url);
+        
+        // If we hit the rate limit (429), try to wait 2 seconds and retry
+        if (resp.status === 429 && retries > 0) {
+            console.warn(`Rate limited for ${commonName}. Retrying...`);
+            await sleep(2000); 
+            return getiNaturalistImage(commonName, latinName, page, retries - 1);
+        }
+
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+
         const data = await resp.json();
         return data.results[0]?.default_photo?.medium_url || null;
     } catch (error) {
-        console.error("iNaturalist fetch failed:", error);
+        // This makes the console errors disappear and shows a quiet warning instead
+        console.warn(`Skipping image for ${commonName}: API busy or bird not found.`);
         return null;
     }
 }
