@@ -1150,7 +1150,11 @@ function calculateMilestones() {
         const badge = document.createElement('div');
         badge.className = `badge-card ${level}`;
         badge.innerHTML = `
-            <div class="badge-icon">${level === 'none' ? '🔒' : '🏆'}</div>
+            <div class="badge-icon-container">
+                <div class="vintage-seal ${level}">
+                    <span class="seal-inner"></span>
+                </div>
+            </div>
             <div class="badge-info">
                 <strong>${m.name}</strong>
                 <span>${m.current} / ${target} ${m.unit}</span>
