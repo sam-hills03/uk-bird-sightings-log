@@ -982,3 +982,54 @@ hr {
     from { box-shadow: 0 0 5px #ffd700; }
     to { box-shadow: 0 0 20px #ffd700; }
 }
+/* Container for the seal */
+.badge-icon-container {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+/* The Base Seal Design */
+.vintage-seal {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+/* Locked State (The '🔒' replacement) */
+.vintage-seal.none {
+    background: #e0e0e0;
+    border: 2px dashed #bbb;
+}
+.vintage-seal.none::after {
+    content: '✖';
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* Bronze, Silver, Gold (The '🏅' replacement) */
+.vintage-seal.bronze { background: #cd7f32; box-shadow: 0 0 0 3px #cd7f32, inset 0 0 10px rgba(0,0,0,0.3); }
+.vintage-seal.silver { background: #c0c0c0; box-shadow: 0 0 0 3px #c0c0c0, inset 0 0 10px rgba(0,0,0,0.3); }
+.vintage-seal.gold   { background: #d4af37; box-shadow: 0 0 0 3px #d4af37, inset 0 0 10px rgba(0,0,0,0.3); }
+
+/* The 'Stamp' detail in the middle */
+.seal-inner {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icons inside the seals */
+.vintage-seal.bronze .seal-inner::after { content: 'III'; color: rgba(255,255,255,0.7); font-weight: bold; }
+.vintage-seal.silver .seal-inner::after { content: 'II'; color: rgba(255,255,255,0.7); font-weight: bold; }
+.vintage-seal.gold .seal-inner::after   { content: 'I'; color: rgba(255,255,255,0.8); font-weight: bold; }
