@@ -56,7 +56,7 @@ async function loadUKBirds() {
         }
         
         populateSpeciesDatalist(); 
-        AndDisplayBirds();
+        DisplayBirds();
         await loadSightings();
         await loads(); 
         addSightingEntry(); 
@@ -160,7 +160,7 @@ async function deleteSightingFromDB(idToDelete) {
 
 function updateAllDisplays() {
     displaySightings();
-    displaySeenBirds(); 
+    displaySeenBirdsSummary(); 
     calculateAndDisplayStats();
     filterAndDisplayBirds();
     createMonthlyChart();
