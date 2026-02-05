@@ -16,7 +16,19 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 100;
 
 // Summary filter
-let currentSummaryRarityFilter = 'All';
+// Make sure this is at the very top of your script.js
+let currentSummaryRarityFilter = 'All'; 
+
+function setupSummaryFilter() {
+    const filter = document.getElementById('summary-rarity-filter');
+    if (filter) {
+        filter.addEventListener('change', (e) => {
+            currentSummaryRarityFilter = e.target.value; 
+            console.log("Summary Filter changed to:", currentSummaryRarityFilter);
+            displaySeenBirdsSummary(); // This tells the cards to redraw
+        });
+    }
+}
 
 // Search filter
 let currentSearchQuery = '';
