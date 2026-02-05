@@ -190,14 +190,17 @@
             <canvas id="monthly-chart"></canvas>
 
             <div class="year-filter-container vintage-panel">
-                <label for="year-selector"> Viewing Period:</label>
-                <select id="year-selector" onchange="handleYearChange(this.value)">
-                    <option value="Lifetime">Lifetime (All Time)</option>
-                    <option value="2026">2026 (Current Year)</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                </select>
-            </div>
+    <div class="vintage-select-wrapper">
+        <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
+        <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
+            <option value="Lifetime">LIFETIME LOG</option>
+            <option value="2026">ANNUAL LOG: 2026</option>
+            <option value="2025">ANNUAL LOG: 2025</option>
+            <option value="2024">ANNUAL LOG: 2024</option>
+        </select>
+        <div class="select-arrow">▼</div>
+    </div>
+</div>
             
             <div class="milestones-container">
         <h3> Field Milestones</h3>
