@@ -1145,9 +1145,9 @@ function calculateMilestones() {
     }).length;
 
     const milestones = [
-        { name: 'Life List', current: uniqueSpeciesCount, tiers: [100, 250, 450], unit: 'species' },
+        { name: 'Life List', current: uniqueSpeciesCount, tiers: [100, 200, 400], unit: 'species' },
         { name: 'Journalist', current: totalSightings, tiers: [500, 1500, 3000], unit: 'logs' },
-        { name: 'Specialist', current: maxAtOneLoc, tiers: [50, 150, 300], unit: 'at spot' },
+        { name: 'Specialist', current: maxAtOneLoc, tiers: [50, 150, 300], unit: 'at one location' },
         { name: 'Mega Finder', current: megaCount, tiers: [5, 10, 20], unit: 'megas' }
     ];
 
