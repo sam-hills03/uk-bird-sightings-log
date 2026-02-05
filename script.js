@@ -56,16 +56,15 @@ async function loadUKBirds() {
         }
         
         populateSpeciesDatalist(); 
-        DisplayBirds();
+        filterAndDisplayBirds();
         await loadSightings();
         await loads(); 
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
-        setup();
+        setupSummaryFilter();
         setupSearchBar();
         setupModal();
-        setupSummary();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
     }
@@ -146,9 +145,7 @@ async function deleteSightingFromDB(idToDelete) {
         
         if (error) throw error;
         
-        // Fixed the missing .filter method name here
         mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
-        
         updateAllDisplays();
         
         return true;
@@ -302,11 +299,8 @@ function setupSummaryFilter() {
     if (filter) {
         filter.addEventListener('change', (e) => {
             currentSummaryRarityFilter = e.target.value;
-            console.log("Filter changed to:", currentSummaryRarityFilter); // Debugging line
             displaySeenBirdsSummary();
         });
-    } else {
-        console.error("Could not find summary-rarity-filter in the HTML");
     }
 }
 
@@ -316,12 +310,10 @@ function displaySeenBirdsSummary() {
     
     summaryContainer.innerHTML = '';
     const speciesMap = new Map();
-    
-    // 1. Group sightings and clean the names
     const validSightings = mySightings.filter(sighting => isSpeciesValid(sighting.species)); 
 
     validSightings.forEach(sighting => {
-        const species = sighting.species.trim(); // Clean up spaces
+        const species = sighting.species;
         if (speciesMap.has(species)) {
             speciesMap.get(species).sightings.push(sighting);
         } else {
@@ -334,31 +326,24 @@ function displaySeenBirdsSummary() {
         return;
     }
 
-    // 2. Filter species by rarity
     let filteredSpecies = Array.from(speciesMap.keys());
     
     if (currentSummaryRarityFilter !== 'All') {
-        filteredSpecies = filteredSpecies.filter(speciesName => {
-            // Find the bird in the master database
-            const birdData = allUKBirds.find(b => b.CommonName.trim().toLowerCase() === speciesName.toLowerCase());
-            
-            // Check if bird exists and its rarity matches our filter
-            return birdData && 
-                   birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+        filteredSpecies = filteredSpecies.filter(species => {
+            const birdData = allUKBirds.find(b => b.CommonName === species);
+            return birdData && birdData.Rarity === currentSummaryRarityFilter;
         });
     }
     
-    // 3. Handle No Results
     if (filteredSpecies.length === 0) {
-        summaryContainer.innerHTML = `<p style="padding: 40px; text-align: center;">No ${currentSummaryRarityFilter} birds found in your journal.</p>`;
-        return; 
+        summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
+        return;
     }
 
-    // 4. Render cards
     const cardTemplate = document.getElementById('bird-card-template');
     
     filteredSpecies.forEach(species => {
-        const birdData = allUKBirds.find(b => b.CommonName.trim().toLowerCase() === species.toLowerCase());
+        const birdData = allUKBirds.find(b => b.CommonName === species);
         if (!birdData) return;
         
         const sightingsData = speciesMap.get(species);
@@ -367,30 +352,68 @@ function displaySeenBirdsSummary() {
         const card = cardClone.querySelector('.bird-card');
         
         card.classList.add('seen');
+        
+        const badge = document.createElement('div');
+        badge.classList.add('seen-badge');
+        badge.textContent = '✓'; 
+        card.appendChild(badge);
+        
+        const countBadge = document.createElement('div');
+        countBadge.classList.add('sighting-count-badge');
+        countBadge.textContent = sightingCount;
+        card.appendChild(countBadge);
 
-        // Text Content
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
-        card.querySelector('.card-latin-name').textContent = birdData.LatinName;
+        card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
         card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
 
-        // Rarity Tag Fix
         const rarityTagEl = card.querySelector('.card-rarity-tag');
-        if (rarityTagEl) {
-            const birdRarity = birdData.Rarity || 'Common';
-            rarityTagEl.textContent = birdRarity;
-            // Clear old classes and add the new one
-            rarityTagEl.className = 'card-rarity-tag'; 
-            rarityTagEl.classList.add(`rarity-${birdRarity.toLowerCase()}`);
+        rarityTagEl.textContent = birdData.Rarity;
+        rarityTagEl.classList.add(`rarity-${birdData.Rarity}`);
+
+        // --- UPDATED IMAGE LOGIC ---
+        const imageEl = card.querySelector('.card-image');
+        const imageContainer = card.querySelector('.card-image-container');
+        const placeholderDiv = document.createElement('div');
+        placeholderDiv.classList.add('image-placeholder');
+        placeholderDiv.textContent = 'Loading...';
+        imageContainer.appendChild(placeholderDiv);
+        
+        // This goes inside your display loop
+getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+    if (result.url) {
+        imageEl.src = result.url;
+        
+        // If result.isVerified is true, add the UI indicator
+        if (result.isVerified) {
+            const imageContainer = card.querySelector('.card-image-container');
+            
+            // Add a badge so you know it's verified
+            const badge = document.createElement('div');
+            badge.className = 'verified-check-badge';
+            badge.innerHTML = '  Verified';
+            imageContainer.appendChild(badge);
+            
+            // Hide the "Keep" button since it's already done
+            const keepBtn = card.querySelector('.keep-btn');
+            if (keepBtn) keepBtn.style.display = 'none';
+            
+            card.classList.add('verified-card');
         }
 
-        // Photo Logic
-        const imageEl = card.querySelector('.card-image');
-        if (imageEl && typeof getBirdImage === 'function') {
-            getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
-                if (result && result.url) imageEl.src = result.url;
-            });
-        }
+        handleImageVerification(card, birdData);
+    }
+});
         
+        // Modal trigger remains the same, but we prevent it 
+        // if clicking the verification buttons
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                showSightingModal(species, birdData, sightingsData.sightings);
+            }
+        });
+        
+        card.style.cursor = 'pointer';
         summaryContainer.appendChild(card);
     });
 }
