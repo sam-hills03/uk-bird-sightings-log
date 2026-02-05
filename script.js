@@ -25,6 +25,22 @@ const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
 const sightingForm = document.getElementById('sighting-form');
 
+let currentYearFilter = 'Lifetime';
+
+function getFilteredSightings() {
+    if (currentYearFilter === 'Lifetime') return mySightings;
+    
+    return mySightings.filter(s => {
+        const sightingYear = new Date(s.date).getFullYear().toString();
+        return sightingYear === currentYearFilter;
+    });
+}
+
+window.handleYearChange = function(year) {
+    currentYearFilter = year;
+    updateAllDisplays(); // This will now trigger everything to redraw with the new year
+};
+
 // Make deleteSighting global
 window.deleteSighting = async function(idToDelete) {
     if (confirm("Are you sure you want to delete this sighting?")) {
@@ -1021,9 +1037,10 @@ if (sightingForm) {
 // ============================================
 
 function calculateAndDisplayStats() {
-    if (allUKBirds.length === 0) return;
-
-    const seenSpecies = getUniqueSeenSpecies();
+    const sightingsToUse = getFilteredSightings(); // Use the filtered list
+    
+    // Change your 'seenSpecies' logic to use the filtered list
+    const seenSpecies = new Set(sightingsToUse.map(s => s.species));
     const totalSeenCount = seenSpecies.size;
     
     // 1. Update Total Unique Species Count
@@ -1104,12 +1121,16 @@ function updateNaturalistRank(count) {
 }
 
 function calculateMilestones() {
+    const sightingsToUse = getFilteredSightings(); // Use the filtered list
     const grid = document.getElementById('milestones-grid');
     if (!grid) return;
-    grid.innerHTML = '';
-
-    const totalSightings = mySightings.length;
-    const uniqueSpeciesCount = getUniqueSeenSpecies().size;
+    
+    // Update your counts to use sightingsToUse instead of mySightings
+    const totalSightings = sightingsToUse.length;
+    const uniqueSpeciesCount = new Set(sightingsToUse.map(s => s.species)).size;
+    
+    // ... (rest of the logic stays the same!)
+}
     
     // 1. Calculate Specialist (Most sightings at one spot)
     const locCounts = {};
