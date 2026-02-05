@@ -329,14 +329,16 @@ function displaySeenBirdsSummary() {
         return;
     }
 
-    // 2. Filter the species list
+    // 2. Filter species
     let filteredSpecies = Array.from(speciesMap.keys());
     
-    if (currentSummaryRarityFilter !== 'All') {
+    if (currentSummaryRarityFilter && currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(speciesName => {
-            const birdData = allUKBirds.find(b => b.CommonName.trim() === speciesName);
-            // This line fixes the filter by making both lowercase during comparison
-            return birdData && birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+            const birdData = allUKBirds.find(b => b.CommonName.trim().toLowerCase() === speciesName.trim().toLowerCase());
+            
+            // This checks if the bird exists and compares the rarity safely
+            return birdData && 
+                   birdData.Rarity.trim().toLowerCase() === currentSummaryRarityFilter.trim().toLowerCase();
         });
     }
     
