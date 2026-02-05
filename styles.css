@@ -974,3 +974,11 @@ hr {
 .badge-card.gold   { border-color: #ffd700; filter: none; opacity: 1; background: #fffdf0; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
 
 .badge-card.gold .badge-icon { font-size: 2rem; }
+.badge-card.gold {
+    animation: gold-glow 3s infinite alternate;
+}
+
+@keyframes gold-glow {
+    from { box-shadow: 0 0 5px #ffd700; }
+    to { box-shadow: 0 0 20px #ffd700; }
+}
