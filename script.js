@@ -1121,27 +1121,25 @@ function updateNaturalistRank(count) {
 }
 
 function calculateMilestones() {
-    const sightingsToUse = getFilteredSightings(); // Use the filtered list
+    const sightingsToUse = getFilteredSightings(); // Respects the Year Toggle
     const grid = document.getElementById('milestones-grid');
     if (!grid) return;
     
-    // Update your counts to use sightingsToUse instead of mySightings
+    grid.innerHTML = '';
+
+    // 1. Calculate Core Counts
     const totalSightings = sightingsToUse.length;
     const uniqueSpeciesCount = new Set(sightingsToUse.map(s => s.species)).size;
     
-    // ... (rest of the logic stays the same!)
-}
-    
-    // 1. Calculate Specialist (Most sightings at one spot)
+    // 2. Calculate Specialist (Most sightings at one spot in the selected period)
     const locCounts = {};
-    mySightings.forEach(s => {
+    sightingsToUse.forEach(s => {
         if (s.location) locCounts[s.location] = (locCounts[s.location] || 0) + 1;
     });
     const maxAtOneLoc = Math.max(...Object.values(locCounts), 0);
 
-    // 2. UPDATED: Mega Finder (Total Megas seen)
-    // This now checks specifically for the 'Mega' rarity tag
-    const megaCount = mySightings.filter(s => {
+    // 3. Calculate Mega Finder (Total Megas seen in the selected period)
+    const megaCount = sightingsToUse.filter(s => {
         const bird = allUKBirds.find(b => b.CommonName === s.species);
         return bird && bird.Rarity === 'Mega';
     }).length;
@@ -1183,6 +1181,16 @@ function calculateMilestones() {
             </div>
         `;
         grid.appendChild(badge);
+    });
+}
+
+function getFilteredSightings() {
+    if (currentYearFilter === 'Lifetime') return mySightings;
+    
+    return mySightings.filter(s => {
+        if (!s.date) return false;
+        const sightingYear = new Date(s.date).getFullYear().toString();
+        return sightingYear === currentYearFilter;
     });
 }
 
