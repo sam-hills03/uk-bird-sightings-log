@@ -1118,17 +1118,18 @@ function calculateMilestones() {
     });
     const maxAtOneLoc = Math.max(...Object.values(locCounts), 0);
 
-    // 2. Calculate Rare Finder
-    const rareCount = mySightings.filter(s => {
+    // 2. UPDATED: Mega Finder (Total Megas seen)
+    // This now checks specifically for the 'Mega' rarity tag
+    const megaCount = mySightings.filter(s => {
         const bird = allUKBirds.find(b => b.CommonName === s.species);
-        return bird && (bird.Rarity === 'Rare' || bird.Rarity === 'Mega');
+        return bird && bird.Rarity === 'Mega';
     }).length;
 
     const milestones = [
         { name: 'Life List', current: uniqueSpeciesCount, tiers: [100, 250, 450], unit: 'species' },
         { name: 'Journalist', current: totalSightings, tiers: [500, 1500, 3000], unit: 'logs' },
         { name: 'Specialist', current: maxAtOneLoc, tiers: [50, 150, 300], unit: 'at spot' },
-        { name: 'Rare Finder', current: rareCount, tiers: [5, 20, 50], unit: 'rares' }
+        { name: 'Mega Finder', current: megaCount, tiers: [5, 10, 20], unit: 'megas' }
     ];
 
     milestones.forEach(m => {
