@@ -815,6 +815,13 @@ hr {
     margin: 8px 0 15px 0; /* Space above and below the line */
     opacity: 0.8;
 }
+.vintage-hr-alt {
+    width: 600px; /* Spans the full width of your new 700px card */
+    border: none;
+    border-top: 2px solid var(--color-border); /* Thicker line for that official look */
+    margin: 8px 0 15px 0; /* Space above and below the line */
+    opacity: 0.8;
+}
 
 .id-header {
     display: flex;
