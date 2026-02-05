@@ -376,7 +376,7 @@ function displaySeenBirdsSummary() {
     
     if (filteredSpecies.length === 0) {
         summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
-        return;
+        return; // This is now LEGAL because it is inside the function
     }
 
     const cardTemplate = document.getElementById('bird-card-template');
