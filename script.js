@@ -714,28 +714,45 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // REPLACED SECTION: The new, quieter, and smarter API fetcher
 async function getiNaturalistImage(commonName, latinName, page = 1, retries = 3) {
-    await sleep(150); 
+    // 1. Check the cache AGAIN just in case (Safety First)
+    if (verifiedImageCache.has(commonName)) {
+        return verifiedImageCache.get(commonName);
+    }
+
+    await sleep(250); // A slightly longer pause (1/4 of a second)
 
     const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
     const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1&page=${page}`;
 
     try {
-        const resp = await fetch(url);
-        
-        // If we hit the rate limit (429), try to wait 2 seconds and retry
+        const resp = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                // Adding a User-Agent tells them this is a real app
+                'User-Agent': 'BirdSightingLog/1.0 (https://github.com/sam-hills03/uk-bird-sightings-log)'
+            }
+        });
+
         if (resp.status === 429 && retries > 0) {
-            console.warn(`Rate limited for ${commonName}. Retrying...`);
-            await sleep(2000); 
+            await sleep(3000); 
             return getiNaturalistImage(commonName, latinName, page, retries - 1);
         }
 
-        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
         const data = await resp.json();
-        return data.results[0]?.default_photo?.medium_url || null;
+        const photoUrl = data.results[0]?.default_photo?.medium_url || null;
+        
+        // 2. Save to cache immediately so duplicates don't trigger more fetches
+        if (photoUrl) {
+            verifiedImageCache.set(commonName, photoUrl);
+        }
+        
+        return photoUrl;
     } catch (error) {
-        // This makes the console errors disappear and shows a quiet warning instead
-        console.warn(`Skipping image for ${commonName}: API busy or bird not found.`);
+        // This is where the CORS block gets caught
+        console.warn(`Handshake failed for ${commonName}. API is likely busy.`);
         return null;
     }
 }
