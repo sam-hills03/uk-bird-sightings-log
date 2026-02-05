@@ -890,10 +890,10 @@ hr {
     filter: brightness(1.2);
 }
 .bug-report-container {
-    position: absolute;
-    right: -50px; /* Adjust this based on your layout spacing */
-    top: 20px;
-    z-index: 100;
+    position: fixed; /* Changed from absolute */
+    right: 20px;     /* Distance from the right edge of screen */
+    bottom: 20px;    /* Distance from the bottom edge of screen */
+    z-index: 9999;   /* Ensures it stays on top of everything */
 }
 
 #bug-fab {
@@ -911,17 +911,17 @@ hr {
     transform: scale(1.1);
 }
 
+/* Adjust the popup to show ABOVE the button now that it's at the bottom */
 .bug-popup {
     position: absolute;
-    right: 50px;
-    top: 0;
+    right: 0;
+    bottom: 50px;    /* Shows above the bug icon */
     width: 250px;
     background: #fdfaf3;
     border: 1px solid #dcd1b3;
     padding: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     border-radius: 4px;
-    text-align: left;
 }
 
 .bug-popup-header {
