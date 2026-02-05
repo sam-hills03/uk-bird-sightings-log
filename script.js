@@ -316,6 +316,8 @@ function displaySeenBirdsSummary() {
     
     summaryContainer.innerHTML = '';
     const speciesMap = new Map();
+    
+    // 1. Group sightings by species name
     const validSightings = mySightings.filter(sighting => isSpeciesValid(sighting.species)); 
 
     validSightings.forEach(sighting => {
@@ -332,14 +334,43 @@ function displaySeenBirdsSummary() {
         return;
     }
 
+    // 2. Filter the species based on the Rarity dropdown
     let filteredSpecies = Array.from(speciesMap.keys());
     
-    // Replace your filter block with this slightly safer version
-if (currentSummaryRarityFilter !== 'All') {
-    filteredSpecies = filteredSpecies.filter(species => {
+    if (currentSummaryRarityFilter !== 'All') {
+        filteredSpecies = filteredSpecies.filter(speciesName => {
+            // Find the master data for this bird in your 609-bird list
+            const birdData = allUKBirds.find(b => b.CommonName === speciesName);
+            
+            // Compare rarity using lowercase to avoid "Rare" vs "rare" bugs
+            return birdData && 
+                   birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+        });
+    }
+    
+    // 3. Handle "No Results" for that specific filter
+    if (filteredSpecies.length === 0) {
+        summaryContainer.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: #8c7d6b;">
+                <p>No <strong>${currentSummaryRarityFilter}</strong> species recorded in your journal yet.</p>
+            </div>`;
+        return;
+    }
+
+    // 4. Render the filtered cards
+    const cardTemplate = document.getElementById('bird-card-template');
+    filteredSpecies.forEach(species => {
         const birdData = allUKBirds.find(b => b.CommonName === species);
-        // .toLowerCase() ensures "Rare" and "rare" both work
-        return birdData && birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+        if (!birdData) return;
+        
+        const sightingsData = speciesMap.get(species);
+        const cardClone = cardTemplate.content.cloneNode(true);
+        const card = cardClone.querySelector('.bird-card');
+        
+        // ... (Rest of your card rendering logic: badges, images, etc.) ...
+        
+        // Ensure the card is actually added to the container!
+        summaryContainer.appendChild(card);
     });
 }
     
