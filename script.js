@@ -62,9 +62,10 @@ async function loadUKBirds() {
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
-        setupSummaryFilter();
+        setupFilter();
         setupSearchBar();
         setupModal();
+        setupSummaryFilter();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
     }
@@ -157,7 +158,7 @@ async function deleteSightingFromDB(idToDelete) {
 
 function updateAllDisplays() {
     displaySightings();
-    displaySeenBirdsSummary(); 
+    displaySeenBirds(); 
     calculateAndDisplayStats();
     filterAndDisplayBirds();
     createMonthlyChart();
@@ -299,8 +300,11 @@ function setupSummaryFilter() {
     if (filter) {
         filter.addEventListener('change', (e) => {
             currentSummaryRarityFilter = e.target.value;
+            console.log("Filter changed to:", currentSummaryRarityFilter); // Debugging line
             displaySeenBirdsSummary();
         });
+    } else {
+        console.error("Could not find summary-rarity-filter in the HTML");
     }
 }
 
@@ -1153,7 +1157,7 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'signup-btn') { e.preventDefault(); handleSignUp(); }
     if (e.target.id === 'logout-btn') { e.preventDefault(); handleLogout(); }
 
-    // --- Tab Switching ---
+.    // --- Tab Switching ---
     if (e.target.classList.contains('tab-button')) {
         const targetTabId = e.target.getAttribute('data-tab');
         switchTab(targetTabId); // We'll make sure this function exists below
