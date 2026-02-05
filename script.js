@@ -56,16 +56,16 @@ async function loadUKBirds() {
         }
         
         populateSpeciesDatalist(); 
-        filterAndDisplayBirds();
+        AndDisplayBirds();
         await loadSightings();
         await loads(); 
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
-        setupFilter();
+        setup();
         setupSearchBar();
         setupModal();
-        setupSummaryFilter();
+        setupSummary();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
     }
@@ -146,7 +146,7 @@ async function deleteSightingFromDB(idToDelete) {
         
         if (error) throw error;
         
-        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
+        mySightings = mySightings.(sighting => sighting.id !== idToDelete);
         updateAllDisplays();
         
         return true;
@@ -332,12 +332,14 @@ function displaySeenBirdsSummary() {
 
     let filteredSpecies = Array.from(speciesMap.keys());
     
-    if (currentSummaryRarityFilter !== 'All') {
-        filteredSpecies = filteredSpecies.filter(species => {
-            const birdData = allUKBirds.find(b => b.CommonName === species);
-            return birdData && birdData.Rarity === currentSummaryRarityFilter;
-        });
-    }
+    // Replace your filter block with this slightly safer version
+if (currentSummaryRarityFilter !== 'All') {
+    filteredSpecies = filteredSpecies.filter(species => {
+        const birdData = allUKBirds.find(b => b.CommonName === species);
+        // .toLowerCase() ensures "Rare" and "rare" both work
+        return birdData && birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
+    });
+}
     
     if (filteredSpecies.length === 0) {
         summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
