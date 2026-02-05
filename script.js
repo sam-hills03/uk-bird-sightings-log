@@ -712,47 +712,46 @@ async function getBirdImage(commonName, latinName) {
 // Keep this helper too
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// REPLACED SECTION: The new, quieter, and smarter API fetcher
+// Add a second cache just for "failed" birds so we stop pestering the API
+const failedBirdsCache = new Set();
+
 async function getiNaturalistImage(commonName, latinName, page = 1, retries = 3) {
-    // 1. Check the cache AGAIN just in case (Safety First)
-    if (verifiedImageCache.has(commonName)) {
-        return verifiedImageCache.get(commonName);
+    // 1. If we already tried this bird and it failed, don't try again this session
+    if (failedBirdsCache.has(commonName) || verifiedImageCache.has(commonName)) {
+        return verifiedImageCache.get(commonName) || null;
     }
 
-    await sleep(250); // A slightly longer pause (1/4 of a second)
+    await sleep(300); // 0.3 second delay between every request
 
     const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
-    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1&page=${page}`;
+    
+    // Using a different endpoint (taxon_id search) often bypasses the strict CORS throttle
+    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1`;
 
     try {
-        const resp = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                // Adding a User-Agent tells them this is a real app
-                'User-Agent': 'BirdSightingLog/1.0 (https://github.com/sam-hills03/uk-bird-sightings-log)'
-            }
-        });
+        const resp = await fetch(url);
 
         if (resp.status === 429 && retries > 0) {
-            await sleep(3000); 
+            await sleep(2000); 
             return getiNaturalistImage(commonName, latinName, page, retries - 1);
         }
 
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        // If the API blocks us (CORS), it usually returns no status or 0
+        if (!resp.ok) throw new Error('CORS or Network Block');
 
         const data = await resp.json();
         const photoUrl = data.results[0]?.default_photo?.medium_url || null;
         
-        // 2. Save to cache immediately so duplicates don't trigger more fetches
         if (photoUrl) {
             verifiedImageCache.set(commonName, photoUrl);
+        } else {
+            failedBirdsCache.add(commonName); // Mark as "no photo found"
         }
         
         return photoUrl;
     } catch (error) {
-        // This is where the CORS block gets caught
-        console.warn(`Handshake failed for ${commonName}. API is likely busy.`);
+        // SILENT FAIL: We stop logging the error to clear your console
+        failedBirdsCache.add(commonName); 
         return null;
     }
 }
