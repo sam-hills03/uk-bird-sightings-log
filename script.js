@@ -1157,7 +1157,7 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'signup-btn') { e.preventDefault(); handleSignUp(); }
     if (e.target.id === 'logout-btn') { e.preventDefault(); handleLogout(); }
 
-.    // --- Tab Switching ---
+    // --- Tab Switching ---
     if (e.target.classList.contains('tab-button')) {
         const targetTabId = e.target.getAttribute('data-tab');
         switchTab(targetTabId); // We'll make sure this function exists below
