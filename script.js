@@ -1184,7 +1184,6 @@ function calculateMilestones() {
         `;
         grid.appendChild(badge);
     });
-}
 
 let birdChart = null; 
 
