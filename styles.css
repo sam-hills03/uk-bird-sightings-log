@@ -809,7 +809,7 @@ hr {
 }
 
 .vintage-hr {
-    width: 100%; /* Spans the full width of your new 700px card */
+    width: 600px; /* Spans the full width of your new 700px card */
     border: none;
     border-top: 2px solid #8c2e1b; /* Thicker line for that official look */
     margin: 8px 0 15px 0; /* Space above and below the line */
