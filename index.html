@@ -144,25 +144,24 @@
     </section>
 
     <section id="summary-view" class="tab-content">
-        <h2>Seen Bird Species Summary</h2>
-        
-        <!-- Rarity filter for summary -->
-        <div id="summary-filters">
-    <label for="summary-rarity-filter">Filter by Rarity:</label>
-    <select id="summary-rarity-filter">
-        <option value="All">All Rarities</option>
-        <option value="Mega">Mega</option>
-        <option value="Rare">Rare</option>
-        <option value="Scarce">Scarce</option>
-        <option value="Local">Local</option>
-        <option value="Common">Common</option>
-    </select>
-</div>
-        
-        <div id="seen-birds-summary">
-            No unique birds seen yet.
-        </div>
-    </section>
+    <h2>Seen Bird Species Summary</h2>
+    
+    <div id="summary-filters">
+        <label for="summary-rarity-filter">Filter by Rarity:</label>
+        <select id="summary-rarity-filter" onchange="handleSummaryFilterChange(this.value)">
+            <option value="All">All Rarities</option>
+            <option value="Mega">Mega</option>
+            <option value="Rare">Rare</option>
+            <option value="Scarce">Scarce</option>
+            <option value="Local">Local</option>
+            <option value="Common">Common</option>
+        </select>
+    </div>
+    
+    <div id="seen-birds-summary">
+        No unique birds seen yet.
+    </div>
+</section>
 
    <div id="sighting-modal" class="modal">
     <div class="modal-content">
