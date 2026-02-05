@@ -833,7 +833,8 @@ hr {
 .id-body {
     text-align: center; /* Centers the 'Observer' name and rank seal */
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content:center;
     align-items: center;
 }
 
@@ -841,10 +842,12 @@ hr {
     font-family: 'EB Garamond', serif;
     font-size: 2.2rem;
     margin: 0;
+    padding: 0 25px 0 0;
     color: #3e362e;
     text-shadow: 1px 1px 0px #fff;
     letter-spacing: -1px;
     font-weight: 500;
+    width:auto;
 }
 
 .rank-stamp-seal {
