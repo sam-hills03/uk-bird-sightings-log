@@ -298,8 +298,8 @@ function setupSummaryFilter() {
     const filter = document.getElementById('summary-rarity-filter');
     if (filter) {
         filter.addEventListener('change', (e) => {
-            currentSummaryRarityFilter = e.target.value;
-            displaySeenBirdsSummary();
+            currentSummaryRarityFilter = e.target.value; // Updates the global variable
+            displaySeenBirdsSummary(); // Triggers the draw
         });
     }
 }
