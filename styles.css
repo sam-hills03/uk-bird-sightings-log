@@ -848,6 +848,7 @@ hr {
     letter-spacing: -1px;
     font-weight: 500;
     width:auto;
+    border-bottom:none;
 }
 
 .rank-stamp-seal {
@@ -875,6 +876,10 @@ hr {
     font-size: 0.9rem;
     color: #5d544b;
     margin-bottom: 5px;
+}
+
+.id-footer{
+    width: 100% !important;
 }
 
 .id-progress-track {
