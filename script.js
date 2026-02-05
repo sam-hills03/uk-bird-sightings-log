@@ -1246,3 +1246,9 @@ document.getElementById('logout-btn').addEventListener('click', handleLogout);
 // Start the app
 loadUKBirds();
 document.getElementById('rarity-filter').addEventListener('change', filterAndDisplayBirds);
+// This is a direct global function that the HTML can always see
+window.handleSummaryFilterChange = function(newRarity) {
+    console.log("Direct Filter Triggered: ", newRarity);
+    currentSummaryRarityFilter = newRarity;
+    displaySeenBirdsSummary();
+};
