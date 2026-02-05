@@ -1049,8 +1049,9 @@ function calculateAndDisplayStats() {
     const percentageNoMegaEl = document.getElementById('percentage-no-mega');
     if (percentageNoMegaEl) percentageNoMegaEl.textContent = percentageNoMega.toFixed(2) + '%';
 
-    // --- ADD THIS LINE TO TRIGGER THE RANK UPDATE ---
+    // --- TRIGGER THE UPDATES ---
     updateNaturalistRank(totalSeenCount);
+    calculateMilestones(); 
 }
 
 function updateNaturalistRank(count) {
@@ -1065,24 +1066,23 @@ function updateNaturalistRank(count) {
     let rank = "Novice";
     let target = 50;
     let nextRank = "Field Naturalist";
-    let color = "#8c2e1b"; // Default wax red
+    let color = "#8c2e1b"; 
 
-    // Level Parameters & Colors
     if (count >= 300) {
         rank = "Master";
         target = 300;
         nextRank = "Elite Status";
-        color = "#d4af37"; // Gold
+        color = "#d4af37"; 
     } else if (count >= 150) {
         rank = "Resident";
         target = 300;
         nextRank = "Master of Skies";
-        color = "#416863"; // Deep Green
+        color = "#416863"; 
     } else if (count >= 50) {
         rank = "Naturalist";
         target = 150;
         nextRank = "Resident Ornith.";
-        color = "#5d544b"; // Vintage Grey/Brown
+        color = "#5d544b"; 
     } else {
         rank = "Novice";
         target = 50;
@@ -1090,28 +1090,82 @@ function updateNaturalistRank(count) {
         color = "#8c2e1b"; 
     }
 
-    // 1. Update the "Wax Seal"
     rankElement.textContent = rank;
     rankElement.style.backgroundColor = color;
 
-    // 2. Update helper text
     if (nextLevelEl) nextLevelEl.textContent = "Next: " + nextRank;
     if (currentDisplay) currentDisplay.textContent = count;
     if (targetDisplay) targetDisplay.textContent = target;
 
-    // 3. Smooth Progress Bar Update
     if (progressBar) {
         const percentage = Math.min((count / target) * 100, 100);
         progressBar.style.width = percentage + "%";
     }
 }
-let birdChart = null; // Global variable to track the chart instance
+
+function calculateMilestones() {
+    const grid = document.getElementById('milestones-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const totalSightings = mySightings.length;
+    const uniqueSpeciesCount = getUniqueSeenSpecies().size;
+    
+    // 1. Calculate Specialist (Most sightings at one spot)
+    const locCounts = {};
+    mySightings.forEach(s => {
+        if (s.location) locCounts[s.location] = (locCounts[s.location] || 0) + 1;
+    });
+    const maxAtOneLoc = Math.max(...Object.values(locCounts), 0);
+
+    // 2. Calculate Rare Finder
+    const rareCount = mySightings.filter(s => {
+        const bird = allUKBirds.find(b => b.CommonName === s.species);
+        return bird && (bird.Rarity === 'Rare' || bird.Rarity === 'Mega');
+    }).length;
+
+    const milestones = [
+        { name: 'Life List', current: uniqueSpeciesCount, tiers: [100, 250, 450], unit: 'species' },
+        { name: 'Journalist', current: totalSightings, tiers: [500, 1500, 3000], unit: 'logs' },
+        { name: 'Specialist', current: maxAtOneLoc, tiers: [50, 150, 300], unit: 'at spot' },
+        { name: 'Rare Finder', current: rareCount, tiers: [5, 20, 50], unit: 'rares' }
+    ];
+
+    milestones.forEach(m => {
+        let level = 'none';
+        let target = m.tiers[0];
+
+        if (m.current >= m.tiers[2]) {
+            level = 'gold';
+            target = m.tiers[2];
+        } else if (m.current >= m.tiers[1]) {
+            level = 'silver';
+            target = m.tiers[2];
+        } else if (m.current >= m.tiers[0]) {
+            level = 'bronze';
+            target = m.tiers[1];
+        }
+
+        const badge = document.createElement('div');
+        badge.className = `badge-card ${level}`;
+        badge.innerHTML = `
+            <div class="badge-icon">${level === 'none' ? '🔒' : '🏆'}</div>
+            <div class="badge-info">
+                <strong>${m.name}</strong>
+                <span>${m.current} / ${target} ${m.unit}</span>
+                <div class="badge-level-tag">${level.toUpperCase()}</div>
+            </div>
+        `;
+        grid.appendChild(badge);
+    });
+}
+
+let birdChart = null; 
 
 function createMonthlyChart() {
     const ctx = document.getElementById('monthly-chart');
     if (!ctx || mySightings.length === 0) return;
 
-    // Process data: Group sightings by Month-Year
     const monthCounts = {};
     
     mySightings.forEach(sighting => {
@@ -1120,16 +1174,13 @@ function createMonthlyChart() {
         monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
     });
 
-    // Sort the months chronologically
     const sortedLabels = Object.keys(monthCounts).sort((a, b) => new Date(a) - new Date(b));
     const sortedData = sortedLabels.map(label => monthCounts[label]);
 
-    // If a chart already exists, destroy it before creating a new one (prevents overlap)
     if (birdChart) {
         birdChart.destroy();
     }
 
-    // Create the bar chart using Chart.js
     birdChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1156,7 +1207,7 @@ function createMonthlyChart() {
         }
     });
 }
-// Function to get a summary from Wikipedia
+
 async function fetchBirdDescription(speciesName) {
     try {
         const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(speciesName)}`);
