@@ -16,19 +16,7 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 100;
 
 // Summary filter
-// Make sure this is at the very top of your script.js
-let currentSummaryRarityFilter = 'All'; 
-
-function setupSummaryFilter() {
-    const filter = document.getElementById('summary-rarity-filter');
-    if (filter) {
-        filter.addEventListener('change', (e) => {
-            currentSummaryRarityFilter = e.target.value; 
-            console.log("Summary Filter changed to:", currentSummaryRarityFilter);
-            displaySeenBirdsSummary(); // This tells the cards to redraw
-        });
-    }
-}
+let currentSummaryRarityFilter = 'All';
 
 // Search filter
 let currentSearchQuery = '';
@@ -310,8 +298,8 @@ function setupSummaryFilter() {
     const filter = document.getElementById('summary-rarity-filter');
     if (filter) {
         filter.addEventListener('change', (e) => {
-            currentSummaryRarityFilter = e.target.value; // Updates the global variable
-            displaySeenBirdsSummary(); // Triggers the draw
+            currentSummaryRarityFilter = e.target.value;
+            displaySeenBirdsSummary();
         });
     }
 }
@@ -340,18 +328,12 @@ function displaySeenBirdsSummary() {
 
     let filteredSpecies = Array.from(speciesMap.keys());
     
-    // --- UPDATED FILTER LOGIC (SAFE VERSION) ---
     if (currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(species => {
-    const birdData = allUKBirds.find(b => b.CommonName === species);
-    if (!birdData) return false;
-    
-    // This logs every bird to the console so you can see why it's being hidden or shown
-    console.log(`Checking ${species}: Database has ${birdData.Rarity}, Filter is ${currentSummaryRarityFilter}`);
-    
-    return currentSummaryRarityFilter === "All" || 
-           birdData.Rarity.toLowerCase() === currentSummaryRarityFilter.toLowerCase();
-});
+            const birdData = allUKBirds.find(b => b.CommonName === species);
+            return birdData && birdData.Rarity === currentSummaryRarityFilter;
+        });
+    }
     
     if (filteredSpecies.length === 0) {
         summaryContainer.innerHTML = `<p style="padding: 20px; text-align: center;">No birds seen with rarity: ${currentSummaryRarityFilter}</p>`;
@@ -389,7 +371,7 @@ function displaySeenBirdsSummary() {
         rarityTagEl.textContent = birdData.Rarity;
         rarityTagEl.classList.add(`rarity-${birdData.Rarity}`);
 
-        // --- IMAGE LOGIC (KEEPING YOUR WORKING VERSION) ---
+        // --- UPDATED IMAGE LOGIC ---
         const imageEl = card.querySelector('.card-image');
         const imageContainer = card.querySelector('.card-image-container');
         const placeholderDiv = document.createElement('div');
@@ -397,22 +379,34 @@ function displaySeenBirdsSummary() {
         placeholderDiv.textContent = 'Loading...';
         imageContainer.appendChild(placeholderDiv);
         
-        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
-            if (result.url) {
-                imageEl.src = result.url;
-                if (result.isVerified) {
-                    const badge = document.createElement('div');
-                    badge.className = 'verified-check-badge';
-                    badge.innerHTML = '  Verified';
-                    card.querySelector('.card-image-container').appendChild(badge);
-                    const keepBtn = card.querySelector('.keep-btn');
-                    if (keepBtn) keepBtn.style.display = 'none';
-                    card.classList.add('verified-card');
-                }
-                handleImageVerification(card, birdData);
-            }
-        });
+        // This goes inside your display loop
+getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+    if (result.url) {
+        imageEl.src = result.url;
         
+        // If result.isVerified is true, add the UI indicator
+        if (result.isVerified) {
+            const imageContainer = card.querySelector('.card-image-container');
+            
+            // Add a badge so you know it's verified
+            const badge = document.createElement('div');
+            badge.className = 'verified-check-badge';
+            badge.innerHTML = '  Verified';
+            imageContainer.appendChild(badge);
+            
+            // Hide the "Keep" button since it's already done
+            const keepBtn = card.querySelector('.keep-btn');
+            if (keepBtn) keepBtn.style.display = 'none';
+            
+            card.classList.add('verified-card');
+        }
+
+        handleImageVerification(card, birdData);
+    }
+});
+        
+        // Modal trigger remains the same, but we prevent it 
+        // if clicking the verification buttons
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
                 showSightingModal(species, birdData, sightingsData.sightings);
