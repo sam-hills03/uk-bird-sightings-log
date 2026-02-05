@@ -146,7 +146,9 @@ async function deleteSightingFromDB(idToDelete) {
         
         if (error) throw error;
         
-        mySightings = mySightings.(sighting => sighting.id !== idToDelete);
+        // Fixed the missing .filter method name here
+        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
+        
         updateAllDisplays();
         
         return true;
