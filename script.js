@@ -150,6 +150,12 @@ async function loadUKBirds() {
             // This tells all other parts of the app to refresh
             updateAllDisplays(); 
         }
+        // Add this inside the 'if (data)' block of loadSightings, after the sort
+if (mySightings.length > 0) {
+    const latest = mySightings[0];
+    const tripData = getExpeditionData(latest.date, latest.location);
+    if (tripData) displayExpeditionCard(tripData);
+}
 
         console.log("Loaded", mySightings.length, "sightings.");
     } catch (error) {
@@ -1514,7 +1520,7 @@ function setupExpeditionSearch() {
                     const data = getExpeditionData(trip.date, trip.location);
                     displayExpeditionCard(data);
                     resultsContainer.style.display = 'none';
-                    locInput.value = trip.location; 
+                    locInput.value = '';
                 };
                 resultsList.appendChild(li);
             });
