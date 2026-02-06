@@ -136,9 +136,7 @@ v
         updateAllDisplays(); // This will now trigger the Logbook display via the code above
     }
 }
-    }
-}
-
+   
 async function saveSighting(sighting) {
     try {
         // Get the logged-in user's data
