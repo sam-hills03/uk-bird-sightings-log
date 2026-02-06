@@ -122,8 +122,6 @@ async function loadUKBirds() {
         console.error("Failed to load UK bird list:", error);
     }
 }
-
-v
         async function loadSightings() {
   
     
