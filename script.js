@@ -1309,14 +1309,52 @@ function createMonthlyChart() {
     });
 }
 
-async function fetchBirdDescription(speciesName) {
+async function fetchBirdSong(latinName) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+    const recordingLoc = document.getElementById('recording-location');
+    
+    console.log("Gramophone attempting to fetch:", latinName); // DEBUG LOG
+
+    if (!audioPlayer) return;
+    if (!latinName || latinName === 'No Data') {
+        recordingLoc.textContent = "No scientific name found.";
+        return;
+    }
+
+    // Reset UI
+    audioPlayer.pause();
+    loadingOverlay.style.display = 'flex';
+    recordingLoc.textContent = "Tuning signal...";
+
     try {
-        const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(speciesName)}`);
+        // We use a proxy or direct fetch. Note: Xeno-canto sometimes requires 
+        // a specific URL format or handles CORS differently.
+        const queryUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(latinName)}+q:A`;
+        const response = await fetch(queryUrl);
         const data = await response.json();
-        return data.extract || "No detailed field notes found for this species.";
+
+        console.log("Xeno-canto response data:", data); // DEBUG LOG
+
+        if (data.recordings && data.recordings.length > 0) {
+            const bestMatch = data.recordings[0];
+            // Xeno-canto files usually start with //, we add https:
+            let fileUrl = bestMatch.file;
+            if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+            
+            audioPlayer.src = fileUrl;
+            audioPlayer.load(); // Forces the browser to buffer the new sound
+            
+            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+            loadingOverlay.style.display = 'none';
+        } else {
+            recordingLoc.textContent = "No recordings in archive.";
+            loadingOverlay.style.display = 'none';
+        }
     } catch (error) {
-        console.error("Wiki fetch error:", error);
-        return "Field notes are currently unavailable.";
+        console.error("Audio fetch error:", error);
+        recordingLoc.textContent = "Signal lost (Network Error)";
+        loadingOverlay.style.display = 'none';
     }
 }
 // --- UPDATED AUTHENTICATION LOGIC ---
