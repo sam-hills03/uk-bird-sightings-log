@@ -1479,29 +1479,32 @@ function setupExpeditionSearch() {
             return;
         }
 
-        // Find unique dates for this location
         const matchedTrips = [];
-        const seenDates = new Set();
+        const seenTrips = new Set(); // We use this to prevent duplicates
 
         mySightings.forEach(s => {
             if (s.location.toLowerCase().includes(query)) {
-                if (!seenDates.has(s.date + s.location)) {
+                // Create a unique ID for this specific Trip (Date + Location)
+                const tripKey = s.date + "|" + s.location;
+                
+                if (!seenTrips.has(tripKey)) {
                     matchedTrips.push({ date: s.date, location: s.location });
-                    seenDates.add(s.date + s.location);
+                    seenTrips.add(tripKey);
                 }
             }
         });
 
-        // Display results
         if (matchedTrips.length > 0) {
             resultsList.innerHTML = '';
             matchedTrips.forEach(trip => {
                 const li = document.createElement('li');
-                li.textContent = `${new Date(trip.date).toLocaleDateString()} — ${trip.location}`;
+                // We show the Location AND Date clearly in the results list
+                li.innerHTML = `<strong>${trip.location}</strong> <br> <small>${new Date(trip.date).toLocaleDateString('en-GB')}</small>`;
                 li.onclick = () => {
                     const data = getExpeditionData(trip.date, trip.location);
                     displayExpeditionCard(data);
                     resultsContainer.style.display = 'none';
+                    locInput.value = trip.location; // Clean up the input box
                 };
                 resultsList.appendChild(li);
             });
@@ -1511,6 +1514,20 @@ function setupExpeditionSearch() {
         }
     });
 }
+document.getElementById('trip-date-select').addEventListener('change', (e) => {
+    const selectedDate = e.target.value;
+    // Find all locations visited on this date
+    const tripsOnDate = mySightings.filter(s => s.date === selectedDate);
+    
+    if (tripsOnDate.length > 0) {
+        // If there are multiple, for now we load the first one, 
+        // but the user can use the Search box to find the specific other one.
+        const data = getExpeditionData(selectedDate, tripsOnDate[0].location);
+        displayExpeditionCard(data);
+    } else {
+        alert("No archive entries found for this specific date.");
+    }
+});
 
 // 2. LOGIN
 async function handleLogin() {
