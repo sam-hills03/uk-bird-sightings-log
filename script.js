@@ -637,41 +637,51 @@ function filterAndDisplayBirds() {
 
     // 3. Build the cards
     filteredBirds.forEach(bird => {
-        const cardClone = cardTemplate.content.cloneNode(true);
-        const card = cardClone.querySelector('.bird-card');
-        const imageContainer = card.querySelector('.card-image-container');
-        const imageEl = card.querySelector('.card-image');
+    const cardClone = cardTemplate.content.cloneNode(true);
+    const card = cardClone.querySelector('.bird-card');
+    const imageContainer = card.querySelector('.card-image-container');
+    const imageEl = card.querySelector('.card-image');
 
-        // Mark as seen if in your sightings
-        if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
+    // 1. CLEAR PREVIOUS STATE (Crucial for preventing the "All Verified" bug)
+    card.classList.remove('verified-card');
+    const oldBadge = imageContainer.querySelector('.verified-check-badge');
+    if (oldBadge) oldBadge.remove();
 
-        // Set Text Data
-        card.querySelector('.card-common-name').textContent = bird.CommonName;
-        const rarityTag = card.querySelector('.card-rarity-tag');
-        rarityTag.textContent = bird.Rarity;
-        rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
+    // Mark as seen if in your sightings
+    if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
-        // Handle Images
-        getBirdImage(bird.CommonName, bird.LatinName).then(result => {
-            if (result && result.url) {
-                imageEl.src = result.url;
-                
-                if (result.isVerified) {
-                    card.classList.add('verified-card');
-                    const vBadge = document.createElement('div');
-                    vBadge.className = 'verified-check-badge';
-                    vBadge.innerHTML = 'Verified';
-                    imageContainer.appendChild(vBadge);
-                    
-                    const keepBtn = card.querySelector('.keep-btn');
-                    if (keepBtn) keepBtn.style.display = 'none';
-                }
+    // ... (Set Text Data: Common Name, Rarity Tag, etc.) ...
 
-                handleImageVerification(card, bird);
+    // 2. STAMP THE IMAGE DATA
+    getBirdImage(bird.CommonName, bird.LatinName).then(result => {
+        if (result && result.url) {
+            imageEl.src = result.url;
+            imageEl.style.display = 'block';
+
+            // Double-check we haven't accidentally kept a badge from a slow load
+            const freshBadgeCheck = imageContainer.querySelector('.verified-check-badge');
+            if (freshBadgeCheck) freshBadgeCheck.remove();
+
+            if (result.isVerified === true) {
+                card.classList.add('verified-card');
+                const vBadge = document.createElement('div');
+                vBadge.className = 'verified-check-badge';
+                vBadge.innerHTML = '✓ Verified';
+                imageContainer.appendChild(vBadge);
+
+                const keepBtn = card.querySelector('.keep-btn');
+                if (keepBtn) keepBtn.style.display = 'none';
             } else {
-                imageEl.style.display = 'none';
+                // Ensure card is NOT verified if the database says it isn't
+                card.classList.remove('verified-card');
+                const keepBtn = card.querySelector('.keep-btn');
+                if (keepBtn) keepBtn.style.display = 'inline-block';
             }
-        }); // <-- This was the missing closing bracket for the .then() block
+            handleImageVerification(card, bird);
+        } else {
+            imageEl.style.display = 'none';
+        }
+    });
 
         // Add click listener to open the info modal
         card.addEventListener('click', (e) => {
