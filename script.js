@@ -1198,45 +1198,32 @@ function calculateAndDisplayStats() {
         }
     }
 
-    // Update Rank Title (The text next to your name)
     const rankTitleElement = document.querySelector('.id-rank-title');
-    if (rankTitleElement) {
-        rankTitleElement.textContent = currentRank.name;
-    }
+    if (rankTitleElement) rankTitleElement.textContent = currentRank.name;
 
-    // Update the Wax Seal Color
     const waxSeal = document.querySelector('.rank-stamp-seal');
-    if (waxSeal) {
-        waxSeal.style.backgroundColor = currentRank.color;
-    }
+    if (waxSeal) waxSeal.style.backgroundColor = currentRank.color;
 
-    // Update Progress Bar & Counts
     const progressBar = document.getElementById('level-progress-bar');
     const nextLevelName = document.getElementById('next-level-name');
     const currentDisplay = document.getElementById('current-count-display');
     const targetDisplay = document.getElementById('target-count-display');
 
-    // --- UPDATED PROGRESS CALCULATION ---
+    if (progressBar && nextLevelName) {
+        let progressPercent = 0;
+        if (currentRank.name === "Grand Archivist") {
+            progressPercent = 100;
+            nextLevelName.textContent = "Ultimate Rank Achieved";
+        } else {
+            // This math gives you that 52% look for 158/300
+            progressPercent = Math.min((totalSeenCount / nextRank.threshold) * 100, 100);
+            nextLevelName.textContent = `Next: ${nextRank.name}`;
+        }
 
-if (progressBar && nextLevelName) {
-    let progressPercent = 0;
-    
-    if (currentRank.name === "Grand Archivist") {
-        // You've reached the final rank
-        progressPercent = 100;
-        nextLevelName.textContent = "Ultimate Rank Achieved";
-    } else {
-        progressPercent = Math.min((totalSeenCount / nextRank.threshold) * 100, 100);
-        
-        nextLevelName.textContent = `Next: ${nextRank.name}`;
+        progressBar.style.width = `${progressPercent}%`;
+        if (currentDisplay) currentDisplay.textContent = totalSeenCount;
+        if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
     }
-
-    // Apply the width to the bar
-    progressBar.style.width = `${progressPercent}%`;
-    
-    if (currentDisplay) currentDisplay.textContent = totalSeenCount;
-    if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
-}}
 
     // 4. Update Other UI Elements
     calculateMilestones(); 
