@@ -1315,30 +1315,6 @@ function createMonthlyChart() {
     if (!ctx) return;
 
     const sightingsToUse = getFilteredSightings();
-    
-    // 1. Prepare Labels and Data
-    let labels = [];
-    let data = [];
-
-    if (currentYearFilter !== 'Lifetime') {
-        // FIXED 12-MONTH VIEW for specific years
-        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
-        // Initialize an array of 12 zeros
-        const monthCounts = new Array(12).fill(0);
-        
-        sightingsToUse.forEach(sighting => {
-            const date = new Date(sighting.date);
-            // getMonth() returns 0 for Jan, 11 for Dec
-            monthCounts[date.getMonth()]++;
-        });
-        
-        data = monthCounts;
-    function createMonthlyChart() {
-    const ctx = document.getElementById('monthly-chart');
-    if (!ctx) return;
-
-    const sightingsToUse = getFilteredSightings();
     let labels = [];
     let data = [];
 
@@ -1359,7 +1335,7 @@ function createMonthlyChart() {
         
         mySightings.forEach(sighting => {
             const date = new Date(sighting.date);
-            // SortKey: "2025-01" (Reliable for sorting)
+            // SortKey: "2025-01" (Reliable for alphabetical sorting of chronological dates)
             const sortKey = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
             // DisplayLabel: "Jan 2025"
             const label = date.toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -1370,7 +1346,7 @@ function createMonthlyChart() {
             monthCounts[sortKey].count++;
         });
 
-        // Sort keys chronologically
+        // Sort keys chronologically (e.g., 2024-12 before 2025-01)
         const sortedKeys = Object.keys(monthCounts).sort();
         
         // Map data in the sorted order
@@ -1378,8 +1354,10 @@ function createMonthlyChart() {
         data = sortedKeys.map(key => monthCounts[key].count);
     }
 
+    // 2. Destroy old chart instance if it exists
     if (birdChart) { birdChart.destroy(); }
 
+    // 3. Create the Chart
     birdChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1407,7 +1385,7 @@ function createMonthlyChart() {
                 x: {
                     ticks: { 
                         font: { family: 'Courier New', size: 10 },
-                        autoSkip: true, // Prevents overlapping on mobile
+                        autoSkip: true, // Prevents overlapping labels on narrow mobile screens
                         maxRotation: 45
                     },
                     grid: { display: false }
