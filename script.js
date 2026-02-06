@@ -1338,13 +1338,15 @@ async function fetchBirdSong(latinName, commonName) {
 
     let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
     
-    // We use a public proxy to bypass the CORS block
-    const proxy = "https://corsproxy.io/?";
+    // Using AllOrigins proxy - it's usually more robust for Xeno-Canto
     const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
-        const response = await fetch(proxy + encodeURIComponent(xenoUrl));
-        const data = await response.json();
+        const response = await fetch(proxyUrl);
+        const wrapper = await response.json();
+        // AllOrigins returns the data as a string in 'contents', so we parse it
+        const data = JSON.parse(wrapper.contents);
 
         if (data.recordings && data.recordings.length > 0) {
             const bestMatch = data.recordings[0];
