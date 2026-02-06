@@ -66,18 +66,49 @@ async function loadUKBirds() {
         }
         
         populateSpeciesDatalist(); 
-        
-        // 1. Load sightings FIRST
         await loadSightings(); 
+        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
         
-        // 2. Load other setup
+        // --- THE FIX ---
+        // This ensures the first input box is there on launch
+        addSightingEntry(); 
+        // ---------------
+
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
         setupSearchBar();
         setupRarityFilter();
+        setupModal();
         
-        // 3. ONLY NOW display the birds
+        filterAndDisplayBirds(); 
+        
+    } catch (error) {
+        console.error("Failed to load UK bird list:", error);
+    }
+}async function loadUKBirds() {
+    try {
+        const response = await fetch('uk_birds.json');
+        if (response.ok) {
+            allUKBirds = await response.json();
+        }
+        
+        populateSpeciesDatalist(); 
+        await loadSightings(); 
+        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
+        
+        // --- THE FIX ---
+        // This ensures the first input box is there on launch
+        addSightingEntry(); 
+        // ---------------
+
+        setupTabSwitching();
+        setupPagination();
+        setupSummaryFilter();
+        setupSearchBar();
+        setupRarityFilter();
+        setupModal();
+        
         filterAndDisplayBirds(); 
         
     } catch (error) {
