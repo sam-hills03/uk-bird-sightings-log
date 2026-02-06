@@ -63,25 +63,23 @@ async function loadUKBirds() {
         const response = await fetch('uk_birds.json');
         if (response.ok) {
             allUKBirds = await response.json();
-            console.log("Loaded", allUKBirds.length, "UK birds");
-        } else {
-            console.error("uk_birds.json not found");
-            document.getElementById('bird-list').innerHTML = 
-                '<p style="color: red; padding: 20px;">Error: uk_birds.json file not found.</p>';
-            return;
         }
         
         populateSpeciesDatalist(); 
-        filterAndDisplayBirds();
-        await loadSightings();
-        await loads(); 
-        addSightingEntry(); 
+        
+        // 1. Load sightings FIRST
+        await loadSightings(); 
+        
+        // 2. Load other setup
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
-        setupSearchBar();   
-        setupRarityFilter(); 
-        setupModal();
+        setupSearchBar();
+        setupRarityFilter();
+        
+        // 3. ONLY NOW display the birds
+        filterAndDisplayBirds(); 
+        
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
     }
@@ -616,6 +614,7 @@ function populateSpeciesDatalist() {
 
 // 1. THE MAIN FILTER FUNCTION
 function filterAndDisplayBirds() {
+    verifiedImageCache.clear();
     const filterValue = document.getElementById('rarity-filter')?.value || 'All';
     const listContainer = document.getElementById('bird-list');
     if (!listContainer) return;
