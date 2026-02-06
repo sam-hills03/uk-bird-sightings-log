@@ -123,29 +123,19 @@ async function loadUKBirds() {
     }
 }
 
-async function loadSightings() {
-    try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
+v
+        async function loadSightings() {
+  
+    
+    if (data) {
+        mySightings = data;
         
-        // If no user is logged in, clear the list and exit
-        if (!user) {
-            mySightings = [];
-            updateAllDisplays();
-            return;
-        }
-
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('*')
-            .order('created_at', { ascending: false });
-            
-        if (error) throw error;
+        // SORT: Newest sightings first
+        mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        mySightings = data || [];
-        console.log("Loaded", mySightings.length, "sightings for user:", user.email);
-        updateAllDisplays();
-    } catch (error) {
-        console.error("Error loading sightings:", error);
+        updateAllDisplays(); // This will now trigger the Logbook display via the code above
+    }
+}
     }
 }
 
@@ -214,6 +204,18 @@ function updateAllDisplays() {
     calculateAndDisplayStats();
     filterAndDisplayBirds();
     createMonthlyChart();
+
+    // ADD THIS: Refresh the Logbook Card whenever data changes
+    if (mySightings.length > 0) {
+        // Find the trip currently being viewed, or default to the latest
+        const currentLoc = document.getElementById('expedition-location').textContent;
+        const currentDate = document.getElementById('trip-date-select').value; // Get date from input
+        
+        // If we have a date selected, refresh that specific trip, otherwise show latest
+        const sighting = mySightings.find(s => s.date === currentDate && s.location === currentLoc) || mySightings[0];
+        const tripData = getExpeditionData(sighting.date, sighting.location);
+        displayExpeditionCard(tripData);
+    }
 }
 
 // ============================================
@@ -1632,3 +1634,21 @@ window.handleSummaryFilterChange = function(value) {
     currentSummaryRarityFilter = value;
     displaySeenBirdsSummary();
 };
+// --- EXPEDITION HUB LINKING ---
+
+// Listen for Date changes in the Museum Drawer
+document.getElementById('trip-date-select').addEventListener('change', (e) => {
+    const selectedDate = e.target.value;
+    // Find the first sighting on this date to get the location
+    const sightingOnDate = mySightings.find(s => s.date === selectedDate);
+    
+    if (sightingOnDate) {
+        const data = getExpeditionData(selectedDate, sightingOnDate.location);
+        displayExpeditionCard(data);
+    } else {
+        alert("Archive entry not found for this date.");
+    }
+});
+
+// Call the Search Setup
+setupExpeditionSearch();
