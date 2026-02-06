@@ -1170,7 +1170,7 @@ hr {
     max-width: 500px;
     border-left: 4px solid #8c2e1b;
     padding-left: 15px;
-    background: rgba(140, 46, 27, 0.02);
+    background: #fdfaf3;
 }
 
 .drawer-label {
@@ -1255,17 +1255,31 @@ hr {
 .logbook-seal {
     border: 2px double #8c2e1b;
     border-radius: 50%;
-    width: 70px;
-    height: 70px;
+    width: 80px;  /* Increased slightly for better breathing room */
+    height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #8c2e1b;
     transform: rotate(-5deg);
+    text-align: center;
+    padding: 5px; /* Ensures text doesn't hit the border */
+    line-height: 1; /* Stops the lines from spreading too far apart */
 }
 
-#expedition-count { font-weight: bold; font-size: 1.4rem; }
+#expedition-count {
+    font-weight: bold;
+    font-size: 1.8rem; /* Make the number nice and big */
+    margin-bottom: -2px; /* Pulls the word "Species" slightly closer */
+}
+
+.logbook-seal small {
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
 .highlight-box {
     background: rgba(140, 46, 27, 0.05);
