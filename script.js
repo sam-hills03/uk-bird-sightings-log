@@ -1642,37 +1642,41 @@ window.handleSummaryFilterChange = function(value) {
 // Call the Search Setup
 setupExpeditionSearch();
 document.addEventListener('click', function(e) {
-    // ... your existing auth buttons (login, signup, logout) ...
-
     // --- 1. Open Bird Details & Fetch Song ---
     const birdCard = e.target.closest('.bird-card');
     if (birdCard) {
-        const speciesName = birdCard.querySelector('.card-common-name').textContent;
-        const bird = allUKBirds.find(b => b.CommonName === speciesName);
-        
-        if (bird) {
-            // Your existing function to open the modal (change name if yours is different)
-            showSightingModal(birdData.CommonName, birdData, sightingsData.sightings); 
-            
-            // Start fetching the song!
-            fetchBirdSong(birdData.LatinName, species);
+        // Only trigger if we aren't clicking the verify buttons
+        if (!e.target.closest('.image-verify-overlay')) {
+            const nameEl = birdCard.querySelector('.card-common-name');
+            if (nameEl) {
+                const speciesName = nameEl.textContent;
+                const bird = allUKBirds.find(b => b.CommonName === speciesName);
+                
+                if (bird) {
+                    // Use 'bird' here because that's what you defined above
+                    showSightingModal(bird.CommonName, bird, []); 
+                    fetchBirdSong(bird.LatinName, bird.CommonName);
+                }
+            }
         }
     }
 
     // --- 2. Stop Audio when Closing Modal ---
-if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const gramophoneBtn = document.getElementById('gramophone-btn');
-    
-    if (audioPlayer) {
-        audioPlayer.pause();
-        audioPlayer.src = ""; // Clear the song
-        if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
+    if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
+        const audioPlayer = document.getElementById('bird-audio-player');
+        const gramophoneBtn = document.getElementById('gramophone-btn');
         
-        // Use a safety check for animationId
-        if (typeof animationId !== 'undefined') {
-            cancelAnimationFrame(animationId);
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.src = ""; 
+            if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
+            
+            if (typeof animationId !== 'undefined') {
+                cancelAnimationFrame(animationId);
+            }
         }
     }
-});
+}); // <--- THIS was the missing '}' that caused the error!
+
+// Initialize the gramophone listeners
 setupAudioPlayer();
