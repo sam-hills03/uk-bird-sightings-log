@@ -677,14 +677,12 @@ function filterAndDisplayBirds() {
 function setupSearchBar() {
     const searchBar = document.getElementById('search-bar');
     if (!searchBar) return;
-    
     let timeout;
     searchBar.addEventListener('input', (e) => {
         clearTimeout(timeout);
-        // We use a small timeout so it doesn't filter on every single keystroke (performance)
         timeout = setTimeout(() => {
-            currentSearchQuery = e.target.value;
-            filterAndDisplayBirds();
+            currentSearchQuery = e.target.value; // This updates the global variable
+            filterAndDisplayBirds(); // This runs the filter
         }, 300);
     });
 }
@@ -1441,14 +1439,17 @@ document.getElementById('login-btn').addEventListener('click', handleLogin);
 document.getElementById('logout-btn').addEventListener('click', handleLogout);
 // Start the app
 loadUKBirds();
-document.getElementById('rarity-filter').addEventListener('change', filterAndDisplayBirds);
-// This is a direct global function that the HTML can always see
-window.handleSummaryFilterChange = function(newRarity) {
-    console.log("Direct Filter Triggered: ", newRarity);
-    currentSummaryRarityFilter = newRarity;
-    displaySeenBirdsSummary();
-};
-// Add this so the Summary tab dropdown works
+
+// 1. Setup the Search Bar Listener
+setupSearchBar(); 
+
+// 2. Setup the Database Rarity Filter Listener
+const rarityFilter = document.getElementById('rarity-filter');
+if (rarityFilter) {
+    rarityFilter.addEventListener('change', filterAndDisplayBirds);
+}
+
+// 3. Setup the Summary Filter (The global window function you already have)
 window.handleSummaryFilterChange = function(value) {
     currentSummaryRarityFilter = value;
     displaySeenBirdsSummary();
