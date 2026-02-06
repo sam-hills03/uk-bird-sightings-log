@@ -123,15 +123,37 @@ async function loadUKBirds() {
     }
 }
         async function loadSightings() {
-  
-    
-    if (data) {
-        mySightings = data;
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
         
-        // SORT: Newest sightings first
-        mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        updateAllDisplays(); // This will now trigger the Logbook display via the code above
+        // If no user is logged in, clear sightings and stop
+        if (!user) {
+            mySightings = [];
+            updateAllDisplays();
+            return;
+        }
+
+        // 1. Fetch the actual data from Supabase
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*');
+            
+        if (error) throw error;
+
+        // 2. Now 'data' exists!
+        if (data) {
+            mySightings = data;
+            
+            // SORT: Newest sightings first
+            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // This tells all other parts of the app to refresh
+            updateAllDisplays(); 
+        }
+
+        console.log("Loaded", mySightings.length, "sightings.");
+    } catch (error) {
+        console.error("Error loading sightings:", error);
     }
 }
    
