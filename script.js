@@ -79,13 +79,20 @@ async function loadUKBirds() {
         setupSummaryFilter();
         setupSearchBar();
         setupRarityFilter();
-        setupModal();
+        setupExpeditionSearch();
         
-        filterAndDisplayBirds(); 
+        filterAndDisplayBirds();
         
+        // Load the most recent trip as a default display
+        if (mySightings.length > 0) {
+            const latest = mySightings[0]; // Assuming most recent is first
+            const data = getExpeditionData(latest.date, latest.location);
+            displayExpeditionCard(data);
+        }
     } catch (error) {
-        console.error("Failed to load UK bird list:", error);
+        console.error("Failed to load:", error);
     }
+}
 }async function loadUKBirds() {
     try {
         const response = await fetch('uk_birds.json');
@@ -1376,6 +1383,36 @@ async function fetchBirdDescription(speciesName) {
 }
 // --- UPDATED AUTHENTICATION LOGIC ---
 
+function getExpeditionData(date, location) {
+    // Filter sightings for this specific trip
+    const tripSightings = mySightings.filter(s => s.date === date && s.location === location);
+    
+    if (tripSightings.length === 0) return null;
+
+    // Find the rarest bird in this group
+    // We look up each bird in allUKBirds to get its Rarity rank
+    let rarestBird = tripSightings[0].species;
+    let highestRarityValue = 0;
+    const rarityRank = { "Common": 1, "Local": 2, "Scarce": 3, "Rare": 4, "Mega": 5 };
+
+    tripSightings.forEach(s => {
+        const birdInfo = allUKBirds.find(b => b.CommonName === s.species);
+        const currentRank = birdInfo ? rarityRank[birdInfo.Rarity] || 0 : 0;
+        if (currentRank > highestRarityValue) {
+            highestRarityValue = currentRank;
+            rarestBird = s.species;
+        }
+    });
+
+    return {
+        date: date,
+        location: location,
+        speciesCount: new Set(tripSightings.map(s => s.species)).size,
+        rarestSpecies: rarestBird,
+        allSpecies: Array.from(new Set(tripSightings.map(s => s.species)))
+    };
+}
+
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
@@ -1387,6 +1424,72 @@ async function handleSignUp() {
     
     if (error) alert("Error: " + error.message);
     else alert("Success! Check your email for a confirmation link.");
+}
+function displayExpeditionCard(tripData) {
+    if (!tripData) return;
+
+    // Update Header & Seal
+    document.getElementById('expedition-date').textContent = new Date(tripData.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('expedition-location').textContent = tripData.location;
+    document.getElementById('expedition-count').textContent = tripData.speciesCount;
+
+    // Update Highlight
+    document.getElementById('expedition-highlight').textContent = tripData.rarestSpecies;
+
+    // Build the Species Grid (The "Stamps")
+    const grid = document.getElementById('expedition-species-list');
+    grid.innerHTML = '';
+    
+    tripData.allSpecies.forEach(species => {
+        const stamp = document.createElement('span');
+        stamp.className = 'species-stamp'; // You can style this to look like a tiny ink stamp
+        stamp.textContent = species;
+        grid.appendChild(stamp);
+    });
+}
+function setupExpeditionSearch() {
+    const locInput = document.getElementById('trip-location-search');
+    const resultsContainer = document.getElementById('trip-search-results');
+    const resultsList = document.getElementById('trip-results-list');
+
+    locInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length < 2) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        // Find unique dates for this location
+        const matchedTrips = [];
+        const seenDates = new Set();
+
+        mySightings.forEach(s => {
+            if (s.location.toLowerCase().includes(query)) {
+                if (!seenDates.has(s.date + s.location)) {
+                    matchedTrips.push({ date: s.date, location: s.location });
+                    seenDates.add(s.date + s.location);
+                }
+            }
+        });
+
+        // Display results
+        if (matchedTrips.length > 0) {
+            resultsList.innerHTML = '';
+            matchedTrips.forEach(trip => {
+                const li = document.createElement('li');
+                li.textContent = `${new Date(trip.date).toLocaleDateString()} — ${trip.location}`;
+                li.onclick = () => {
+                    const data = getExpeditionData(trip.date, trip.location);
+                    displayExpeditionCard(data);
+                    resultsContainer.style.display = 'none';
+                };
+                resultsList.appendChild(li);
+            });
+            resultsContainer.style.display = 'block';
+        } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
 }
 
 // 2. LOGIN
