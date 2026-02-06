@@ -1157,3 +1157,66 @@ hr {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
     pointer-events: none;
 }
+.logbook-card {
+    background: #fdfaf3; /* Aged paper color */
+    border: 1px solid #d1ccbc;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+    padding: 30px;
+    margin-top: 20px;
+    position: relative;
+    background-image: radial-gradient(#d1ccbc 1px, transparent 1px);
+    background-size: 20px 20px; /* Subtle dot-grid paper */
+}
+
+.logbook-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #8c2e1b;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.handwritten {
+    font-family: 'DM Serif Display', serif; /* Or a cursive font if you have one */
+    font-style: italic;
+    color: #416863;
+    font-size: 1.2rem;
+}
+
+.logbook-seal {
+    border: 2px double #8c2e1b;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #8c2e1b;
+    transform: rotate(-10deg); /* Makes it look like a physical stamp */
+}
+
+.highlight-box {
+    background: rgba(140, 46, 27, 0.05);
+    border: 1px dashed #8c2e1b;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.species-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+/* For the search results dropdown */
+.search-results-overlay {
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 100;
+    width: calc(100% - 60px);
+}
