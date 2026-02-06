@@ -224,20 +224,28 @@
             <button type="button" class="remove-entry-btn">✕ Remove</button>
         </div>
     </template>
-    <div class="expedition-hub vintage-panel">
+   <div class="expedition-hub vintage-panel">
     <h3 class="hub-title">Field Expedition Archive</h3>
     
     <div class="expedition-controls">
-        <div class="control-group">
-            <label for="trip-location-search">Find by Location:</label>
-            <input type="text" id="trip-location-search" placeholder="e.g. Pulborough Brooks" list="location-datalist">
+        <div class="museum-drawer">
+            <span class="drawer-label">LOCATION INDEX</span>
+            <input type="text" id="trip-location-search" placeholder="Search Archives..." list="location-datalist" class="naturalist-input">
         </div>
-        <div class="control-group">
-            <label for="trip-date-select">Find by Date:</label>
-            <input type="date" id="trip-date-select">
+        
+        <div class="museum-drawer">
+            <span class="drawer-label">TEMPORAL LOG</span>
+            <div class="date-input-wrapper">
+                <input type="date" id="trip-date-select" class="naturalist-input">
+            </div>
         </div>
     </div>
 
+    <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
+        <ul id="trip-results-list"></ul>
+    </div>
+    
+    </div>
     <div id="trip-search-results" class="search-results-overlay" style="display: none;">
         <ul id="trip-results-list"></ul>
     </div>
