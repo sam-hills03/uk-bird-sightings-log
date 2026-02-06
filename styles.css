@@ -1328,3 +1328,91 @@ hr {
     background: white;
     font-size: 0.95rem;
 }
+/* --- AUDIO SECTION --- */
+.audio-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f4f1e8;
+    border: 1px solid #d1ccbc;
+    border-radius: 4px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.audio-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* --- THE GRAMOPHONE BUTTON --- */
+.gramophone-control {
+    background: #8c2e1b;
+    border: 2px solid #5d2014;
+    color: white;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    box-shadow: 2px 2px 0px #5d2014;
+    transition: all 0.1s;
+}
+
+.gramophone-control:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #5d2014;
+}
+
+.gramophone-icon::before {
+    content: '📻'; /* We can swap this for a custom SVG later if you like! */
+    font-size: 1.2rem;
+}
+
+.gramophone-control.playing {
+    background: #416863;
+    border-color: #2d4a46;
+}
+
+.gramophone-control.playing .gramophone-icon::before {
+    content: '⏸';
+}
+
+/* --- SPECTROGRAM --- */
+.spectrogram-container {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    background: #e9e5d9;
+    border: 1px solid #d1ccbc;
+    overflow: hidden;
+}
+
+#spectrogram-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: sepia(0.5) contrast(1.2); /* Makes the "ink" look older */
+}
+
+.recording-meta {
+    font-size: 0.75rem;
+    color: #5d544b;
+    text-align: right;
+}
+
+/* --- LOADING ANIMATION --- */
+.loading-ink {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(233, 229, 217, 0.8);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: #8c2e1b;
+}
