@@ -1332,54 +1332,50 @@ async function fetchBirdSong(latinName, commonName) {
     
     if (!audioPlayer) return;
 
-    // Reset UI and stop any current audio
+    // 1. Immediate Reset
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Determine the best name to search for
     let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
-    if (!searchQuery) {
-        recordingLoc.textContent = "Identity unknown.";
-        loadingOverlay.style.display = 'none';
-        return;
-    }
-
-    // Using AllOrigins with a cache-buster to ensure we get fresh results
+    
+    // Using a different AllOrigins endpoint that is sometimes less restricted
     const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}&disableCache=true`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error('Network response was not ok');
-        
+        // We add a timeout so it doesn't hang forever
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second limit
+
+        const response = await fetch(proxyUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         const wrapper = await response.json();
         
-        if (wrapper.contents) {
+        if (wrapper && wrapper.contents) {
             const data = JSON.parse(wrapper.contents);
 
             if (data.recordings && data.recordings.length > 0) {
-                // Pick the first high-quality recording
                 const bestMatch = data.recordings[0];
                 let fileUrl = bestMatch.file;
-                
-                // Fix URL formatting
                 if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
                 
                 audioPlayer.src = fileUrl;
                 audioPlayer.load();
                 
-                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+                recordingLoc.textContent = `Captured: ${bestMatch.loc}`;
                 loadingOverlay.style.display = 'none';
             } else {
-                recordingLoc.textContent = "No recordings in archive.";
+                recordingLoc.textContent = "No recordings found.";
                 loadingOverlay.style.display = 'none';
             }
         }
     } catch (error) {
         console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost (Archive busy)";
+        // If the proxy fails, we give the user a clear message
+        recordingLoc.textContent = "Archive signal weak. Try again later.";
         loadingOverlay.style.display = 'none';
     }
 }
