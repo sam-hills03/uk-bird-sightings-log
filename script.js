@@ -1472,44 +1472,61 @@ function setupExpeditionSearch() {
     const resultsContainer = document.getElementById('trip-search-results');
     const resultsList = document.getElementById('trip-results-list');
 
-    locInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
+    if (!locInput) return;
+
+    locInput.addEventListener('input', () => {
+        const query = locInput.value.toLowerCase().trim();
+        
         if (query.length < 2) {
             resultsContainer.style.display = 'none';
             return;
         }
 
-        const matchedTrips = [];
-        const seenTrips = new Set(); // We use this to prevent duplicates
+        // Group sightings into unique trips (Date + Location)
+        const tripsMap = new Map();
 
         mySightings.forEach(s => {
             if (s.location.toLowerCase().includes(query)) {
-                // Create a unique ID for this specific Trip (Date + Location)
-                const tripKey = s.date + "|" + s.location;
-                
-                if (!seenTrips.has(tripKey)) {
-                    matchedTrips.push({ date: s.date, location: s.location });
-                    seenTrips.add(tripKey);
+                const key = `${s.date}|${s.location}`;
+                if (!tripsMap.has(key)) {
+                    tripsMap.set(key, { date: s.date, location: s.location });
                 }
             }
         });
 
-        if (matchedTrips.length > 0) {
+        const sortedTrips = Array.from(tripsMap.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (sortedTrips.length > 0) {
             resultsList.innerHTML = '';
-            matchedTrips.forEach(trip => {
+            sortedTrips.forEach(trip => {
                 const li = document.createElement('li');
-                // We show the Location AND Date clearly in the results list
-                li.innerHTML = `<strong>${trip.location}</strong> <br> <small>${new Date(trip.date).toLocaleDateString('en-GB')}</small>`;
+                li.className = 'archive-item';
+                const d = new Date(trip.date).toLocaleDateString('en-GB');
+                
+                li.innerHTML = `
+                    <div class="archive-item-content">
+                        <strong>${trip.location}</strong>
+                        <span class="archive-date">${d}</span>
+                    </div>
+                `;
+                
                 li.onclick = () => {
                     const data = getExpeditionData(trip.date, trip.location);
                     displayExpeditionCard(data);
                     resultsContainer.style.display = 'none';
-                    locInput.value = trip.location; // Clean up the input box
+                    locInput.value = trip.location; 
                 };
                 resultsList.appendChild(li);
             });
             resultsContainer.style.display = 'block';
         } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
+
+    // Close drawer if clicking away
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.expedition-hub')) {
             resultsContainer.style.display = 'none';
         }
     });
