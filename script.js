@@ -21,6 +21,8 @@ let currentSummaryRarityFilter = 'All';
 // Search filter
 let currentSearchQuery = '';
 
+let audioContext, analyser, dataArray, animationId;
+
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
 const sightingForm = document.getElementById('sighting-form');
@@ -572,6 +574,104 @@ function setupModal() {
     const closeBtn = document.querySelector('.modal-close');
     if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
     window.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
+}
+
+// 1. Setup the basic audio listeners
+function setupAudioPlayer() {
+    const gramophoneBtn = document.getElementById('gramophone-btn');
+    const audioPlayer = document.getElementById('bird-audio-player');
+
+    if (!gramophoneBtn || !audioPlayer) return;
+
+    gramophoneBtn.onclick = () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            gramophoneBtn.classList.add('playing');
+            startSpectrogram();
+        } else {
+            audioPlayer.pause();
+            gramophoneBtn.classList.remove('playing');
+            cancelAnimationFrame(animationId);
+        }
+    };
+
+    // Auto-reset button when audio ends
+    audioPlayer.onended = () => {
+        gramophoneBtn.classList.remove('playing');
+        cancelAnimationFrame(animationId);
+    };
+}
+
+// 2. The API Fetch: Find the song on Xeno-canto
+async function fetchBirdSong(latinName) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+    const recordingLoc = document.getElementById('recording-location');
+    
+    if (!audioPlayer) return;
+
+    // Reset UI
+    audioPlayer.pause();
+    loadingOverlay.style.display = 'flex';
+    recordingLoc.textContent = "Tuning signal...";
+
+    try {
+        // We query Xeno-canto using the scientific name
+        const response = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(latinName)}+q:A`);
+        const data = await response.json();
+
+        if (data.recordings && data.recordings.length > 0) {
+            const bestMatch = data.recordings[0];
+            audioPlayer.src = bestMatch.file;
+            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+            loadingOverlay.style.display = 'none';
+        } else {
+            recordingLoc.textContent = "No recordings in archive.";
+            loadingOverlay.style.display = 'none';
+        }
+    } catch (error) {
+        console.error("Audio fetch error:", error);
+        recordingLoc.textContent = "Signal lost...";
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+// 3. The Spectrogram: Drawing the "Ink Blot"
+function startSpectrogram() {
+    const canvas = document.getElementById('spectrogram-canvas');
+    const ctx = canvas.getContext('2d');
+    const audioPlayer = document.getElementById('bird-audio-player');
+
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audioPlayer);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+    }
+
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        ctx.fillStyle = '#e9e5d9'; // Parchment color
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const barHeight = dataArray[i] / 2;
+            ctx.fillStyle = `rgba(140, 46, 27, ${barHeight / 100})`; // Ink Red
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+    draw();
 }
 
 // ============================================
@@ -1683,3 +1783,35 @@ window.handleSummaryFilterChange = function(value) {
 
 // Call the Search Setup
 setupExpeditionSearch();
+document.addEventListener('click', function(e) {
+    // ... your existing auth buttons (login, signup, logout) ...
+
+    // --- 1. Open Bird Details & Fetch Song ---
+    const birdCard = e.target.closest('.bird-card');
+    if (birdCard) {
+        const speciesName = birdCard.querySelector('.card-common-name').textContent;
+        const bird = allUKBirds.find(b => b.CommonName === speciesName);
+        
+        if (bird) {
+            // Your existing function to open the modal (change name if yours is different)
+            openSightingModal(speciesName); 
+            
+            // Start fetching the song!
+            fetchBirdSong(bird.ScientificName);
+        }
+    }
+
+    // --- 2. Stop Audio when Closing Modal ---
+    if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
+        const audioPlayer = document.getElementById('bird-audio-player');
+        const gramophoneBtn = document.getElementById('gramophone-btn');
+        
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.src = ""; // Stop the stream
+            if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
+            cancelAnimationFrame(animationId);
+        }
+    }
+});
+setupAudioPlayer();
