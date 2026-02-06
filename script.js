@@ -1674,5 +1674,5 @@ if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-moda
             cancelAnimationFrame(animationId);
         }
     }
-});
+}
 setupAudioPlayer();
