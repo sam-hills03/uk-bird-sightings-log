@@ -80,6 +80,7 @@ async function loadUKBirds() {
         setupPagination();
         setupSummaryFilter();
         setupSearchBar();
+        setupRarityFilter();
         setupModal();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
@@ -568,7 +569,7 @@ function populateLocationDatalist() {
 }
 
 // ============================================
-// F. BIRD LIST & SEARCH
+// F. BIRD LIST & 
 // ============================================
 
 function toggleAdminControls(isAdmin) {
@@ -684,6 +685,14 @@ function setupSearchBar() {
             filterAndDisplayBirds();
         }, 300);
     });
+}
+function setupRarityFilter() {
+    const rarityFilter = document.getElementById('rarity-filter');
+    if (rarityFilter) {
+        rarityFilter.addEventListener('change', () => {
+            filterAndDisplayBirds();
+        });
+    }
 }
 
 function getUniqueSeenSpecies() {
