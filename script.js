@@ -1216,22 +1216,27 @@ function calculateAndDisplayStats() {
     const currentDisplay = document.getElementById('current-count-display');
     const targetDisplay = document.getElementById('target-count-display');
 
-    if (progressBar && nextLevelName) {
-        let progressPercent = 0;
-        if (currentRank === nextRank) {
-            progressPercent = 100;
-            nextLevelName.textContent = "Ultimate Rank Achieved";
-        } else {
-            const progressInTier = totalSeenCount - currentRank.threshold;
-            const tierRange = nextRank.threshold - currentRank.threshold;
-            progressPercent = Math.min((progressInTier / tierRange) * 100, 100);
-            nextLevelName.textContent = `Next: ${nextRank.name}`;
-        }
+    // --- UPDATED PROGRESS CALCULATION ---
 
-        progressBar.style.width = `${progressPercent}%`;
-        if (currentDisplay) currentDisplay.textContent = totalSeenCount;
-        if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
+if (progressBar && nextLevelName) {
+    let progressPercent = 0;
+    
+    if (currentRank.name === "Grand Archivist") {
+        // You've reached the final rank
+        progressPercent = 100;
+        nextLevelName.textContent = "Ultimate Rank Achieved";
+    } else {
+        progressPercent = Math.min((totalSeenCount / nextRank.threshold) * 100, 100);
+        
+        nextLevelName.textContent = `Next: ${nextRank.name}`;
     }
+
+    // Apply the width to the bar
+    progressBar.style.width = `${progressPercent}%`;
+    
+    if (currentDisplay) currentDisplay.textContent = totalSeenCount;
+    if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
+}}
 
     // 4. Update Other UI Elements
     calculateMilestones(); 
