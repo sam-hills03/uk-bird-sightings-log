@@ -228,17 +228,16 @@
     <h3 class="hub-title">Field Expedition Archive</h3>
     
     <div class="expedition-controls">
-        <div class="museum-drawer">
+        <div class="museum-drawer" style="grid-column: span 2;">
             <span class="drawer-label">LOCATION INDEX</span>
-            <input type="text" id="trip-location-search" placeholder="Search Archives..." list="location-datalist" class="naturalist-input">
+            <input type="text" id="trip-location-search" placeholder="Search Archives (e.g. Pulborough)..." class="naturalist-input" autocomplete="off">
         </div>
-        
-        <div class="museum-drawer">
-            <span class="drawer-label">TEMPORAL LOG</span>
-            <div class="date-input-wrapper">
-                <input type="date" id="trip-date-select" class="naturalist-input">
-            </div>
-        </div>
+    </div>
+
+    <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
+        <ul id="trip-results-list"></ul>
+    </div>
+
     </div>
 
     <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
