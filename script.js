@@ -622,6 +622,7 @@ function filterAndDisplayBirds() {
     
     listContainer.innerHTML = ''; 
 
+    // Filter the list based on rarity and search query
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
     
     if (currentSearchQuery && currentSearchQuery.trim() !== '') {
@@ -634,25 +635,27 @@ function filterAndDisplayBirds() {
     const seenSpecies = new Set(mySightings.map(s => s.species));
     const cardTemplate = document.getElementById('bird-card-template');
 
+    // Build the cards
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
 
-        // Reset state
+        // Reset state to ensure clean visual start
         card.classList.remove('verified-card');
         const existingBadge = imageContainer.querySelector('.verified-check-badge');
         if (existingBadge) existingBadge.remove();
 
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
+        // Set Text Data
         card.querySelector('.card-common-name').textContent = bird.CommonName;
         const rarityTag = card.querySelector('.card-rarity-tag');
         rarityTag.textContent = bird.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        // RUN THE IMAGE HELPER
+        // RUN THE IMAGE HELPER (Defined below)
         applyBirdImageData(card, imageContainer, imageEl, bird);
 
         // ADD CLICK LISTENER
@@ -667,20 +670,21 @@ function filterAndDisplayBirds() {
         listContainer.appendChild(card);
     });
 
-    // Admin check
+    // Admin check once the loop is done
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         const isAdmin = session?.user?.id === ADMIN_UID;
         toggleAdminControls(isAdmin);
     });
 }
 
-// 2. THE IMAGE HELPER (Defined outside)
+// 2. THE IMAGE HELPER (Defined outside to keep things tidy)
 function applyBirdImageData(card, imageContainer, imageEl, bird) {
     getBirdImage(bird.CommonName, bird.LatinName).then(result => {
         if (result && result.url) {
             imageEl.src = result.url;
             imageEl.style.display = 'block';
             
+            // Clear any lingering badges inside the async call
             const oldBadge = imageContainer.querySelector('.verified-check-badge');
             if (oldBadge) oldBadge.remove();
 
@@ -702,25 +706,6 @@ function applyBirdImageData(card, imageContainer, imageEl, bird) {
         } else {
             imageEl.style.display = 'none';
         }
-    });
-}
-
-        // Add click listener to open the info modal
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.image-verify-overlay')) {
-                const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-                showSightingModal(bird.CommonName, bird, birdSightings);
-            }
-        });
-
-        card.style.cursor = 'pointer';
-        listContainer.appendChild(card);
-    });
-
-    // Admin check (Keep this at the end)
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        const isAdmin = session?.user?.id === ADMIN_UID;
-        toggleAdminControls(isAdmin);
     });
 }
 
