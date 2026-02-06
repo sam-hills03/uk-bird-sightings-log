@@ -229,16 +229,15 @@ function updateAllDisplays() {
     filterAndDisplayBirds();
     createMonthlyChart();
 
-    // ADD THIS: Refresh the Logbook Card whenever data changes
+    // --- FORCE UPDATE LOGBOOK ---
     if (mySightings.length > 0) {
-        // Find the trip currently being viewed, or default to the latest
-        const currentLoc = document.getElementById('expedition-location').textContent;
-        const currentDate = document.getElementById('trip-date-select').value; // Get date from input
+        // Find the trip data for the very first (latest) sighting
+        const latest = mySightings[0];
+        const tripData = getExpeditionData(latest.date, latest.location);
         
-        // If we have a date selected, refresh that specific trip, otherwise show latest
-        const sighting = mySightings.find(s => s.date === currentDate && s.location === currentLoc) || mySightings[0];
-        const tripData = getExpeditionData(sighting.date, sighting.location);
-        displayExpeditionCard(tripData);
+        if (tripData) {
+            displayExpeditionCard(tripData);
+        }
     }
 }
 
