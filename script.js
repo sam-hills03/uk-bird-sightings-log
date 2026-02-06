@@ -1151,87 +1151,90 @@ if (sightingForm) {
 // ============================================
 
 function calculateAndDisplayStats() {
-    const sightingsToUse = getFilteredSightings(); // Use the filtered list
-    
-    // Change your 'seenSpecies' logic to use the filtered list
-    const seenSpecies = new Set(sightingsToUse.map(s => s.species));
-    const totalSeenCount = seenSpecies.size;
-    
-    // 1. Update Total Unique Species Count
+    const sightingsToUse = getFilteredSightings(); // Respects Lifetime vs Annual toggle
+    const seenSpeciesNames = new Set(sightingsToUse.map(s => s.species));
+    const totalSeenCount = seenSpeciesNames.size;
+    const totalPossible = allUKBirds.length;
+
+    // 1. Update Basic Text Stats
     const totalSpeciesEl = document.getElementById('total-species');
     if (totalSpeciesEl) totalSpeciesEl.textContent = totalSeenCount;
 
-    // 2. Calculate Percentage of UK List Seen
-    const totalUKSpeciesCount = allUKBirds.length;
-    const percentage = (totalSeenCount / totalUKSpeciesCount) * 100;
     const percentageSeenEl = document.getElementById('percentage-seen');
-    if (percentageSeenEl) percentageSeenEl.textContent = percentage.toFixed(2) + '%';
+    if (percentageSeenEl) {
+        const percentage = totalPossible > 0 ? (totalSeenCount / totalPossible) * 100 : 0;
+        percentageSeenEl.textContent = percentage.toFixed(2) + '%';
+    }
 
-    // 3. Calculate Percentage Excluding Megas
+    // 2. Percentage Excluding Megas
     const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega');
-    const nonMegaTotalCount = nonMegaBirds.length;
-    
-    const seenNonMegaCount = Array.from(seenSpecies).filter(speciesName => {
+    const seenNonMegaCount = Array.from(seenSpeciesNames).filter(speciesName => {
         const bird = allUKBirds.find(b => b.CommonName === speciesName);
         return bird && bird.Rarity !== 'Mega';
     }).length;
 
-    const percentageNoMega = (seenNonMegaCount / nonMegaTotalCount) * 100;
     const percentageNoMegaEl = document.getElementById('percentage-no-mega');
-    if (percentageNoMegaEl) percentageNoMegaEl.textContent = percentageNoMega.toFixed(2) + '%';
+    if (percentageNoMegaEl && nonMegaBirds.length > 0) {
+        const pNoMega = (seenNonMegaCount / nonMegaBirds.length) * 100;
+        percentageNoMegaEl.textContent = pNoMega.toFixed(2) + '%';
+    }
 
-    // --- TRIGGER THE UPDATES ---
-    updateNaturalistRank(totalSeenCount);
-    calculateMilestones(); 
-}
+    // 3. ID Card Rank & Progress Logic
+    const ranks = [
+        { name: "Fledgling", threshold: 0, color: "#8c2e1b" },
+        { name: "Wanderer", threshold: 10, color: "#5d544b" },
+        { name: "Naturalist", threshold: 50, color: "#416863" },
+        { name: "Master of Skies", threshold: 150, color: "#2c2621" },
+        { name: "Grand Archivist", threshold: 300, color: "#d4af37" }
+    ];
 
-function updateNaturalistRank(count) {
-    const rankElement = document.getElementById('naturalist-rank');
+    let currentRank = ranks[0];
+    let nextRank = ranks[1];
+
+    for (let i = 0; i < ranks.length; i++) {
+        if (totalSeenCount >= ranks[i].threshold) {
+            currentRank = ranks[i];
+            nextRank = ranks[i + 1] || ranks[i]; 
+        }
+    }
+
+    // Update Rank Title (The text next to your name)
+    const rankTitleElement = document.querySelector('.id-rank-title');
+    if (rankTitleElement) {
+        rankTitleElement.textContent = currentRank.name;
+    }
+
+    // Update the Wax Seal Color
+    const waxSeal = document.querySelector('.rank-stamp-seal');
+    if (waxSeal) {
+        waxSeal.style.backgroundColor = currentRank.color;
+    }
+
+    // Update Progress Bar & Counts
     const progressBar = document.getElementById('level-progress-bar');
-    const nextLevelEl = document.getElementById('next-level-name');
+    const nextLevelName = document.getElementById('next-level-name');
     const currentDisplay = document.getElementById('current-count-display');
     const targetDisplay = document.getElementById('target-count-display');
 
-    if (!rankElement) return;
+    if (progressBar && nextLevelName) {
+        let progressPercent = 0;
+        if (currentRank === nextRank) {
+            progressPercent = 100;
+            nextLevelName.textContent = "Ultimate Rank Achieved";
+        } else {
+            const progressInTier = totalSeenCount - currentRank.threshold;
+            const tierRange = nextRank.threshold - currentRank.threshold;
+            progressPercent = Math.min((progressInTier / tierRange) * 100, 100);
+            nextLevelName.textContent = `Next: ${nextRank.name}`;
+        }
 
-    let rank = "Novice";
-    let target = 50;
-    let nextRank = "Field Naturalist";
-    let color = "#8c2e1b"; 
-
-    if (count >= 300) {
-        rank = "Master";
-        target = 300;
-        nextRank = "Elite Status";
-        color = "#d4af37"; 
-    } else if (count >= 150) {
-        rank = "Resident";
-        target = 300;
-        nextRank = "Master of Skies";
-        color = "#416863"; 
-    } else if (count >= 50) {
-        rank = "Naturalist";
-        target = 150;
-        nextRank = "Resident Ornith.";
-        color = "#5d544b"; 
-    } else {
-        rank = "Novice";
-        target = 50;
-        nextRank = "Field Naturalist";
-        color = "#8c2e1b"; 
+        progressBar.style.width = `${progressPercent}%`;
+        if (currentDisplay) currentDisplay.textContent = totalSeenCount;
+        if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
     }
 
-    rankElement.textContent = rank;
-    rankElement.style.backgroundColor = color;
-
-    if (nextLevelEl) nextLevelEl.textContent = "Next: " + nextRank;
-    if (currentDisplay) currentDisplay.textContent = count;
-    if (targetDisplay) targetDisplay.textContent = target;
-
-    if (progressBar) {
-        const percentage = Math.min((count / target) * 100, 100);
-        progressBar.style.width = percentage + "%";
-    }
+    // 4. Update Other UI Elements
+    calculateMilestones(); 
 }
 
 function calculateMilestones() {
