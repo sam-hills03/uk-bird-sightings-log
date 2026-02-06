@@ -1332,17 +1332,18 @@ async function fetchBirdSong(latinName, commonName) {
     
     if (!audioPlayer) return;
 
-    // Reset UI
     audioPlayer.pause();
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // 1. Try Latin Name first, fall back to Common Name if Latin is missing
     let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
     
+    // We use a public proxy to bypass the CORS block
+    const proxy = "https://corsproxy.io/?";
+    const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
+
     try {
-        // We add 'q:A' to get high-quality, and 'len_gt:5' to ensure it's not a 1-second clip
-        const response = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`);
+        const response = await fetch(proxy + encodeURIComponent(xenoUrl));
         const data = await response.json();
 
         if (data.recordings && data.recordings.length > 0) {
@@ -1356,26 +1357,12 @@ async function fetchBirdSong(latinName, commonName) {
             recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
             loadingOverlay.style.display = 'none';
         } else {
-            // 2. If the first search failed, try a broader search without the 'q:A' filter
-            const broadResponse = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}`);
-            const broadData = await broadResponse.json();
-
-            if (broadData.recordings && broadData.recordings.length > 0) {
-                const backupMatch = broadData.recordings[0];
-                let fileUrl = backupMatch.file;
-                if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-                audioPlayer.src = fileUrl;
-                audioPlayer.load();
-                recordingLoc.textContent = `Captured: ${backupMatch.loc} (Standard Grade)`;
-                loadingOverlay.style.display = 'none';
-            } else {
-                recordingLoc.textContent = "No recordings in archive.";
-                loadingOverlay.style.display = 'none';
-            }
+            recordingLoc.textContent = "No recordings in archive.";
+            loadingOverlay.style.display = 'none';
         }
     } catch (error) {
         console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost...";
+        recordingLoc.textContent = "Signal lost (CORS block)";
         loadingOverlay.style.display = 'none';
     }
 }
@@ -1673,14 +1660,17 @@ document.addEventListener('click', function(e) {
     }
 
     // --- 2. Stop Audio when Closing Modal ---
-    if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
-        const audioPlayer = document.getElementById('bird-audio-player');
-        const gramophoneBtn = document.getElementById('gramophone-btn');
+if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const gramophoneBtn = document.getElementById('gramophone-btn');
+    
+    if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.src = ""; // Clear the song
+        if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
         
-        if (audioPlayer) {
-            audioPlayer.pause();
-            audioPlayer.src = ""; // Stop the stream
-            if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
+        // Use a safety check for animationId
+        if (typeof animationId !== 'undefined') {
             cancelAnimationFrame(animationId);
         }
     }
