@@ -385,23 +385,41 @@ function displaySeenBirdsSummary() {
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Only fetch image when card is visible
-                    getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
-                        if (result && result.url) {
-                            imageEl.src = result.url;
-                            
-                            if (result.isVerified) {
-                                card.classList.add('verified-card');
-                                const vBadge = document.createElement('div');
-                                vBadge.className = 'verified-check-badge';
-                                vBadge.innerHTML = '✓ Verified';
-                                imageContainer.appendChild(vBadge);
-                                const keepBtn = card.querySelector('.keep-btn');
-                                if (keepBtn) keepBtn.style.display = 'none';
-                            }
-                            handleImageVerification(card, birdData);
-                        }
-                    });
+                    // Inside your filteredBirds.forEach loop...
+
+getBirdImage(bird.CommonName, bird.LatinName).then(result => {
+    // 1. Reset the card state before applying new data 
+    // This prevents "ghost" tags from previous cards
+    card.classList.remove('verified-card');
+    const existingBadge = imageContainer.querySelector('.verified-check-badge');
+    if (existingBadge) existingBadge.remove();
+    
+    if (result && result.url) {
+        imageEl.src = result.url;
+        imageEl.style.display = 'block';
+
+        // 2. STRICT CHECK: Only add badge if verified in your Supabase table
+        if (result.isVerified === true) {
+            card.classList.add('verified-card');
+            
+            const vBadge = document.createElement('div');
+            vBadge.className = 'verified-check-badge';
+            vBadge.innerHTML = '✓ Verified';
+            imageContainer.appendChild(vBadge);
+            
+            const keepBtn = card.querySelector('.keep-btn');
+            if (keepBtn) keepBtn.style.display = 'none';
+        } else {
+            // Ensure the keep button is visible for unverified images
+            const keepBtn = card.querySelector('.keep-btn');
+            if (keepBtn) keepBtn.style.display = 'inline-block';
+        }
+
+        handleImageVerification(card, bird);
+    } else {
+        imageEl.style.display = 'none';
+    }
+});
                     // Stop watching once loaded
                     observer.unobserve(entry.target);
                 }
