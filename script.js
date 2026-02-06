@@ -1472,44 +1472,79 @@ function setupExpeditionSearch() {
     const resultsContainer = document.getElementById('trip-search-results');
     const resultsList = document.getElementById('trip-results-list');
 
+    if (!locInput) return;
+
     locInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
+        
+        // Hide if search is too short
         if (query.length < 2) {
             resultsContainer.style.display = 'none';
             return;
         }
 
         const matchedTrips = [];
-        const seenTrips = new Set(); // We use this to prevent duplicates
+        const seenKeys = new Set(); // To prevent exact duplicates
 
+        // 1. Scan through EVERY sighting
         mySightings.forEach(s => {
-            if (s.location.toLowerCase().includes(query)) {
-                // Create a unique ID for this specific Trip (Date + Location)
-                const tripKey = s.date + "|" + s.location;
+            const locMatch = s.location.toLowerCase().includes(query);
+            
+            if (locMatch) {
+                // Create a unique key for Date + Location
+                const tripKey = `${s.date}_${s.location}`;
                 
-                if (!seenTrips.has(tripKey)) {
-                    matchedTrips.push({ date: s.date, location: s.location });
-                    seenTrips.add(tripKey);
+                if (!seenKeys.has(tripKey)) {
+                    matchedTrips.push({
+                        date: s.date,
+                        location: s.location
+                    });
+                    seenKeys.add(tripKey);
                 }
             }
         });
 
+        // 2. Sort results so the most recent trips are at the top
+        matchedTrips.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // 3. Render the list
         if (matchedTrips.length > 0) {
             resultsList.innerHTML = '';
             matchedTrips.forEach(trip => {
                 const li = document.createElement('li');
-                // We show the Location AND Date clearly in the results list
-                li.innerHTML = `<strong>${trip.location}</strong> <br> <small>${new Date(trip.date).toLocaleDateString('en-GB')}</small>`;
+                li.className = 'archive-item';
+                
+                // Format the date nicely
+                const displayDate = new Date(trip.date).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+
+                li.innerHTML = `
+                    <div class="archive-item-content">
+                        <span class="archive-loc"><strong>${trip.location}</strong></span>
+                        <span class="archive-date">${displayDate}</span>
+                    </div>
+                `;
+
                 li.onclick = () => {
                     const data = getExpeditionData(trip.date, trip.location);
                     displayExpeditionCard(data);
                     resultsContainer.style.display = 'none';
-                    locInput.value = trip.location; // Clean up the input box
+                    locInput.value = ''; // Reset search
                 };
                 resultsList.appendChild(li);
             });
             resultsContainer.style.display = 'block';
         } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
+
+    // Close the drawer if user clicks outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.expedition-controls')) {
             resultsContainer.style.display = 'none';
         }
     });
