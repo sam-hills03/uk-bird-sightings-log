@@ -1325,51 +1325,57 @@ function createMonthlyChart() {
     });
 }
 
-async function fetchBirdSong(latinName) {
+async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
     
-    console.log("Gramophone attempting to fetch:", latinName); // DEBUG LOG
-
     if (!audioPlayer) return;
-    if (!latinName || latinName === 'No Data') {
-        recordingLoc.textContent = "No scientific name found.";
-        return;
-    }
 
     // Reset UI
     audioPlayer.pause();
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
+    // 1. Try Latin Name first, fall back to Common Name if Latin is missing
+    let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
+    
     try {
-        // We use a proxy or direct fetch. Note: Xeno-canto sometimes requires 
-        // a specific URL format or handles CORS differently.
-        const queryUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(latinName)}+q:A`;
-        const response = await fetch(queryUrl);
+        // We add 'q:A' to get high-quality, and 'len_gt:5' to ensure it's not a 1-second clip
+        const response = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`);
         const data = await response.json();
-
-        console.log("Xeno-canto response data:", data); // DEBUG LOG
 
         if (data.recordings && data.recordings.length > 0) {
             const bestMatch = data.recordings[0];
-            // Xeno-canto files usually start with //, we add https:
             let fileUrl = bestMatch.file;
             if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
             
             audioPlayer.src = fileUrl;
-            audioPlayer.load(); // Forces the browser to buffer the new sound
+            audioPlayer.load();
             
             recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
             loadingOverlay.style.display = 'none';
         } else {
-            recordingLoc.textContent = "No recordings in archive.";
-            loadingOverlay.style.display = 'none';
+            // 2. If the first search failed, try a broader search without the 'q:A' filter
+            const broadResponse = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}`);
+            const broadData = await broadResponse.json();
+
+            if (broadData.recordings && broadData.recordings.length > 0) {
+                const backupMatch = broadData.recordings[0];
+                let fileUrl = backupMatch.file;
+                if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+                audioPlayer.src = fileUrl;
+                audioPlayer.load();
+                recordingLoc.textContent = `Captured: ${backupMatch.loc} (Standard Grade)`;
+                loadingOverlay.style.display = 'none';
+            } else {
+                recordingLoc.textContent = "No recordings in archive.";
+                loadingOverlay.style.display = 'none';
+            }
         }
     } catch (error) {
         console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost (Network Error)";
+        recordingLoc.textContent = "Signal lost...";
         loadingOverlay.style.display = 'none';
     }
 }
@@ -1662,7 +1668,7 @@ document.addEventListener('click', function(e) {
             showSightingModal(birdData.CommonName, birdData, sightingsData.sightings); 
             
             // Start fetching the song!
-            fetchBirdSong(bird.ScientificName);
+            fetchBirdSong(birdData.LatinName, species);
         }
     }
 
