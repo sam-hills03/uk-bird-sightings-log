@@ -224,6 +224,47 @@
             <button type="button" class="remove-entry-btn">✕ Remove</button>
         </div>
     </template>
+    <div class="expedition-hub vintage-panel">
+    <h3 class="hub-title">Field Expedition Archive</h3>
+    
+    <div class="expedition-controls">
+        <div class="control-group">
+            <label for="trip-location-search">Find by Location:</label>
+            <input type="text" id="trip-location-search" placeholder="e.g. Pulborough Brooks" list="location-datalist">
+        </div>
+        <div class="control-group">
+            <label for="trip-date-select">Find by Date:</label>
+            <input type="date" id="trip-date-select">
+        </div>
+    </div>
+
+    <div id="trip-search-results" class="search-results-overlay" style="display: none;">
+        <ul id="trip-results-list"></ul>
+    </div>
+
+    <div id="expedition-card" class="logbook-card">
+        <div class="logbook-header">
+            <div class="logbook-meta">
+                <span id="expedition-date" class="handwritten">Feb 6, 2026</span>
+                <h2 id="expedition-location" class="serif-title">Worthing Pier</h2>
+            </div>
+            <div class="logbook-seal">
+                <span id="expedition-count">0</span>
+                <small>Species</small>
+            </div>
+        </div>
+
+        <div class="logbook-body">
+            <div class="highlight-box">
+                <span class="label">⭐ RAREST ENCOUNTER</span>
+                <p id="expedition-highlight" class="handwritten">No data found</p>
+            </div>
+            
+            <div class="species-grid" id="expedition-species-list">
+                </div>
+        </div>
+    </div>
+</div>
     
     <template id="bird-card-template">
     <div class="bird-card">
