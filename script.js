@@ -93,7 +93,7 @@ async function loadUKBirds() {
         console.error("Failed to load:", error);
     }
 }
-}async function loadUKBirds() {
+async function loadUKBirds() {
     try {
         const response = await fetch('uk_birds.json');
         if (response.ok) {
