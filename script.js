@@ -229,12 +229,10 @@ function updateAllDisplays() {
     filterAndDisplayBirds();
     createMonthlyChart();
 
-    // --- FORCE UPDATE LOGBOOK ---
-    if (mySightings.length > 0) {
-        // Find the trip data for the very first (latest) sighting
+    // Refresh the Expedition Logbook Card with the latest data
+    if (mySightings && mySightings.length > 0) {
         const latest = mySightings[0];
         const tripData = getExpeditionData(latest.date, latest.location);
-        
         if (tripData) {
             displayExpeditionCard(tripData);
         }
@@ -1678,20 +1676,6 @@ window.handleSummaryFilterChange = function(value) {
     displaySeenBirdsSummary();
 };
 // --- EXPEDITION HUB LINKING ---
-
-// Listen for Date changes in the Museum Drawer
-document.getElementById('trip-date-select').addEventListener('change', (e) => {
-    const selectedDate = e.target.value;
-    // Find the first sighting on this date to get the location
-    const sightingOnDate = mySightings.find(s => s.date === selectedDate);
-    
-    if (sightingOnDate) {
-        const data = getExpeditionData(selectedDate, sightingOnDate.location);
-        displayExpeditionCard(data);
-    } else {
-        alert("Archive entry not found for this date.");
-    }
-});
 
 // Call the Search Setup
 setupExpeditionSearch();
