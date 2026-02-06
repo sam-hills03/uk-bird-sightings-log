@@ -602,58 +602,61 @@ function filterAndDisplayBirds() {
     
     listContainer.innerHTML = ''; 
 
-    // 1. Filter by Rarity
+    // 1. Filter the list
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
     
-    // 2. Filter by Search Query (Using the global currentSearchQuery)
     if (currentSearchQuery && currentSearchQuery.trim() !== '') {
         const q = currentSearchQuery.toLowerCase();
         filteredBirds = filteredBirds.filter(b => 
-            b.CommonName.toLowerCase().includes(q) || 
-            (b.LatinName || '').toLowerCase().includes(q)
+            b.CommonName.toLowerCase().includes(q) || (b.LatinName || '').toLowerCase().includes(q)
         );
     }
     
-    // 3. IMPORTANT: Database checkmarks should always be based on Lifetime sightings
-    // This prevents checkmarks from disappearing when you switch years
+    // 2. We use 'mySightings' directly here to ensure database 'Seen' status is LIFETIME
     const seenSpecies = new Set(mySightings.map(s => s.species));
     const cardTemplate = document.getElementById('bird-card-template');
 
-    // 4. Build the cards
+    // 3. Build the cards
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
 
+        // Mark as seen if in your sightings
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
+        // Set Text Data
         card.querySelector('.card-common-name').textContent = bird.CommonName;
         const rarityTag = card.querySelector('.card-rarity-tag');
         rarityTag.textContent = bird.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
+        // Handle Images
         getBirdImage(bird.CommonName, bird.LatinName).then(result => {
             if (result && result.url) {
                 imageEl.src = result.url;
+                
                 if (result.isVerified) {
                     card.classList.add('verified-card');
                     const vBadge = document.createElement('div');
                     vBadge.className = 'verified-check-badge';
                     vBadge.innerHTML = 'Verified';
                     imageContainer.appendChild(vBadge);
+                    
                     const keepBtn = card.querySelector('.keep-btn');
                     if (keepBtn) keepBtn.style.display = 'none';
                 }
+
                 handleImageVerification(card, bird);
             } else {
                 imageEl.style.display = 'none';
             }
-        });
+        }); // <-- This was the missing closing bracket for the .then() block
 
+        // Add click listener to open the info modal
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
-                // Modal shows lifetime sightings for that bird
                 const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
                 showSightingModal(bird.CommonName, bird, birdSightings);
             }
@@ -662,8 +665,8 @@ function filterAndDisplayBirds() {
         card.style.cursor = 'pointer';
         listContainer.appendChild(card);
     });
-}
 
+    // Admin check (Keep this at the end)
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         const isAdmin = session?.user?.id === ADMIN_UID;
         toggleAdminControls(isAdmin);
