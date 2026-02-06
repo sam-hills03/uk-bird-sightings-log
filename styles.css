@@ -1151,16 +1151,21 @@ hr {
 
 /* 1. The Museum Drawer Containers */
 .expedition-controls {
-    display: block; /* Stacked look */
-    margin-bottom: 20px;
+    display: flex;
+    justify-content: center; /* Centers the search bar */
+    margin-bottom: 30px;
+    width: 100%;
 }
 
 .museum-drawer {
+    flex: 1;
+    max-width: 500px; /* Prevents the search bar from being too wide */
     border-left: 4px solid #8c2e1b;
     padding-left: 15px;
     background: rgba(140, 46, 27, 0.02);
 }
 
+}
 .drawer-label {
     font-family: 'DM Serif Display', serif;
     font-size: 0.7rem;
@@ -1196,13 +1201,13 @@ hr {
 
 /* 4. The Search Results "Drawer" */
 .archive-drawer-results {
-    background: #f4f1e9;
+    position: absolute;
+    width: 100%;
+    max-width: 500px;
+    background: #fdfaf3;
     border: 1px solid #d1ccbc;
-    border-top: none;
-    margin-top: -31px; /* Snaps to the bottom of the input */
-    position: relative;
-    z-index: 10;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .archive-drawer-results ul {
