@@ -1334,36 +1334,63 @@ function createMonthlyChart() {
         });
         
         data = monthCounts;
+    function createMonthlyChart() {
+    const ctx = document.getElementById('monthly-chart');
+    if (!ctx) return;
+
+    const sightingsToUse = getFilteredSightings();
+    let labels = [];
+    let data = [];
+
+    if (currentYearFilter !== 'Lifetime') {
+        // --- 12-MONTH VIEW for specific years ---
+        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthCounts = new Array(12).fill(0);
+        
+        sightingsToUse.forEach(sighting => {
+            const date = new Date(sighting.date);
+            monthCounts[date.getMonth()]++;
+        });
+        data = monthCounts;
+
     } else {
-        // CHRONOLOGICAL VIEW for Lifetime
+        // --- CHRONOLOGICAL VIEW for Lifetime (Fixes mobile sorting) ---
         const monthCounts = {};
+        
         mySightings.forEach(sighting => {
             const date = new Date(sighting.date);
-            const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-            monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
+            // SortKey: "2025-01" (Reliable for sorting)
+            const sortKey = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
+            // DisplayLabel: "Jan 2025"
+            const label = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            
+            if (!monthCounts[sortKey]) {
+                monthCounts[sortKey] = { count: 0, label: label };
+            }
+            monthCounts[sortKey].count++;
         });
 
-        labels = Object.keys(monthCounts).sort((a, b) => new Date(a) - new Date(b));
-        data = labels.map(label => monthCounts[label]);
+        // Sort keys chronologically
+        const sortedKeys = Object.keys(monthCounts).sort();
+        
+        // Map data in the sorted order
+        labels = sortedKeys.map(key => monthCounts[key].label);
+        data = sortedKeys.map(key => monthCounts[key].count);
     }
 
-    // 2. Destroy old chart instance if it exists
-    if (birdChart) {
-        birdChart.destroy();
-    }
+    if (birdChart) { birdChart.destroy(); }
 
-    // 3. Create the Chart
     birdChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: currentYearFilter === 'Lifetime' ? 'Lifetime Sightings' : `${currentYearFilter} Sightings`,
+                label: currentYearFilter === 'Lifetime' ? 'Lifetime' : currentYearFilter,
                 data: data,
-                backgroundColor: 'rgba(140, 46, 27, 0.2)', // Vintage Wax Red tint
-                borderColor: '#8c2e1b', // Vintage Wax Red
+                backgroundColor: 'rgba(140, 46, 27, 0.2)',
+                borderColor: '#8c2e1b',
                 borderWidth: 2,
-                tension: 0.3, // Makes the line slightly curved/hand-drawn
+                tension: 0.3,
                 pointBackgroundColor: '#8c2e1b',
                 fill: true
             }]
@@ -1374,22 +1401,19 @@ function createMonthlyChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { 
-                        stepSize: 1,
-                        font: { family: 'Courier New' }
-                    },
+                    ticks: { stepSize: 1, font: { family: 'Courier New' } },
                     grid: { color: 'rgba(0,0,0,0.05)' }
                 },
                 x: {
                     ticks: { 
-                        font: { family: 'Courier New' } 
+                        font: { family: 'Courier New', size: 10 },
+                        autoSkip: true, // Prevents overlapping on mobile
+                        maxRotation: 45
                     },
                     grid: { display: false }
                 }
             },
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 }
