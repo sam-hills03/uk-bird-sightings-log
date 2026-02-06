@@ -602,70 +602,67 @@ function filterAndDisplayBirds() {
     
     listContainer.innerHTML = ''; 
 
-    // 1. Filter the list
+    // 1. Filter by Rarity
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
     
-    if (currentSearchQuery.trim() !== '') {
+    // 2. Filter by Search Query (Using the global currentSearchQuery)
+    if (currentSearchQuery && currentSearchQuery.trim() !== '') {
         const q = currentSearchQuery.toLowerCase();
         filteredBirds = filteredBirds.filter(b => 
-            b.CommonName.toLowerCase().includes(q) || (b.LatinName || '').toLowerCase().includes(q)
+            b.CommonName.toLowerCase().includes(q) || 
+            (b.LatinName || '').toLowerCase().includes(q)
         );
     }
     
-    const seenSpecies = getUniqueSeenSpecies();
+    // 3. IMPORTANT: Database checkmarks should always be based on Lifetime sightings
+    // This prevents checkmarks from disappearing when you switch years
+    const seenSpecies = new Set(mySightings.map(s => s.species));
     const cardTemplate = document.getElementById('bird-card-template');
 
-    // 2. Build the cards
+    // 4. Build the cards
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
 
-        // Mark as seen if in your sightings
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
-        // Set Text Data
         card.querySelector('.card-common-name').textContent = bird.CommonName;
         const rarityTag = card.querySelector('.card-rarity-tag');
         rarityTag.textContent = bird.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        // Handle Images (Check Cache/Supabase first)
         getBirdImage(bird.CommonName, bird.LatinName).then(result => {
             if (result && result.url) {
                 imageEl.src = result.url;
-                
-                // Add Verified Checkmark if saved in DB
                 if (result.isVerified) {
                     card.classList.add('verified-card');
                     const vBadge = document.createElement('div');
                     vBadge.className = 'verified-check-badge';
-                    vBadge.innerHTML = '  Verified';
+                    vBadge.innerHTML = 'Verified';
                     imageContainer.appendChild(vBadge);
-                    
                     const keepBtn = card.querySelector('.keep-btn');
                     if (keepBtn) keepBtn.style.display = 'none';
                 }
-
-                // Initialize the pencil menu logic
                 handleImageVerification(card, bird);
             } else {
                 imageEl.style.display = 'none';
             }
         });
-// Add click listener to open the info modal
-card.addEventListener('click', (e) => {
-    // Only open if you didn't click the "Pencil" icon or its menu
-    if (!e.target.closest('.image-verify-overlay')) {
-        const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-        showSightingModal(bird.CommonName, bird, birdSightings);
-    }
-});
 
-        card.style.cursor = 'pointer'; // Show hand icon on hover
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                // Modal shows lifetime sightings for that bird
+                const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
+                showSightingModal(bird.CommonName, bird, birdSightings);
+            }
+        });
+
+        card.style.cursor = 'pointer';
         listContainer.appendChild(card);
-    }); // This ends the filteredBirds.forEach loop
+    });
+}
 
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         const isAdmin = session?.user?.id === ADMIN_UID;
