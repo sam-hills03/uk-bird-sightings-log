@@ -669,14 +669,12 @@ function filterAndDisplayBirds() {
         listContainer.appendChild(card);
     });
 
-// --- THE HELPER FUNCTION (Put this OUTSIDE filterAndDisplayBirds) ---
 function applyBirdImageData(card, imageContainer, imageEl, bird) {
     getBirdImage(bird.CommonName, bird.LatinName).then(result => {
         if (result && result.url) {
             imageEl.src = result.url;
             imageEl.style.display = 'block';
             
-            // Final check to prevent duplicate badges on re-render
             const oldBadge = imageContainer.querySelector('.verified-check-badge');
             if (oldBadge) oldBadge.remove();
 
@@ -698,8 +696,8 @@ function applyBirdImageData(card, imageContainer, imageEl, bird) {
         } else {
             imageEl.style.display = 'none';
         }
-    });
-}
+    }); // This matches the .then(
+} // This matches function applyBirdImageData(
 
         // Add click listener to open the info modal
         card.addEventListener('click', (e) => {
