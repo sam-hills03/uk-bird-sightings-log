@@ -679,27 +679,38 @@ function filterAndDisplayBirds() {
 
 // 2. THE IMAGE HELPER (Defined outside to keep things tidy)
 function applyBirdImageData(card, imageContainer, imageEl, bird) {
+    // --- RESET 1: Clean the card before the database even responds ---
+    card.classList.remove('verified-card');
+    const existingBadge = imageContainer.querySelector('.verified-check-badge');
+    if (existingBadge) existingBadge.remove();
+    
+    const keepBtn = card.querySelector('.keep-btn');
+    if (keepBtn) keepBtn.style.display = 'inline-block'; 
+
     getBirdImage(bird.CommonName, bird.LatinName).then(result => {
+        // --- RESET 2: Clean again inside the async block to be safe ---
+        card.classList.remove('verified-card');
+        const oldBadge = imageContainer.querySelector('.verified-check-badge');
+        if (oldBadge) oldBadge.remove();
+
         if (result && result.url) {
             imageEl.src = result.url;
             imageEl.style.display = 'block';
-            
-            // Clear any lingering badges inside the async call
-            const oldBadge = imageContainer.querySelector('.verified-check-badge');
-            if (oldBadge) oldBadge.remove();
 
+            // --- STRICT VERIFICATION CHECK ---
             if (result.isVerified === true) {
                 card.classList.add('verified-card');
+                
+                // Add the badge only if it's actually verified
                 const vBadge = document.createElement('div');
                 vBadge.className = 'verified-check-badge';
                 vBadge.innerHTML = '✓ Verified';
                 imageContainer.appendChild(vBadge);
                 
-                const keepBtn = card.querySelector('.keep-btn');
                 if (keepBtn) keepBtn.style.display = 'none';
             } else {
+                // Not verified - ensure no verified styling exists
                 card.classList.remove('verified-card');
-                const keepBtn = card.querySelector('.keep-btn');
                 if (keepBtn) keepBtn.style.display = 'inline-block';
             }
             handleImageVerification(card, bird);
@@ -747,9 +758,11 @@ const verifiedImageCache = new Map();
 
 // Keep this exactly as it is (it handles your cache and Supabase check)
 async function getBirdImage(commonName, latinName) {
+    // 1. Check local cache first
     if (verifiedImageCache.has(commonName)) {
         return { url: verifiedImageCache.get(commonName), isVerified: true };
     }
+
     try {
         const { data } = await supabaseClient
             .from('verified_images')
@@ -757,6 +770,7 @@ async function getBirdImage(commonName, latinName) {
             .eq('species', commonName)
             .maybeSingle();
 
+        // 2. ONLY return isVerified: true if data actually exists in Supabase
         if (data && data.image_url) {
             verifiedImageCache.set(commonName, data.image_url);
             return { url: data.image_url, isVerified: true };
@@ -765,8 +779,9 @@ async function getBirdImage(commonName, latinName) {
         console.warn("Storage check failed", err);
     }
 
+    // 3. FALLBACK: If not in Supabase, fetch from iNaturalist and mark isVerified as FALSE
     const apiUrl = await getiNaturalistImage(commonName, latinName);
-    return { url: apiUrl, isVerified: false };
+    return { url: apiUrl, isVerified: false }; // This line MUST say false
 }
 
 // Keep this helper too
