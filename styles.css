@@ -1149,108 +1149,143 @@ hr {
     font-size: 0.8rem;
 }
 
-/* 1. The Museum Drawer Containers */
+/* --- EXPEDITION HUB CONTAINER --- */
+.expedition-hub {
+    position: relative;
+    padding: 30px;
+    margin-top: 20px;
+}
+
+/* --- MUSEUM SEARCH DRAWER --- */
 .expedition-controls {
     display: flex;
-    justify-content: center; /* Centers the search bar */
-    margin-bottom: 30px;
-    width: 100%;
+    flex-direction: column;
+    align-items: center; /* Centers the drawer */
+    margin-bottom: 40px;
+    position: relative;
 }
 
 .museum-drawer {
-    flex: 1;
-    max-width: 500px; /* Prevents the search bar from being too wide */
+    width: 100%;
+    max-width: 500px;
     border-left: 4px solid #8c2e1b;
     padding-left: 15px;
     background: rgba(140, 46, 27, 0.02);
 }
 
-}
 .drawer-label {
     font-family: 'DM Serif Display', serif;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     letter-spacing: 2px;
     color: #5d544b;
+    display: block;
     margin-bottom: 5px;
-    text-transform: uppercase;
 }
 
-/* 2. Customizing the actual Inputs */
 .naturalist-input {
-    background: #e9e5d9; /* Slight parchment tint */
+    width: 100%;
+    background: transparent;
     border: none;
     border-bottom: 1px solid #d1ccbc;
     font-family: 'EB Garamond', serif;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     padding: 8px 0;
     color: #416863;
     outline: none;
-    transition: border-color 0.3s;
 }
 
-.naturalist-input:focus {
-    border-bottom: 1px solid #8c2e1b;
-}
-
-/* 3. Handling the Date Picker specifically */
-/* This tries to style the "calendar icon" in modern browsers */
-.naturalist-input::-webkit-calendar-picker-indicator {
-    filter: sepia(100%) saturate(200%) brightness(70%);
-    cursor: pointer;
-}
-
-/* 4. The Search Results "Drawer" */
+/* --- SEARCH RESULTS DRAWER --- */
 .archive-drawer-results {
     position: absolute;
+    top: 100%; /* Sits exactly below the input */
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
     max-width: 500px;
     background: #fdfaf3;
     border: 1px solid #d1ccbc;
-    z-index: 100;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-top: none;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.archive-drawer-results ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.archive-drawer-results li {
-    padding: 10px 15px;
-    font-family: 'EB Garamond', serif;
-    cursor: pointer;
-    border-bottom: 1px solid #e9e5d9;
-}
-
-.archive-drawer-results li:hover {
-    background: #e9e5d9;
-    color: #8c2e1b;
-}
-.archive-drawer-results li {
+.archive-item {
     padding: 12px 15px;
-    line-height: 1.2;
     border-bottom: 1px solid #e9e5d9;
+    cursor: pointer;
+    list-style: none;
 }
 
-.archive-drawer-results li strong {
-    color: #8c2e1b;
-    font-size: 1.05rem;
+.archive-item:hover {
+    background: #e9e5d9;
 }
 
-.archive-drawer-results li small {
-    color: #5d544b;
-    font-family: 'Courier New', monospace; /* Keeps the "Typewriter" archive feel */
-}
 .archive-item-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'EB Garamond', serif;
 }
 
 .archive-date {
-    color: #5d544b;
-    font-size: 0.9rem;
     font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #5d544b;
+}
+
+/* --- THE LOGBOOK CARD --- */
+.logbook-card {
+    background: #fdfaf3;
+    border: 1px solid #d1ccbc;
+    padding: 30px;
+    position: relative;
+    background-image: radial-gradient(#d1ccbc 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+}
+
+.logbook-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #8c2e1b;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.logbook-seal {
+    border: 2px double #8c2e1b;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #8c2e1b;
+    transform: rotate(-5deg);
+}
+
+#expedition-count { font-weight: bold; font-size: 1.4rem; }
+
+.highlight-box {
+    background: rgba(140, 46, 27, 0.05);
+    border: 1px dashed #8c2e1b;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.species-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.species-stamp {
+    font-family: 'EB Garamond', serif;
+    border: 1px solid rgba(65, 104, 99, 0.3);
+    padding: 4px 10px;
+    background: white;
+    font-size: 0.95rem;
 }
