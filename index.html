@@ -228,47 +228,32 @@
     <h3 class="hub-title">Field Expedition Archive</h3>
     
     <div class="expedition-controls">
-        <div class="museum-drawer" style="grid-column: span 2;">
+        <div class="museum-drawer">
             <span class="drawer-label">LOCATION INDEX</span>
-            <input type="text" id="trip-location-search" placeholder="Search Archives (e.g. Pulborough)..." class="naturalist-input" autocomplete="off">
+            <input type="text" id="trip-location-search" placeholder="Search Archives..." class="naturalist-input" autocomplete="off">
         </div>
-    </div>
-
-    <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
-        <ul id="trip-results-list"></ul>
-    </div>
-
-    </div>
-
-    <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
-        <ul id="trip-results-list"></ul>
-    </div>
-    
-    </div>
-    <div id="trip-search-results" class="search-results-overlay" style="display: none;">
-        <ul id="trip-results-list"></ul>
+        <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
+            <ul id="trip-results-list"></ul>
+        </div>
     </div>
 
     <div id="expedition-card" class="logbook-card">
         <div class="logbook-header">
             <div class="logbook-meta">
-                <span id="expedition-date" class="handwritten">Feb 6, 2026</span>
-                <h2 id="expedition-location" class="serif-title">Worthing Pier</h2>
+                <span id="expedition-date" class="handwritten">Loading archives...</span>
+                <h2 id="expedition-location" class="serif-title">Connecting to Field Logs...</h2>
             </div>
             <div class="logbook-seal">
-                <span id="expedition-count">0</span>
+                <span id="expedition-count">--</span>
                 <small>Species</small>
             </div>
         </div>
-
         <div class="logbook-body">
             <div class="highlight-box">
-                <span class="label">⭐ RAREST ENCOUNTER</span>
-                <p id="expedition-highlight" class="handwritten">No data found</p>
+                <span class="label">RAREST ENCOUNTER</span>
+                <p id="expedition-highlight" class="handwritten">Scanning...</p>
             </div>
-            
-            <div class="species-grid" id="expedition-species-list">
-                </div>
+            <div class="species-grid" id="expedition-species-list"></div>
         </div>
     </div>
 </div>
