@@ -79,8 +79,8 @@ async function loadUKBirds() {
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
-        setupSearchBar();
-        setupRarityFilter();
+        setupSearchBar();   
+        setupRarityFilter(); 
         setupModal();
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
@@ -677,9 +677,11 @@ function filterAndDisplayBirds() {
 function setupSearchBar() {
     const searchBar = document.getElementById('search-bar');
     if (!searchBar) return;
+    
     let timeout;
     searchBar.addEventListener('input', (e) => {
         clearTimeout(timeout);
+        // We use a small timeout so it doesn't filter on every single keystroke (performance)
         timeout = setTimeout(() => {
             currentSearchQuery = e.target.value;
             filterAndDisplayBirds();
@@ -1444,5 +1446,10 @@ document.getElementById('rarity-filter').addEventListener('change', filterAndDis
 window.handleSummaryFilterChange = function(newRarity) {
     console.log("Direct Filter Triggered: ", newRarity);
     currentSummaryRarityFilter = newRarity;
+    displaySeenBirdsSummary();
+};
+// Add this so the Summary tab dropdown works
+window.handleSummaryFilterChange = function(value) {
+    currentSummaryRarityFilter = value;
     displaySeenBirdsSummary();
 };
