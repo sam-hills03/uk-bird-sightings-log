@@ -173,35 +173,39 @@
 
    <div id="sighting-modal" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <h2 id="modal-species-name"></h2>
-        <p id="modal-species-info"></p>
-<div class="audio-section vintage-panel">
-    <div class="audio-controls">
-        <button id="gramophone-btn" class="gramophone-control" title="Listen to Song">
-            <span class="gramophone-icon"></span>
-            <span class="play-text">PLAY RECORDING</span>
-        </button>
-        <div class="recording-meta">
-            <span id="recording-location" class="handwritten">Searching archives...</span>
+        <div class="modal-nav">
+            <span class="modal-close">&times;</span>
         </div>
-    </div>
-    
-    <div class="spectrogram-container">
-        <canvas id="spectrogram-canvas"></canvas>
-        <div id="audio-loading-overlay" class="loading-ink" style="display: none;">
-            Tuning signal...
-        </div>
-    </div>
-    
-    <audio id="bird-audio-player"></audio>
-</div>
-        <div id="modal-field-notes" style="margin: 20px 0; padding: 15px; background: var(--color-background-soft); border-left: 4px solid var(--color-primary); border-radius: 4px;">
-            <h4 style="margin: 0 0 10px 0; text-transform: uppercase; font-size: 0.75em; letter-spacing: 1px; color: var(--color-secondary);">Field Notes (via Wikipedia)</h4>
-            <p id="modal-description-text" style="font-family: 'EB Garamond', serif; font-size: 1.1em; line-height: 1.5; color: var(--color-text-dark);">Fetching notes...</p>
+        
+        <h2 id="modal-species-name" class="serif-title"></h2>
+        <p id="modal-species-info" class="rarity-subtitle"></p>
+
+        <div class="audio-section vintage-panel">
+            <div class="audio-controls">
+                <button id="gramophone-btn" class="gramophone-control" title="Listen to Song">
+                    <span class="gramophone-icon"></span>
+                    <span class="play-text">PLAY RECORDING</span>
+                </button>
+                <div class="recording-meta">
+                    <span id="recording-location" class="handwritten">Searching archives...</span>
+                </div>
+            </div>
+            
+            <div class="spectrogram-container">
+                <canvas id="spectrogram-canvas"></canvas>
+                <div id="audio-loading-overlay" class="loading-ink" style="display: none;">
+                    Tuning signal...
+                </div>
+            </div>
+            <audio id="bird-audio-player"></audio>
         </div>
 
-        <h3>Your Sightings:</h3>
+        <div id="modal-field-notes" class="museum-note-box">
+            <h4 class="note-label">Field Notes (via Wikipedia)</h4>
+            <p id="modal-description-text">Fetching notes...</p>
+        </div>
+
+        <h3 class="serif-subtitle">Your Sightings:</h3>
         <ul id="modal-sightings-list"></ul>
     </div>
 </div>
