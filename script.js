@@ -372,17 +372,6 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 // ============================================
 
 
-function setupSummaryFilter() {
-    const filter = document.getElementById('summary-rarity-filter');
-    if (filter) {
-        filter.addEventListener('change', (e) => {
-            currentSummaryRarityFilter = e.target.value;
-            console.log("Summary filter changed to:", currentSummaryRarityFilter);
-            displaySeenBirdsSummary();
-        });
-    }
-}
-
 function displaySeenBirdsSummary() {
     const summaryContainer = document.getElementById('seen-birds-summary');
     if (!summaryContainer) return;
@@ -390,7 +379,6 @@ function displaySeenBirdsSummary() {
     summaryContainer.innerHTML = '';
     const speciesMap = new Map();
     
-    // 1. Group sightings
     const validSightings = mySightings.filter(sighting => isSpeciesValid(sighting.species)); 
 
     validSightings.forEach(sighting => {
@@ -407,25 +395,15 @@ function displaySeenBirdsSummary() {
         return;
     }
 
-    // 2. Filter species
     let filteredSpecies = Array.from(speciesMap.keys());
     
     if (currentSummaryRarityFilter && currentSummaryRarityFilter !== 'All') {
         filteredSpecies = filteredSpecies.filter(speciesName => {
             const birdData = allUKBirds.find(b => b.CommonName.trim().toLowerCase() === speciesName.trim().toLowerCase());
-            
-            // This checks if the bird exists and compares the rarity safely
-            return birdData && 
-                   birdData.Rarity.trim().toLowerCase() === currentSummaryRarityFilter.trim().toLowerCase();
+            return birdData && birdData.Rarity.trim().toLowerCase() === currentSummaryRarityFilter.trim().toLowerCase();
         });
     }
     
-    if (filteredSpecies.length === 0) {
-        summaryContainer.innerHTML = `<p style="padding: 40px; text-align: center;">No <strong>${currentSummaryRarityFilter}</strong> species recorded in your journal yet.</p>`;
-        return; 
-    }
-
-    // 3. Render cards using your working logic
     const cardTemplate = document.getElementById('bird-card-template');
     
     filteredSpecies.forEach(species => {
@@ -442,76 +420,16 @@ function displaySeenBirdsSummary() {
         
         card.classList.add('seen');
 
-        // --- NEW LAZY LOADING LOGIC STARTS HERE ---
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Inside your filteredBirds.forEach loop...
-
-getBirdImage(bird.CommonName, bird.LatinName).then(result => {
-    // 1. Reset the card state before applying new data 
-    // This prevents "ghost" tags from previous cards
-    card.classList.remove('verified-card');
-    const existingBadge = imageContainer.querySelector('.verified-check-badge');
-    if (existingBadge) existingBadge.remove();
-    
-    if (result && result.url) {
-        imageEl.src = result.url;
-        imageEl.style.display = 'block';
-
-        // 2. STRICT CHECK: Only add badge if verified in your Supabase table
-        if (result.isVerified === true) {
-            card.classList.add('verified-card');
-            
-            const vBadge = document.createElement('div');
-            vBadge.className = 'verified-check-badge';
-            vBadge.innerHTML = '✓ Verified';
-            imageContainer.appendChild(vBadge);
-            
-            const keepBtn = card.querySelector('.keep-btn');
-            if (keepBtn) keepBtn.style.display = 'none';
-        } else {
-            // Ensure the keep button is visible for unverified images
-            const keepBtn = card.querySelector('.keep-btn');
-            if (keepBtn) keepBtn.style.display = 'inline-block';
-        }
-
-        handleImageVerification(card, bird);
-    } else {
-        imageEl.style.display = 'none';
-    }
-});
-                    // Stop watching once loaded
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { rootMargin: '200px' }); // Pre-load when 200px from viewport
-
-        observer.observe(card);
-        // --- NEW LAZY LOADING LOGIC ENDS HERE ---
-
-        // Set Text Data (Using your working Card logic)
+        // Set Text Data
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
         card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
         card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
 
-        // Rarity Tag Logic (Matching your working version)
         const rarityTag = card.querySelector('.card-rarity-tag');
         rarityTag.textContent = birdData.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${birdData.Rarity}`;
 
-        // Add Seen Badges
-        const badge = document.createElement('div');
-        badge.classList.add('seen-badge');
-        badge.textContent = '✓'; 
-        card.appendChild(badge);
-        
-        const countBadge = document.createElement('div');
-        countBadge.classList.add('sighting-count-badge');
-        countBadge.textContent = sightingCount;
-        card.appendChild(countBadge);
-
-        // Image Logic (Matching your working version)
+        // Image & Verification Logic
         getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
             if (result && result.url) {
                 imageEl.src = result.url;
@@ -519,26 +437,26 @@ getBirdImage(bird.CommonName, bird.LatinName).then(result => {
                     card.classList.add('verified-card');
                     const vBadge = document.createElement('div');
                     vBadge.className = 'verified-check-badge';
-                    vBadge.innerHTML = ' Verified';
+                    vBadge.innerHTML = '✓ Verified';
                     imageContainer.appendChild(vBadge);
-                    const keepBtn = card.querySelector('.keep-btn');
-                    if (keepBtn) keepBtn.style.display = 'none';
                 }
                 handleImageVerification(card, birdData);
             }
         });
         
-        // Modal Trigger
+        // Modal Trigger - NOW INCLUDES THE SONG FETCH
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
                 showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
+                // Start the audio fetch here!
+                fetchBirdSong(birdData.LatinName);
             }
         });
         
-        card.style.cursor = 'pointer';
         summaryContainer.appendChild(card);
     });
 }
+
 async function showSightingModal(species, birdData, sightings) {
     const modal = document.getElementById('sighting-modal');
     
@@ -546,13 +464,13 @@ async function showSightingModal(species, birdData, sightings) {
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData.LatinName || ''} • ${birdData.Rarity || ''}`;
     
-    // 1. CLEAR & FETCH FIELD NOTES
+    // Field Notes
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
     const description = await fetchBirdDescription(species);
     descriptionBox.textContent = description;
     
-    // 2. BUILD SIGHTINGS LIST
+    // Sightings List
     const modalList = document.getElementById('modal-sightings-list');
     modalList.innerHTML = '';
     
@@ -562,116 +480,9 @@ async function showSightingModal(species, birdData, sightings) {
             li.innerHTML = `<span>${new Date(sighting.date).toLocaleDateString()}</span> - <span>${sighting.location}</span>`;
             modalList.appendChild(li);
         });
-    } else {
-        modalList.innerHTML = '<li style="border:none; background:none; font-style:italic;">No personal sightings recorded yet.</li>';
     }
     
     modal.style.display = 'block';
-}
-
-function setupModal() {
-    const modal = document.getElementById('sighting-modal');
-    const closeBtn = document.querySelector('.modal-close');
-    if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
-    window.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
-}
-
-// 1. Setup the basic audio listeners
-function setupAudioPlayer() {
-    const gramophoneBtn = document.getElementById('gramophone-btn');
-    const audioPlayer = document.getElementById('bird-audio-player');
-
-    if (!gramophoneBtn || !audioPlayer) return;
-
-    gramophoneBtn.onclick = () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            gramophoneBtn.classList.add('playing');
-            startSpectrogram();
-        } else {
-            audioPlayer.pause();
-            gramophoneBtn.classList.remove('playing');
-            cancelAnimationFrame(animationId);
-        }
-    };
-
-    // Auto-reset button when audio ends
-    audioPlayer.onended = () => {
-        gramophoneBtn.classList.remove('playing');
-        cancelAnimationFrame(animationId);
-    };
-}
-
-// 2. The API Fetch: Find the song on Xeno-canto
-async function fetchBirdSong(latinName) {
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-    const recordingLoc = document.getElementById('recording-location');
-    
-    if (!audioPlayer) return;
-
-    // Reset UI
-    audioPlayer.pause();
-    loadingOverlay.style.display = 'flex';
-    recordingLoc.textContent = "Tuning signal...";
-
-    try {
-        // We query Xeno-canto using the scientific name
-        const response = await fetch(`https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(latinName)}+q:A`);
-        const data = await response.json();
-
-        if (data.recordings && data.recordings.length > 0) {
-            const bestMatch = data.recordings[0];
-            audioPlayer.src = bestMatch.file;
-            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
-            loadingOverlay.style.display = 'none';
-        } else {
-            recordingLoc.textContent = "No recordings in archive.";
-            loadingOverlay.style.display = 'none';
-        }
-    } catch (error) {
-        console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost...";
-        loadingOverlay.style.display = 'none';
-    }
-}
-
-// 3. The Spectrogram: Drawing the "Ink Blot"
-function startSpectrogram() {
-    const canvas = document.getElementById('spectrogram-canvas');
-    const ctx = canvas.getContext('2d');
-    const audioPlayer = document.getElementById('bird-audio-player');
-
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaElementSource(audioPlayer);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-    }
-
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
-
-    function draw() {
-        animationId = requestAnimationFrame(draw);
-        analyser.getByteFrequencyData(dataArray);
-
-        ctx.fillStyle = '#e9e5d9'; // Parchment color
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const barWidth = (canvas.width / bufferLength) * 2.5;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            const barHeight = dataArray[i] / 2;
-            ctx.fillStyle = `rgba(140, 46, 27, ${barHeight / 100})`; // Ink Red
-            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-            x += barWidth + 1;
-        }
-    }
-    draw();
 }
 
 // ============================================
