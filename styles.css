@@ -886,16 +886,17 @@ hr {
     position: relative;
 }
     .seal-inner-text {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.8);
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.7rem; /* Slightly smaller to ensure 'LVL' fits */
     border: 1px solid rgba(255,255,255,0.4);
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
+    letter-spacing: 0.5px;
 }
 
 .id-meta {
