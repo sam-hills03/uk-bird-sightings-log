@@ -1180,12 +1180,13 @@ function calculateAndDisplayStats() {
     }
 
     // 3. ID Card Rank & Progress Logic
+    // 3. ID Card Rank & Progress Logic
     const ranks = [
-        { name: "Fledgling", threshold: 0, color: "#8c2e1b" },
-        { name: "Wanderer", threshold: 10, color: "#5d544b" },
-        { name: "Naturalist", threshold: 50, color: "#416863" },
-        { name: "Master of Skies", threshold: 150, color: "#2c2621" },
-        { name: "Grand Archivist", threshold: 300, color: "#d4af37" }
+        { name: "Passerine", level: "1", threshold: 0, color: "#8c2e1b" },    // Earthy Red
+        { name: "Corvid", level: "2", threshold: 10, color: "#5d544b" },      // Slate Grey
+        { name: "Charadriiform", level: "3", threshold: 50, color: "#416863" }, // Deep Teal
+        { name: "Falconiform", level: "4", threshold: 150, color: "#2c2621" },  // Iron Black
+        { name: "Aquiline", level: "5", threshold: 300, color: "#d4af37" }    // Gold
     ];
 
     let currentRank = ranks[0];
@@ -1198,12 +1199,18 @@ function calculateAndDisplayStats() {
         }
     }
 
+    // Update the Rank Title (next to name)
     const rankTitleElement = document.querySelector('.id-rank-title');
     if (rankTitleElement) rankTitleElement.textContent = currentRank.name;
 
+    // --- NEW STAMP UPDATE LOGIC ---
     const waxSeal = document.querySelector('.rank-stamp-seal');
-    if (waxSeal) waxSeal.style.backgroundColor = currentRank.color;
-
+    const sealText = document.querySelector('.seal-inner-text');
+    
+    if (waxSeal && sealText) {
+        waxSeal.style.backgroundColor = currentRank.color;
+        sealText.textContent = `LVL ${currentRank.level}`; // Changes from UK to LVL 1, 2, etc.
+    }
     const progressBar = document.getElementById('level-progress-bar');
     const nextLevelName = document.getElementById('next-level-name');
     const currentDisplay = document.getElementById('current-count-display');
