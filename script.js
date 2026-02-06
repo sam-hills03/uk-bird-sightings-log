@@ -463,7 +463,13 @@ async function showSightingModal(species, birdData, sightings) {
     // Set Names
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData.LatinName || ''} • ${birdData.Rarity || ''}`;
-    
+
+    // --- TRIGGER THE AUDIO SEARCH ---
+    if (birdData.LatinName && birdData.LatinName !== 'No Data') {
+        fetchBirdSong(birdData.LatinName);
+    } else {
+        document.getElementById('recording-location').textContent = "Scientific name missing.";
+    }
     // Field Notes
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
@@ -923,6 +929,16 @@ if (refreshBtn) {
                 uploadTrigger.textContent = "📤 Upload My Own";
             }
         });
+    }
+}
+async function fetchBirdDescription(speciesName) {
+    try {
+        const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(speciesName)}`);
+        const data = await response.json();
+        return data.extract || "No detailed field notes found for this species.";
+    } catch (error) {
+        console.error("Wiki fetch error:", error);
+        return "Field notes are currently unavailable.";
     }
 }
 
@@ -1643,7 +1659,7 @@ document.addEventListener('click', function(e) {
         
         if (bird) {
             // Your existing function to open the modal (change name if yours is different)
-            openSightingModal(speciesName); 
+            showSightingModal(birdData.CommonName, birdData, sightingsData.sightings); 
             
             // Start fetching the song!
             fetchBirdSong(bird.ScientificName);
