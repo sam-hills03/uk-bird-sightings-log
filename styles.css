@@ -1149,74 +1149,80 @@ hr {
     font-size: 0.8rem;
 }
 
-/* Texture for the container to match the ID card */
-.year-filter-container::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-    pointer-events: none;
-}
-.logbook-card {
-    background: #fdfaf3; /* Aged paper color */
-    border: 1px solid #d1ccbc;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
-    padding: 30px;
-    margin-top: 20px;
-    position: relative;
-    background-image: radial-gradient(#d1ccbc 1px, transparent 1px);
-    background-size: 20px 20px; /* Subtle dot-grid paper */
+/* 1. The Museum Drawer Containers */
+.expedition-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 10px;
 }
 
-.logbook-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border-bottom: 2px solid #8c2e1b;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.handwritten {
-    font-family: 'DM Serif Display', serif; /* Or a cursive font if you have one */
-    font-style: italic;
-    color: #416863;
-    font-size: 1.2rem;
-}
-
-.logbook-seal {
-    border: 2px double #8c2e1b;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
+.museum-drawer {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    border-left: 4px solid #8c2e1b; /* The "Red Wax" Accent */
+    padding-left: 15px;
+}
+
+.drawer-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: #5d544b;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+/* 2. Customizing the actual Inputs */
+.naturalist-input {
+    background: #e9e5d9; /* Slight parchment tint */
+    border: none;
+    border-bottom: 1px solid #d1ccbc;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    padding: 8px 0;
+    color: #416863;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.naturalist-input:focus {
+    border-bottom: 1px solid #8c2e1b;
+}
+
+/* 3. Handling the Date Picker specifically */
+/* This tries to style the "calendar icon" in modern browsers */
+.naturalist-input::-webkit-calendar-picker-indicator {
+    filter: sepia(100%) saturate(200%) brightness(70%);
+    cursor: pointer;
+}
+
+/* 4. The Search Results "Drawer" */
+.archive-drawer-results {
+    background: #f4f1e9;
+    border: 1px solid #d1ccbc;
+    border-top: none;
+    margin-top: -31px; /* Snaps to the bottom of the input */
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.archive-drawer-results ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.archive-drawer-results li {
+    padding: 10px 15px;
+    font-family: 'EB Garamond', serif;
+    cursor: pointer;
+    border-bottom: 1px solid #e9e5d9;
+}
+
+.archive-drawer-results li:hover {
+    background: #e9e5d9;
     color: #8c2e1b;
-    transform: rotate(-10deg); /* Makes it look like a physical stamp */
-}
-
-.highlight-box {
-    background: rgba(140, 46, 27, 0.05);
-    border: 1px dashed #8c2e1b;
-    padding: 15px;
-    margin-bottom: 20px;
-}
-
-.species-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-}
-
-/* For the search results dropdown */
-.search-results-overlay {
-    background: white;
-    border: 1px solid #ccc;
-    max-height: 200px;
-    overflow-y: auto;
-    position: absolute;
-    z-index: 100;
-    width: calc(100% - 60px);
 }
