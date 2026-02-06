@@ -614,6 +614,7 @@ function populateSpeciesDatalist() {
     });
 }
 
+// 1. THE MAIN FILTER FUNCTION
 function filterAndDisplayBirds() {
     const filterValue = document.getElementById('rarity-filter')?.value || 'All';
     const listContainer = document.getElementById('bird-list');
@@ -621,7 +622,6 @@ function filterAndDisplayBirds() {
     
     listContainer.innerHTML = ''; 
 
-    // 1. Filter the list
     let filteredBirds = filterValue === 'All' ? allUKBirds : allUKBirds.filter(b => b.Rarity === filterValue);
     
     if (currentSearchQuery && currentSearchQuery.trim() !== '') {
@@ -631,22 +631,19 @@ function filterAndDisplayBirds() {
         );
     }
     
-    // 2. We use 'mySightings' directly here to ensure database 'Seen' status is LIFETIME
     const seenSpecies = new Set(mySightings.map(s => s.species));
     const cardTemplate = document.getElementById('bird-card-template');
 
-    // 3. Build the cards
     filteredBirds.forEach(bird => {
         const cardClone = cardTemplate.content.cloneNode(true);
         const card = cardClone.querySelector('.bird-card');
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
 
-        // --- HARD RESET START ---
+        // Reset state
         card.classList.remove('verified-card');
         const existingBadge = imageContainer.querySelector('.verified-check-badge');
         if (existingBadge) existingBadge.remove();
-        // -------------------------
 
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
 
@@ -655,9 +652,10 @@ function filterAndDisplayBirds() {
         rarityTag.textContent = bird.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        // LOCK the card logic into a separate function call to prevent "leaking"
+        // RUN THE IMAGE HELPER
         applyBirdImageData(card, imageContainer, imageEl, bird);
 
+        // ADD CLICK LISTENER
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
                 const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
@@ -669,6 +667,14 @@ function filterAndDisplayBirds() {
         listContainer.appendChild(card);
     });
 
+    // Admin check
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        const isAdmin = session?.user?.id === ADMIN_UID;
+        toggleAdminControls(isAdmin);
+    });
+}
+
+// 2. THE IMAGE HELPER (Defined outside)
 function applyBirdImageData(card, imageContainer, imageEl, bird) {
     getBirdImage(bird.CommonName, bird.LatinName).then(result => {
         if (result && result.url) {
@@ -696,8 +702,8 @@ function applyBirdImageData(card, imageContainer, imageEl, bird) {
         } else {
             imageEl.style.display = 'none';
         }
-    }); // This matches the .then(
-} // This matches function applyBirdImageData(
+    });
+}
 
         // Add click listener to open the info modal
         card.addEventListener('click', (e) => {
