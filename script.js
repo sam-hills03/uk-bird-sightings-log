@@ -1332,39 +1332,54 @@ async function fetchBirdSong(latinName, commonName) {
     
     if (!audioPlayer) return;
 
+    // Reset UI and stop any current audio
     audioPlayer.pause();
+    audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
+    // Determine the best name to search for
     let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
-    
-    // Using AllOrigins proxy - it's usually more robust for Xeno-Canto
+    if (!searchQuery) {
+        recordingLoc.textContent = "Identity unknown.";
+        loadingOverlay.style.display = 'none';
+        return;
+    }
+
+    // Using AllOrigins with a cache-buster to ensure we get fresh results
     const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}&disableCache=true`;
 
     try {
         const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
         const wrapper = await response.json();
-        // AllOrigins returns the data as a string in 'contents', so we parse it
-        const data = JSON.parse(wrapper.contents);
+        
+        if (wrapper.contents) {
+            const data = JSON.parse(wrapper.contents);
 
-        if (data.recordings && data.recordings.length > 0) {
-            const bestMatch = data.recordings[0];
-            let fileUrl = bestMatch.file;
-            if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-            
-            audioPlayer.src = fileUrl;
-            audioPlayer.load();
-            
-            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
-            loadingOverlay.style.display = 'none';
-        } else {
-            recordingLoc.textContent = "No recordings in archive.";
-            loadingOverlay.style.display = 'none';
+            if (data.recordings && data.recordings.length > 0) {
+                // Pick the first high-quality recording
+                const bestMatch = data.recordings[0];
+                let fileUrl = bestMatch.file;
+                
+                // Fix URL formatting
+                if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+                
+                audioPlayer.src = fileUrl;
+                audioPlayer.load();
+                
+                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+                loadingOverlay.style.display = 'none';
+            } else {
+                recordingLoc.textContent = "No recordings in archive.";
+                loadingOverlay.style.display = 'none';
+            }
         }
     } catch (error) {
         console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost (CORS block)";
+        recordingLoc.textContent = "Signal lost (Archive busy)";
         loadingOverlay.style.display = 'none';
     }
 }
