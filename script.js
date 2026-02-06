@@ -1029,6 +1029,11 @@ function addSightingEntry() {
         }
     }
 }
+// Set default date to today
+const dateInput = document.getElementById('sighting-date');
+if (dateInput) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+}
 
 // Ensure the button is actually listening
 if (addEntryBtn) {
