@@ -1226,3 +1226,18 @@ hr {
     background: #e9e5d9;
     color: #8c2e1b;
 }
+.archive-drawer-results li {
+    padding: 12px 15px;
+    line-height: 1.2;
+    border-bottom: 1px solid #e9e5d9;
+}
+
+.archive-drawer-results li strong {
+    color: #8c2e1b;
+    font-size: 1.05rem;
+}
+
+.archive-drawer-results li small {
+    color: #5d544b;
+    font-family: 'Courier New', monospace; /* Keeps the "Typewriter" archive feel */
+}
