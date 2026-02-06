@@ -1151,18 +1151,14 @@ hr {
 
 /* 1. The Museum Drawer Containers */
 .expedition-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 30px;
-    padding: 10px;
+    display: block; /* Stacked look */
+    margin-bottom: 20px;
 }
 
 .museum-drawer {
-    display: flex;
-    flex-direction: column;
-    border-left: 4px solid #8c2e1b; /* The "Red Wax" Accent */
+    border-left: 4px solid #8c2e1b;
     padding-left: 15px;
+    background: rgba(140, 46, 27, 0.02);
 }
 
 .drawer-label {
@@ -1240,4 +1236,16 @@ hr {
 .archive-drawer-results li small {
     color: #5d544b;
     font-family: 'Courier New', monospace; /* Keeps the "Typewriter" archive feel */
+}
+.archive-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'EB Garamond', serif;
+}
+
+.archive-date {
+    color: #5d544b;
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
 }
