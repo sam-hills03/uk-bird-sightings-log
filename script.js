@@ -1531,20 +1531,6 @@ function setupExpeditionSearch() {
         }
     });
 }
-document.getElementById('trip-date-select').addEventListener('change', (e) => {
-    const selectedDate = e.target.value;
-    // Find all locations visited on this date
-    const tripsOnDate = mySightings.filter(s => s.date === selectedDate);
-    
-    if (tripsOnDate.length > 0) {
-        // If there are multiple, for now we load the first one, 
-        // but the user can use the Search box to find the specific other one.
-        const data = getExpeditionData(selectedDate, tripsOnDate[0].location);
-        displayExpeditionCard(data);
-    } else {
-        alert("No archive entries found for this specific date.");
-    }
-});
 
 // 2. LOGIN
 async function handleLogin() {
