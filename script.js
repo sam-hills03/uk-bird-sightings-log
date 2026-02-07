@@ -406,20 +406,30 @@ function displaySeenBirdsSummary() {
     
     const cardTemplate = document.getElementById('bird-card-template');
     
-    filteredSpecies.forEach(species => {
-        const birdData = allUKBirds.find(b => b.CommonName.trim() === species);
-        if (!birdData) return;
-        
-        const sightingsData = speciesMap.get(species);
-        const sightingCount = sightingsData.sightings.length;
-        
-        const cardClone = cardTemplate.content.cloneNode(true);
-        const card = cardClone.querySelector('.bird-card');
-        const imageContainer = card.querySelector('.card-image-container');
-        const imageEl = card.querySelector('.card-image');
-        
-        card.classList.add('seen');
+    // Find this section inside displaySeenBirdsSummary:
+filteredSpecies.forEach(species => {
+    const birdData = allUKBirds.find(b => b.CommonName.trim() === species);
+    if (!birdData) return;
+    
+    const sightingsData = speciesMap.get(species);
+    const sightingCount = sightingsData.sightings.length;
+    
+    const cardClone = cardTemplate.content.cloneNode(true);
+    const card = cardClone.querySelector('.bird-card');
+    
+    // --- FIXING THE BADGES ---
+    const countBadge = card.querySelector('.sighting-count-badge');
+    if (countBadge) {
+        countBadge.textContent = sightingCount;
+        countBadge.style.display = 'flex'; 
+    }
 
+    const seenBadge = card.querySelector('.seen-badge');
+    if (seenBadge) seenBadge.style.display = 'flex';
+
+    card.classList.add('seen');
+    // ... rest of your code (images, modal trigger, etc.)
+});
         // Set Text Data
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
         card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
