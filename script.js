@@ -67,101 +67,34 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
+        // 1. Core Data Loading
         populateSpeciesDatalist(); 
         await loadSightings(); 
-        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
+        await loadLocations(); 
         
-        // --- THE FIX ---
-        // This ensures the first input box is there on launch
+        // 2. UI Setup (The stuff that was being overwritten)
         addSightingEntry(); 
-        // ---------------
-
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
         setupSearchBar();
         setupRarityFilter();
-        setupExpeditionSearch();
+        setupModal();            // From version 2
+        setupExpeditionSearch(); // From version 1
         
-        filterAndDisplayBirds();
-        
-        // Load the most recent trip as a default display
-        if (mySightings.length > 0) {
-            const latest = mySightings[0]; // Assuming most recent is first
-            const data = getExpeditionData(latest.date, latest.location);
-            displayExpeditionCard(data);
-        }
-    } catch (error) {
-        console.error("Failed to load:", error);
-    }
-}
-async function loadUKBirds() {
-    try {
-        const response = await fetch('uk_birds.json');
-        if (response.ok) {
-            allUKBirds = await response.json();
-        }
-        
-        populateSpeciesDatalist(); 
-        await loadSightings(); 
-        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
-        
-        // --- THE FIX ---
-        // This ensures the first input box is there on launch
-        addSightingEntry(); 
-        // ---------------
-
-        setupTabSwitching();
-        setupPagination();
-        setupSummaryFilter();
-        setupSearchBar();
-        setupRarityFilter();
-        setupModal();
-        
+        // 3. Initial Display
         filterAndDisplayBirds(); 
         
+        // 4. Load the most recent trip as a default display
+        if (mySightings.length > 0) {
+            const latest = mySightings[0];
+            const data = getExpeditionData(latest.date, latest.location);
+            if (data) displayExpeditionCard(data);
+        }
+
+        console.log("UK Bird Database and UI successfully initialized.");
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
-    }
-}
-        async function loadSightings() {
-    try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        
-        // If no user is logged in, clear sightings and stop
-        if (!user) {
-            mySightings = [];
-            updateAllDisplays();
-            return;
-        }
-
-        // 1. Fetch the actual data from Supabase
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('*');
-            
-        if (error) throw error;
-
-        // 2. Now 'data' exists!
-        if (data) {
-            mySightings = data;
-            
-            // SORT: Newest sightings first
-            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // This tells all other parts of the app to refresh
-            updateAllDisplays(); 
-        }
-        // Add this inside the 'if (data)' block of loadSightings, after the sort
-if (mySightings.length > 0) {
-    const latest = mySightings[0];
-    const tripData = getExpeditionData(latest.date, latest.location);
-    if (tripData) displayExpeditionCard(tripData);
-}
-
-        console.log("Loaded", mySightings.length, "sightings.");
-    } catch (error) {
-        console.error("Error loading sightings:", error);
     }
 }
    
@@ -256,16 +189,15 @@ function switchTab(targetTabId) {
     
     tabButtons.forEach(button => button.classList.remove('active'));
 
-    const targetContent = document.getElementById(targetTabId);
-    if (targetContent) {
-        targetContent.classList.add('active-content');
-        targetContent.style.display = 'block'; // FORCE SHOW THE TAB
-        
-        // This triggers the stats math only when the tab is clicked
-        if (targetTabId === 'stats-view') {
-            calculateAndDisplayStats();
-            createMonthlyChart();
-        }
+    // Inside switchTab(targetTabId)...
+const targetContent = document.getElementById(targetTabId);
+if (targetContent) {
+    targetContent.classList.add('active-content');
+    targetContent.style.display = 'block'; // This forces it to be visible
+    
+    if (targetTabId === 'stats-view') {
+        calculateAndDisplayStats();
+        createMonthlyChart();
     }
 }
 // ============================================
@@ -514,27 +446,23 @@ document.getElementById('refresh-audio').onclick = () => {
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    if (!audioPlayer) return;
+    if (!audioPlayer || !recordingLoc) return;
 
     audioPlayer.pause();
     recordingLoc.textContent = "Tuning signal...";
 
-    // We use only the Latin Name to ensure we don't get a Great Tit for a Blue Tit
+    // Simple search to prevent Great Tit confusion
     const query = latinName || commonName;
 
     try {
-        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=5`;
+        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=10`;
         const response = await fetch(url);
         const data = await response.json();
 
         if (data.query && data.query.pages) {
-            const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            const images = pages[pageId].images || [];
-            
-            const audioFile = images.find(img => 
-                ['.ogg', '.oga', '.mp3'].some(ext => img.title.toLowerCase().endsWith(ext))
-            );
+            const pageId = Object.keys(data.query.pages)[0];
+            const images = data.query.pages[pageId].images || [];
+            const audioFile = images.find(img => img.title.toLowerCase().match(/\.(ogg|oga|mp3)$/));
 
             if (audioFile) {
                 const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
@@ -549,56 +477,9 @@ async function fetchBirdSong(latinName, commonName) {
             }
         }
     } catch (e) {
-        console.log("Audio skipped to prevent crash.");
         recordingLoc.textContent = "Signal lost.";
     }
 }
-async function attemptSecondarySearch(name) {
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const recordingLoc = document.getElementById('recording-location');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-
-    try {
-        const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(name)}&gsrlimit=1&prop=imageinfo&iiprop=url`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (data.query && data.query.pages) {
-            const pages = data.query.pages;
-            const fileUrl = pages[Object.keys(pages)[0]].imageinfo[0].url;
-            audioPlayer.src = fileUrl;
-            audioPlayer.load();
-            recordingLoc.textContent = "Captured: Common Archive";
-        } else {
-            recordingLoc.textContent = "No recordings in archive.";
-        }
-    } catch (e) {
-        recordingLoc.textContent = "Archive silent.";
-    }
-    loadingOverlay.style.display = 'none';
-}
-function setupAudioPlayer() {
-    const gramophoneBtn = document.getElementById('gramophone-btn');
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const vinylDisc = document.getElementById('vinyl-disc');
-
-    if (!gramophoneBtn || !audioPlayer) return;
-
-    gramophoneBtn.onclick = () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play().then(() => {
-                gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                vinylDisc.classList.add('spinning');
-            }).catch(err => {
-                console.error("Playback failed:", err);
-            });
-        } else {
-            audioPlayer.pause();
-            gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
-            vinylDisc.classList.remove('spinning');
-        }
-    };
-
     // Auto-stop spinning when audio finishes
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
