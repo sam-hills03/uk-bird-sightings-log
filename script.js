@@ -63,25 +63,18 @@ window.deleteSighting = async function(idToDelete) {
 async function loadSightings() {
     try {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        
         if (!user) {
             mySightings = [];
             updateAllDisplays();
             return;
         }
-
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('*');
-            
+        const { data, error } = await supabaseClient.from('sightings').select('*');
         if (error) throw error;
-
         if (data) {
             mySightings = data;
             mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
             updateAllDisplays(); 
         }
-        console.log("Loaded sightings from archive.");
     } catch (error) {
         console.error("Error loading sightings:", error);
     }
@@ -550,7 +543,7 @@ function setupAudioPlayer() {
             audioPlayer.play().then(() => {
                 gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 vinylDisc.classList.add('spinning');
-            }).catch(err => console.error("Audio failed:", err));
+            });
         } else {
             audioPlayer.pause();
             gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -558,7 +551,6 @@ function setupAudioPlayer() {
         }
     };
 
-    // This was the loose part causing the crash - it is now safely inside!
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
         gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -1667,28 +1659,23 @@ if (helpForm) {
     helpForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = new FormData(helpForm);
-        
         try {
             const response = await fetch(helpForm.action, {
                 method: 'POST',
                 body: data,
                 headers: { 'Accept': 'application/json' }
             });
-
             if (response.ok) {
                 formStatus.style.display = 'block';
-                formStatus.style.color = '#416863'; // Naturalist Green
+                formStatus.style.color = '#416863';
                 formStatus.textContent = "Thank you. The report has been filed.";
                 helpForm.reset();
-                // Close popup after a short delay
                 setTimeout(() => { bugPopup.style.display = 'none'; }, 2000);
-            } else {
-                throw new Error("Failed to send");
             }
         } catch (error) {
             formStatus.style.display = 'block';
-            formStatus.style.color = '#682d1f'; // Wax Seal Red
-            formStatus.textContent = "Submission failed. Please try again.";
+            formStatus.style.color = '#682d1f';
+            formStatus.textContent = "Submission failed.";
         }
     });
 }
