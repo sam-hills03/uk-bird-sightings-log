@@ -59,7 +59,33 @@ window.deleteSighting = async function(idToDelete) {
 // ============================================
 // A. INITIAL LOAD FUNCTIONS
 // ============================================
+async function loadSightings() {
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (!user) {
+            mySightings = [];
+            if (typeof updateAllDisplays === 'function') updateAllDisplays();
+            return;
+        }
 
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*');
+            
+        if (error) throw error;
+
+        if (data) {
+            mySightings = data;
+            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (typeof updateAllDisplays === 'function') updateAllDisplays(); 
+        }
+
+        console.log("Loaded", mySightings.length, "sightings.");
+    } catch (error) {
+        console.error("Error loading sightings:", error);
+    }
+}
 async function loadUKBirds() {
     try {
         const response = await fetch('uk_birds.json');
@@ -67,62 +93,31 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
-        // 1. Core Data
-        populateSpeciesDatalist(); 
-        await loadSightings(); // This fetches your data for the stats!
-        await loadLocations(); 
+        // This is where the error was happening. Now it will work!
+        await loadSightings(); 
         
-        // 2. UI Systems
-        addSightingEntry(); 
-        setupTabSwitching();
-        setupPagination();
-        setupSummaryFilter();
-        setupSearchBar();
-        setupRarityFilter();
-        setupModal();            
-        setupExpeditionSearch(); 
-        setupAudioPlayer(); 
+        if (typeof loadLocations === 'function') await loadLocations(); 
         
-        // 3. Kickoff
-        filterAndDisplayBirds(); 
-        console.log("Expedition Log Initialized.");
+        // Standard UI Setup
+        if (typeof populateSpeciesDatalist === 'function') populateSpeciesDatalist(); 
+        if (typeof addSightingEntry === 'function') addSightingEntry(); 
+        if (typeof setupTabSwitching === 'function') setupTabSwitching();
+        if (typeof setupPagination === 'function') setupPagination();
+        if (typeof setupSummaryFilter === 'function') setupSummaryFilter();
+        if (typeof setupSearchBar === 'function') setupSearchBar();
+        if (typeof setupRarityFilter === 'function') setupRarityFilter();
+        if (typeof setupModal === 'function') setupModal();            
+        if (typeof setupExpeditionSearch === 'function') setupExpeditionSearch(); 
+        if (typeof setupAudioPlayer === 'function') setupAudioPlayer(); 
+        
+        // Final Kickoff
+        if (typeof filterAndDisplayBirds === 'function') filterAndDisplayBirds(); 
+        
+        console.log("System Initialized Successfully.");
     } catch (error) {
         console.error("Initialization Failed:", error);
     }
 }
-   
-async function saveSighting(sighting) {
-    try {
-        // Get the logged-in user's data
-        const { data: { user } } = await supabaseClient.auth.getUser();
-
-        if (!user) {
-            alert("You must be logged in to save sightings.");
-            return false;
-        }
-
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .insert([{
-                species: sighting.species,
-                date: sighting.date,
-                location: sighting.location,
-                user_id: user.id // <--- Ensure this matches your column name exactly
-            }]);
-        
-        if (error) {
-            console.error("Supabase Insert Error:", error.message);
-            throw error;
-        }
-        
-        console.log("Sighting saved successfully!");
-        return true;
-    } catch (error) {
-        alert("Failed to save: " + error.message);
-        return false;
-    }
-}
-
 async function deleteSightingFromDB(idToDelete) {
     try {
         const { data: { user } } = await supabaseClient.auth.getUser();
