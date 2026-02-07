@@ -1416,3 +1416,13 @@ hr {
     font-style: italic;
     color: #8c2e1b;
 }
+/* Hide badges by default */
+.seen-badge, .sighting-count-badge {
+    display: none;
+}
+
+/* Only show them when the 'seen' class is present */
+.bird-card.seen .seen-badge, 
+.bird-card.seen .sighting-count-badge {
+    display: flex;
+}
