@@ -67,101 +67,35 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
+        // 1. Load Data
         populateSpeciesDatalist(); 
         await loadSightings(); 
-        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
+        await loadLocations(); 
         
-        // --- THE FIX ---
-        // This ensures the first input box is there on launch
+        // 2. Initialize UI (Added missing setup calls)
         addSightingEntry(); 
-        // ---------------
-
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
         setupSearchBar();
         setupRarityFilter();
-        setupExpeditionSearch();
+        setupModal();            
+        setupExpeditionSearch(); // Restored from version 1
+        setupAudioPlayer();      // Ensure audio button works
         
-        filterAndDisplayBirds();
-        
-        // Load the most recent trip as a default display
-        if (mySightings.length > 0) {
-            const latest = mySightings[0]; // Assuming most recent is first
-            const data = getExpeditionData(latest.date, latest.location);
-            displayExpeditionCard(data);
-        }
-    } catch (error) {
-        console.error("Failed to load:", error);
-    }
-}
-async function loadUKBirds() {
-    try {
-        const response = await fetch('uk_birds.json');
-        if (response.ok) {
-            allUKBirds = await response.json();
-        }
-        
-        populateSpeciesDatalist(); 
-        await loadSightings(); 
-        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
-        
-        // --- THE FIX ---
-        // This ensures the first input box is there on launch
-        addSightingEntry(); 
-        // ---------------
-
-        setupTabSwitching();
-        setupPagination();
-        setupSummaryFilter();
-        setupSearchBar();
-        setupRarityFilter();
-        setupModal();
-        
+        // 3. Initial Display
         filterAndDisplayBirds(); 
         
+        // 4. Load the most recent trip
+        if (mySightings.length > 0) {
+            const latest = mySightings[0];
+            const data = getExpeditionData(latest.date, latest.location);
+            if (data) displayExpeditionCard(data);
+        }
+        
+        console.log("Field Journal fully initialized.");
     } catch (error) {
         console.error("Failed to load UK bird list:", error);
-    }
-}
-        async function loadSightings() {
-    try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        
-        // If no user is logged in, clear sightings and stop
-        if (!user) {
-            mySightings = [];
-            updateAllDisplays();
-            return;
-        }
-
-        // 1. Fetch the actual data from Supabase
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('*');
-            
-        if (error) throw error;
-
-        // 2. Now 'data' exists!
-        if (data) {
-            mySightings = data;
-            
-            // SORT: Newest sightings first
-            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // This tells all other parts of the app to refresh
-            updateAllDisplays(); 
-        }
-        // Add this inside the 'if (data)' block of loadSightings, after the sort
-if (mySightings.length > 0) {
-    const latest = mySightings[0];
-    const tripData = getExpeditionData(latest.date, latest.location);
-    if (tripData) displayExpeditionCard(tripData);
-}
-
-        console.log("Loaded", mySightings.length, "sightings.");
-    } catch (error) {
-        console.error("Error loading sightings:", error);
     }
 }
    
@@ -251,7 +185,7 @@ function switchTab(targetTabId) {
 
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        content.style.display = 'none'; // Force hide everything
+        content.style.display = 'none'; // Ensure hidden sections are truly gone
     });
     
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -259,12 +193,16 @@ function switchTab(targetTabId) {
     const targetContent = document.getElementById(targetTabId);
     if (targetContent) {
         targetContent.classList.add('active-content');
-        targetContent.style.display = 'block'; // FORCE SHOW THE TAB
+        targetContent.style.display = 'block'; // FORCE VISIBILITY
         
-        // This triggers the stats math only when the tab is clicked
+        // This triggers the stats calculations and chart drawing
         if (targetTabId === 'stats-view') {
+            console.log("📊 Stats Tab Activated");
             calculateAndDisplayStats();
-            createMonthlyChart();
+            // Wrap in a check in case Chart.js hasn't loaded yet
+            if (typeof createMonthlyChart === 'function') {
+                createMonthlyChart();
+            }
         }
     }
 }
