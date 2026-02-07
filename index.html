@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- Starting everything -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,13 +13,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 
-    <!-- Load Supabase library -->
+<!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Load Chart.js for the monthly chart -->
+<!-- Load monthly chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦆</text></svg>">
 </head>
-
+<!-- Log in section/header -->
 <body>
     <header>
         <div id="auth-section" class="vintage-panel">
@@ -70,7 +70,7 @@
             <h1>UK Bird Sighting Log</h1>
             <p>A simple log for tracking your UK bird sightings and statistics.</p>
     </header>
-
+<!-- Navigation tabs -->
     <div id="nav-bar">
         <button class="tab-button active" data-tab="database-view">UK Bird Database</button>
         <button class="tab-button" data-tab="submission-view">Submit Sighting</button>
@@ -78,7 +78,7 @@
         <button class="tab-button" data-tab="summary-view">Species Summary</button>
         <button class="tab-button" data-tab="stats-view">My Stats</button>
     </div>
-
+<!-- UK birds database tab -->
     <section id="database-view" class="tab-content active-content">
         <h2>UK Bird Database</h2>
 
@@ -105,7 +105,7 @@
             Loading UK bird data...
         </div>
     </section>
-
+<!-- Submit new sighting tab -->
     <section id="submission-view" class="tab-content">
         <h2>Submit New Sighting</h2>
         <form id="sighting-form">
@@ -131,7 +131,7 @@
             </div>
         </form>
     </section>
-
+<!-- Raw sighting checklist tab -->
     <section id="checklist-view" class="tab-content">
         <h2>Raw Sighting Checklist</h2>
 
@@ -146,14 +146,14 @@
             No sightings recorded yet.
         </ul>
 
-        <!-- Pagination controls at bottom too -->
+        <!-- Pagination controls at bottom -->
         <div id="pagination-controls-bottom">
             <button id="prev-page-btn-bottom" disabled>← Previous</button>
             <span id="page-info-bottom">Page 1</span>
             <button id="next-page-btn-bottom">Next →</button>
         </div>
     </section>
-
+<!-- Bird species summary tab -->
     <section id="summary-view" class="tab-content">
         <h2>Seen Bird Species Summary</h2>
 
@@ -173,16 +173,17 @@
             No unique birds seen yet.
         </div>
     </section>
+<!-- My stats tab -->
     <section id="stats-view" class="tab-content">
         <h2>My Birding Statistics</h2>
         <div id="stats-page">
             <p>Total Unique Species Seen: <span id="total-species">0</span></p>
             <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
             <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
-
+    <!-- Line chart -->
             <h3>Sightings Over Time</h3>
             <canvas id="monthly-chart"></canvas>
-
+    <!-- Year selector under chart -->
             <div class="year-filter-container vintage-panel">
                 <div class="vintage-select-wrapper">
                     <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
@@ -195,18 +196,18 @@
                     <div class="select-arrow">▼</div>
                 </div>
             </div>
-
+    <!-- Milestones section -->
             <div class="milestones-container">
                 <h3> Field Milestones</h3>
                 <div id="milestones-grid" class="milestones-grid">
                 </div>
             </div>
-
+    <!-- Trip report section -->
             <div class="stats-grid">
             </div>
             <div class="expedition-hub vintage-panel">
                 <h3 class="hub-title">Field Expedition Archive</h3>
-
+        <!-- Search for location -->
                 <div class="expedition-controls">
                     <div class="museum-drawer">
                         <span class="drawer-label">LOCATION INDEX</span>
@@ -216,7 +217,7 @@
                         <ul id="trip-results-list"></ul>
                     </div>
                 </div>
-
+        <!-- Actual trip report -->
                 <div id="expedition-card" class="logbook-card">
                     <div class="logbook-header">
                         <div class="logbook-meta">
@@ -238,7 +239,7 @@
                 </div>
             </div>
     </section>
-
+<!-- Bird cards after click -->
     <div id="sighting-modal" class="modal">
         <div class="modal-content">
             <div class="modal-nav">
@@ -247,7 +248,7 @@
 
             <h2 id="modal-species-name" class="serif-title"></h2>
             <p id="modal-species-info" class="rarity-subtitle"></p>
-
+    <!-- Bird card audio -->
             <div class="audio-section vintage-panel">
                 <div class="audio-deck">
                     <div class="vinyl-container">
@@ -265,7 +266,7 @@
                         </div>
                     </div>
                 </div>
-
+    <!-- Bird card wiki info -->
                 <div id="modal-field-notes" class="museum-note-box">
                     <h4 class="note-label">Field Notes (via Wikipedia)</h4>
                     <p id="modal-description-text">Fetching notes...</p>
@@ -275,9 +276,11 @@
                 <ul id="modal-sightings-list"></ul>
             </div>
         </div>
-
+    <!-- Bird card sightings -->
         <datalist id="species-datalist"></datalist>
 
+<!-- Submit sighting bird box -->
+        
         <template id="sighting-template">
             <div class="sighting-entry-group">
                 <label>Species Name:</label>
@@ -285,12 +288,12 @@
                 <button type="button" class="remove-entry-btn">✕ Remove</button>
             </div>
         </template>
-
+<!-- Bird card thumbnail -->
         <template id="bird-card-template">
             <div class="bird-card">
                 <div class="card-image-container">
                     <img class="card-image" alt="Bird photo">
-
+    <!-- Bird card tags for species summary tab -->
                     <div class="seen-badge">✓</div>
                     <div class="sighting-count-badge">0</div>
 
@@ -316,12 +319,12 @@
                 </div>
             </div>
         </template>
-
+<!-- Bug report button -->
         <div class="bug-report-container">
             <button type="button" id="bug-fab" title="Report a Bug">
                 <span style="font-size: 1.2rem;">🪲</span>
             </button>
-
+    <!-- Bug report form -->
             <div id="bug-form-popup" class="bug-popup" style="display: none;">
                 <div class="bug-popup-header">
                     <h4>Report an Issue</h4>
