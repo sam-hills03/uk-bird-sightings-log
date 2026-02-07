@@ -481,6 +481,15 @@ async function showSightingModal(species, birdData) {
     // We look at the global mySightings array and filter for this specific bird
     const personalSightings = mySightings.filter(s => s.species.trim().toLowerCase() === species.trim().toLowerCase());
 
+    // Inside showSightingModal...
+const recordingLoc = document.getElementById('recording-location');
+recordingLoc.innerHTML = `Tuning signal... <span id="refresh-audio" style="cursor:pointer; margin-left:10px; text-decoration:underline; font-size:0.8em;">[Not the right bird?]</span>`;
+
+document.getElementById('refresh-audio').onclick = () => {
+    // This will try the Latin name specifically to force accuracy
+    fetchBirdSong(birdData.LatinName, birdData.CommonName, true); 
+};
+
     if (personalSightings.length > 0) {
         // Sort newest to oldest
         personalSightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
@@ -508,12 +517,19 @@ async function showSightingModal(species, birdData) {
 }
 
 // 1. The main function
-async function fetchBirdSong(latinName, commonName) {
+async function fetchBirdSong(latinName, commonName, isRetry = false) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-    // This order prioritizes specific audio files over general species pages
-// Specifically designed to bypass the 'Great Tit' confusion
+    if (!audioPlayer) return;
+
+    audioPlayer.pause();
+    
+    // If it's a retry, we ONLY use the Latin Name + "vocalization" 
+    // to bypass common name confusion
+    const query = (isRetry && latinName) ? `${latinName} vocalization` : (latinName || commonName);
+
+    // ... rest of your fetch logic ...
+}
 const attempts = [
     `${latinName} vocalization`, 
     `${latinName} call`, 
@@ -784,11 +800,16 @@ function filterAndDisplayBirds() {
     const imageContainer = card.querySelector('.card-image-container');
     const imageEl = card.querySelector('.card-image');
 
-    // 1. Clean the template
+    // 1. Set ID and Data Attributes (CRITICAL for Edit/Verify logic)
+    card.id = `bird-${bird.CommonName.replace(/\s+/g, '-')}`;
+    card.dataset.commonName = bird.CommonName;
+    card.dataset.latinName = bird.LatinName;
+
+    // 2. Clean and Reset State
     card.classList.remove('verified-card', 'seen');
     imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
 
-    // 2. Set Text Data
+    // 3. Apply Text and "Seen" status
     if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
     card.querySelector('.card-common-name').textContent = bird.CommonName;
     
@@ -796,26 +817,24 @@ function filterAndDisplayBirds() {
     rarityTag.textContent = bird.Rarity;
     rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-    // 3. RESTORE THE VERIFIED IMAGE SYSTEM
-    // We use applyBirdImageData again but we've made it safer
-    applyBirdImageData(card, imageContainer, imageEl, bird);
+    // 4. RE-ATTACH TO YOUR VERIFICATION SYSTEM
+    // This function must be the one that handles Supabase checks and overlays
+    if (typeof applyBirdImageData === 'function') {
+        applyBirdImageData(card, imageContainer, imageEl, bird);
+    }
 
-    // 4. Click Listener
+    // 5. Click Listener for Modal
     card.addEventListener('click', (e) => {
-        if (!e.target.closest('.image-verify-overlay')) {
+        // Prevent modal if clicking the verify buttons/overlays
+        if (!e.target.closest('.image-verify-overlay') && !e.target.closest('.admin-controls')) {
             const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-            
-            // Open modal
             showSightingModal(bird.CommonName, bird, birdSightings);
-            
-            // Fetch song with stricter Latin-first query
             fetchBirdSong(bird.LatinName, bird.CommonName);
         }
     });
 
     listContainer.appendChild(cardClone);
 });
-
     // Admin check
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         const isAdmin = session?.user?.id === ADMIN_UID;
