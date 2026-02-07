@@ -596,17 +596,17 @@ function setupAudioPlayer() {
     if (!gramophoneBtn || !audioPlayer) return;
 
     gramophoneBtn.onclick = () => {
-    if (audioPlayer.paused) {
-        audioPlayer.play().catch(e => {
-            console.error("Playback blocked:", e);
-            recordingLoc.textContent = "Format error - try another bird.";
-        });
-        gramophoneBtn.classList.add('playing');
-    } else {
-        audioPlayer.pause();
-        gramophoneBtn.classList.remove('playing');
-    }
-};
+        if (audioPlayer.paused) {
+            audioPlayer.play().catch(err => {
+                console.error("Playback failed:", err);
+            });
+            gramophoneBtn.classList.add('playing');
+        } else {
+            audioPlayer.pause();
+            gramophoneBtn.classList.remove('playing');
+        }
+    };
+}
 
 function startSpectrogram() {
     const audioPlayer = document.getElementById('bird-audio-player');
@@ -1758,6 +1758,7 @@ window.handleSummaryFilterChange = function(value) {
 
 // Call the Search Setup
 setupExpeditionSearch();
+
 document.addEventListener('click', function(e) {
     // --- 1. Open Bird Details & Fetch Song ---
     const birdCard = e.target.closest('.bird-card');
@@ -1770,8 +1771,11 @@ document.addEventListener('click', function(e) {
                 const bird = allUKBirds.find(b => b.CommonName === speciesName);
                 
                 if (bird) {
-                    // Use 'bird' here because that's what you defined above
-                    showSightingModal(bird.CommonName, bird, []); 
+                    // Pull sightings from your global source if available
+                    const sightings = typeof mySightings !== 'undefined' ? 
+                        mySightings.filter(s => s.species === bird.CommonName) : [];
+                    
+                    showSightingModal(bird.CommonName, bird, sightings); 
                     fetchBirdSong(bird.LatinName, bird.CommonName);
                 }
             }
@@ -1782,18 +1786,17 @@ document.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
         const audioPlayer = document.getElementById('bird-audio-player');
         const gramophoneBtn = document.getElementById('gramophone-btn');
+        const modal = document.getElementById('sighting-modal');
         
         if (audioPlayer) {
             audioPlayer.pause();
             audioPlayer.src = ""; 
             if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
-            
-            if (typeof animationId !== 'undefined') {
-                cancelAnimationFrame(animationId);
-            }
         }
+        
+        if (modal) modal.style.display = 'none';
     }
-}); // <--- THIS was the missing '}' that caused the error!
+}); 
 
 // Initialize the gramophone listeners
 setupAudioPlayer();
