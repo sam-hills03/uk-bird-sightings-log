@@ -610,7 +610,6 @@ function setupAudioPlayer() {
         }
     };
 }
-let audioContext, analyser, dataArray, animationId;
 
 function startSpectrogram() {
     const audioPlayer = document.getElementById('bird-audio-player');
