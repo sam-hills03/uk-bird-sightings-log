@@ -520,31 +520,27 @@ document.getElementById('refresh-audio').onclick = () => {
 async function fetchBirdSong(latinName, commonName, isRetry = false) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    if (!audioPlayer) return;
-
-    audioPlayer.pause();
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
     
-    // If it's a retry, we ONLY use the Latin Name + "vocalization" 
-    // to bypass common name confusion
-    const query = (isRetry && latinName) ? `${latinName} vocalization` : (latinName || commonName);
-
-    // ... rest of your fetch logic ...
-}
-const attempts = [
-    `${latinName} vocalization`, 
-    `${latinName} call`, 
-    `${latinName} song`,
-    `${commonName} (bird)`
-];  
     if (!audioPlayer) return;
 
-    // Reset
+    // Reset UI
     audioPlayer.pause();
     audioPlayer.src = ""; 
-    loadingOverlay.style.display = 'flex';
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    const queries = [commonName, latinName, `${commonName} (bird)`];
+    // Define search variations. 
+    // If it's a retry (user clicked "Not the right bird"), we force Latin vocalization first.
+    let queries = isRetry 
+        ? [`${latinName} vocalization`, `${latinName} bird call`] 
+        : [commonName, latinName, `${commonName} (bird)`];
+
+    // Special fix for Blue Tit vs Great Tit confusion
+    if (commonName === "Blue Tit") {
+        queries = [`${latinName} vocalization`, `Cyanistes caeruleus song`].concat(queries);
+    }
+
     let foundUrl = null;
 
     try {
@@ -567,8 +563,12 @@ const attempts = [
                         const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
                         const infoRes = await fetch(infoUrl);
                         const infoData = await infoRes.json();
-                        foundUrl = infoData.query.pages[Object.keys(infoData.query.pages)[0]].imageinfo[0].url;
-                        break;
+                        const infoPage = infoData.query.pages[Object.keys(infoData.query.pages)[0]];
+                        
+                        if (infoPage && infoPage.imageinfo) {
+                            foundUrl = infoPage.imageinfo[0].url;
+                            break;
+                        }
                     }
                 }
             }
@@ -578,14 +578,20 @@ const attempts = [
         if (foundUrl) {
             audioPlayer.src = foundUrl;
             audioPlayer.load();
-            recordingLoc.textContent = "Captured: Archive Recording";
+            recordingLoc.innerHTML = `Captured: Archive Recording <span id="refresh-audio" style="cursor:pointer; margin-left:10px; text-decoration:underline; font-size:0.8em; color: #8c2e1b;">[Not the right bird?]</span>`;
+            
+            // Re-attach the retry listener
+            document.getElementById('refresh-audio').onclick = () => {
+                fetchBirdSong(latinName, commonName, true);
+            };
         } else {
             recordingLoc.textContent = "No recordings found.";
         }
     } catch (error) {
+        console.error("Audio Fetch Error:", error);
         recordingLoc.textContent = "Signal lost.";
     } finally {
-        loadingOverlay.style.display = 'none';
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
     }
 }
 async function attemptSecondarySearch(name) {
@@ -800,32 +806,25 @@ function filterAndDisplayBirds() {
     const imageContainer = card.querySelector('.card-image-container');
     const imageEl = card.querySelector('.card-image');
 
-    // 1. Set ID and Data Attributes (CRITICAL for Edit/Verify logic)
-    card.id = `bird-${bird.CommonName.replace(/\s+/g, '-')}`;
+    // 1. DATA ATTRIBUTES (Essential for Edit/Verify scripts)
     card.dataset.commonName = bird.CommonName;
-    card.dataset.latinName = bird.LatinName;
+    card.id = `card-${bird.CommonName.replace(/\s+/g, '-')}`;
 
-    // 2. Clean and Reset State
-    card.classList.remove('verified-card', 'seen');
-    imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
-
-    // 3. Apply Text and "Seen" status
-    if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
+    // 2. TEXT CONTENT
     card.querySelector('.card-common-name').textContent = bird.CommonName;
-    
     const rarityTag = card.querySelector('.card-rarity-tag');
     rarityTag.textContent = bird.Rarity;
     rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-    // 4. RE-ATTACH TO YOUR VERIFICATION SYSTEM
-    // This function must be the one that handles Supabase checks and overlays
+    // 3. THE MAGIC LINK (This restores badges and edit buttons)
+    // This calls your original script that handles the "Confirm" overlay
     if (typeof applyBirdImageData === 'function') {
         applyBirdImageData(card, imageContainer, imageEl, bird);
     }
 
-    // 5. Click Listener for Modal
+    // 4. CLICK LISTENER
     card.addEventListener('click', (e) => {
-        // Prevent modal if clicking the verify buttons/overlays
+        // Don't open modal if clicking 'Confirm' or Admin buttons
         if (!e.target.closest('.image-verify-overlay') && !e.target.closest('.admin-controls')) {
             const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
             showSightingModal(bird.CommonName, bird, birdSightings);
