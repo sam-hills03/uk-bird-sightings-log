@@ -1284,12 +1284,27 @@ if (sightingForm) {
 // ============================================
 
 function calculateAndDisplayStats() {
-    const sightingsToUse = getFilteredSightings(); // Respects Lifetime vs Annual toggle
+    // 1. DATA SAFETY CHECK
+    // If your bird list hasn't loaded from the database yet, stop here.
+    if (!allUKBirds || allUKBirds.length === 0) {
+        console.warn("⚠️ Stats delay: Bird database not yet loaded.");
+        return;
+    }
+
+    const sightingsToUse = getFilteredSightings() || []; 
     const seenSpeciesNames = new Set(sightingsToUse.map(s => s.species));
     const totalSeenCount = seenSpeciesNames.size;
     const totalPossible = allUKBirds.length;
 
-    // 1. Update Basic Text Stats
+    // 2. FORCE VISIBILITY
+    // This ensures the container isn't being hidden by a CSS ghost
+    const statsView = document.getElementById('stats-view');
+    if (statsView) {
+        statsView.style.display = 'block';
+        statsView.classList.add('active-content');
+    }
+
+    // --- YOUR EXISTING LOGIC (with safety checks) ---
     const totalSpeciesEl = document.getElementById('total-species');
     if (totalSpeciesEl) totalSpeciesEl.textContent = totalSeenCount;
 
@@ -1299,7 +1314,6 @@ function calculateAndDisplayStats() {
         percentageSeenEl.textContent = percentage.toFixed(2) + '%';
     }
 
-    // 2. Percentage Excluding Megas
     const nonMegaBirds = allUKBirds.filter(bird => bird.Rarity !== 'Mega');
     const seenNonMegaCount = Array.from(seenSpeciesNames).filter(speciesName => {
         const bird = allUKBirds.find(b => b.CommonName === speciesName);
@@ -1312,14 +1326,13 @@ function calculateAndDisplayStats() {
         percentageNoMegaEl.textContent = pNoMega.toFixed(2) + '%';
     }
 
-    // 3. ID Card Rank & Progress Logic
-    // 3. ID Card Rank & Progress Logic
+    // Rank Logic
     const ranks = [
-        { name: "Passerine", level: "1", threshold: 0, color: "#8c2e1b" },    // Earthy Red
-        { name: "Corvid", level: "2", threshold: 10, color: "#5d544b" },      // Slate Grey
-        { name: "Charadriiform", level: "3", threshold: 50, color: "#416863" }, // Deep Teal
-        { name: "Falconiform", level: "4", threshold: 150, color: "#2c2621" },  // Iron Black
-        { name: "Aquiline", level: "5", threshold: 300, color: "#d4af37" }    // Gold
+        { name: "Passerine", level: "1", threshold: 0, color: "#8c2e1b" },
+        { name: "Corvid", level: "2", threshold: 10, color: "#5d544b" },
+        { name: "Charadriiform", level: "3", threshold: 50, color: "#416863" },
+        { name: "Falconiform", level: "4", threshold: 150, color: "#2c2621" },
+        { name: "Aquiline", level: "5", threshold: 300, color: "#d4af37" }
     ];
 
     let currentRank = ranks[0];
@@ -1332,41 +1345,34 @@ function calculateAndDisplayStats() {
         }
     }
 
-    // Update the Rank Title (next to name)
     const rankTitleElement = document.querySelector('.id-rank-title');
     if (rankTitleElement) rankTitleElement.textContent = currentRank.name;
 
-    // --- NEW STAMP UPDATE LOGIC ---
     const waxSeal = document.querySelector('.rank-stamp-seal');
     const sealText = document.querySelector('.seal-inner-text');
-    
     if (waxSeal && sealText) {
         waxSeal.style.backgroundColor = currentRank.color;
-        sealText.textContent = `LVL ${currentRank.level}`; // Changes from UK to LVL 1, 2, etc.
+        sealText.textContent = `LVL ${currentRank.level}`;
     }
+
     const progressBar = document.getElementById('level-progress-bar');
-    const nextLevelName = document.getElementById('next-level-name');
-    const currentDisplay = document.getElementById('current-count-display');
-    const targetDisplay = document.getElementById('target-count-display');
-
-    if (progressBar && nextLevelName) {
-        let progressPercent = 0;
-        if (currentRank.name === "Grand Archivist") {
-            progressPercent = 100;
-            nextLevelName.textContent = "Ultimate Rank Achieved";
-        } else {
-            // This math gives you that 52% look for 158/300
-            progressPercent = Math.min((totalSeenCount / nextRank.threshold) * 100, 100);
-            nextLevelName.textContent = `Next: ${nextRank.name}`;
-        }
-
+    if (progressBar) {
+        const progressPercent = Math.min((totalSeenCount / nextRank.threshold) * 100, 100);
         progressBar.style.width = `${progressPercent}%`;
+        
+        const nextLevelName = document.getElementById('next-level-name');
+        if (nextLevelName) nextLevelName.textContent = `Next: ${nextRank.name}`;
+        
+        const currentDisplay = document.getElementById('current-count-display');
+        const targetDisplay = document.getElementById('target-count-display');
         if (currentDisplay) currentDisplay.textContent = totalSeenCount;
         if (targetDisplay) targetDisplay.textContent = nextRank.threshold;
     }
 
-    // 4. Update Other UI Elements
-    calculateMilestones(); 
+    // Milestones
+    if (typeof calculateMilestones === 'function') {
+        calculateMilestones(); 
+    }
 }
 
 function calculateMilestones() {
