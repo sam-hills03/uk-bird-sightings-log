@@ -513,11 +513,21 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
+    // 1. Reset UI
     audioPlayer.pause();
+    audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    const query = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
+    // 2. Try Latin Name First, then Common Name
+    // We remove any extra words like "(British)" or "Adult" that might be in your database
+    const cleanLatin = latinName && latinName !== 'No Data' ? latinName.split(',')[0].trim() : null;
+    const cleanCommon = commonName ? commonName.split('(')[0].trim() : null;
+    
+    const query = cleanLatin || cleanCommon;
+    console.log(`🎵 Gramophone searching for: "${query}" (Latin: ${cleanLatin}, Common: ${cleanCommon})`);
+
+    // Using the 'raw' proxy which is usually more reliable for binary/audio data
     const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}`;
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(xenoUrl)}`;
 
@@ -525,20 +535,32 @@ async function fetchBirdSong(latinName, commonName) {
         const response = await fetch(proxyUrl);
         const data = await response.json();
 
+        console.log("📡 Xeno-canto v3 response:", data);
+
         if (data && data.recordings && data.recordings.length > 0) {
-            const bestMatch = data.recordings[0];
+            // Sort by quality (A is best)
+            const sorted = data.recordings.sort((a, b) => (a.q || 'Z').localeCompare(b.q || 'Z'));
+            const bestMatch = sorted[0];
+            
             let fileUrl = bestMatch.file;
             if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
             
+            console.log("✅ Found recording:", fileUrl);
+            
             audioPlayer.src = fileUrl;
             audioPlayer.load();
-            recordingLoc.textContent = `Captured: ${bestMatch.loc}`;
+            
+            // Show the English name from the archive + Location
+            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
+            loadingOverlay.style.display = 'none';
         } else {
-            recordingLoc.textContent = "No recordings found.";
+            console.warn("⚠️ No recordings found for query:", query);
+            recordingLoc.textContent = "No recordings in archive.";
+            loadingOverlay.style.display = 'none';
         }
     } catch (error) {
-        recordingLoc.textContent = "Signal lost.";
-    } finally {
+        console.error("❌ Audio Fetch Error:", error);
+        recordingLoc.textContent = "Signal lost...";
         loadingOverlay.style.display = 'none';
     }
 }
