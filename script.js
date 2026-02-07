@@ -514,55 +514,90 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
-    // 1. Reset UI
+    // 1. Reset everything
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Use the Common Name for Wikipedia searches (it's often more reliable for media titles)
-    const query = commonName || latinName;
+    // 2. Try multiple search variations
+    const searchTerms = [commonName, `${commonName} (bird)`, latinName];
+    let audioUrl = null;
 
     try {
-        // We search Wikipedia specifically for audio files related to the bird
-        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(query)}&imlimit=50`;
-        
-        const response = await fetch(searchUrl);
-        const data = await response.json();
-        
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
-        const images = pages[pageId].images || [];
-
-        // Look for the first file ending in .ogg, .mp3, or .wav
-        const audioFile = images.find(img => 
-            img.title.toLowerCase().endsWith('.ogg') || 
-            img.title.toLowerCase().endsWith('.mp3') || 
-            img.title.toLowerCase().endsWith('.wav')
-        );
-
-        if (audioFile) {
-            // Get the actual direct URL for that audio file
-            const fileInfoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-            const infoRes = await fetch(fileInfoUrl);
-            const infoData = await infoRes.json();
+        for (const term of searchTerms) {
+            if (!term) continue;
             
-            const infoPages = infoData.query.pages;
-            const infoPageId = Object.keys(infoPages)[0];
-            const directUrl = infoPages[infoPageId].imageinfo[0].url;
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(term)}&imlimit=100`;
+            const res = await fetch(url);
+            const data = await res.json();
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            
+            if (pageId === "-1") continue; // Page not found, try next term
 
-            audioPlayer.src = directUrl;
+            const images = pages[pageId].images || [];
+            // We look for audio files - Wikipedia uses .oga often for bird calls
+            const audioFile = images.find(img => 
+                img.title.toLowerCase().endsWith('.oga') || 
+                img.title.toLowerCase().endsWith('.ogg') || 
+                img.title.toLowerCase().endsWith('.mp3')
+            );
+
+            if (audioFile) {
+                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                const infoRes = await fetch(infoUrl);
+                const infoData = await infoRes.json();
+                const infoPages = infoData.query.pages;
+                const infoId = Object.keys(infoPages)[0];
+                audioUrl = infoPages[infoId].imageinfo[0].url;
+                break; // Found one! Stop searching
+            }
+        }
+
+        if (audioUrl) {
+            audioPlayer.src = audioUrl;
+            // Crucial: Pre-load the metadata
             audioPlayer.load();
-            recordingLoc.textContent = "Captured: Wikimedia Commons Archive";
+            recordingLoc.textContent = "Captured: Wikipedia Audio Archive";
+            
+            // Ensure the sonograph is ready to react
+            audioPlayer.onplay = () => {
+                startSpectrogram();
+            };
         } else {
-            recordingLoc.textContent = "No audio found in archives.";
+            recordingLoc.textContent = "No recordings found in archive.";
         }
     } catch (error) {
-        console.error("Wikipedia Audio Error:", error);
+        console.error("Audio Archive Error:", error);
         recordingLoc.textContent = "Signal lost...";
     } finally {
         loadingOverlay.style.display = 'none';
     }
+}
+function setupAudioPlayer() {
+    const gramophoneBtn = document.getElementById('gramophone-btn');
+    const audioPlayer = document.getElementById('bird-audio-player');
+
+    if (!gramophoneBtn || !audioPlayer) return;
+
+    gramophoneBtn.onclick = () => {
+        // Create or resume the audio context on click (Browser requirement)
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            gramophoneBtn.classList.add('playing');
+            // The Spectrogram is triggered here
+            startSpectrogram(); 
+        } else {
+            audioPlayer.pause();
+            gramophoneBtn.classList.remove('playing');
+            cancelAnimationFrame(animationId);
+        }
+    };
 }
 // ============================================
 // E. LOCATIONS
