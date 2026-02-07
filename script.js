@@ -519,47 +519,40 @@ async function fetchBirdSong(latinName, commonName) {
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // 2. Try Latin Name First, then Common Name
-    // We remove any extra words like "(British)" or "Adult" that might be in your database
+    // 2. Clean names
     const cleanLatin = latinName && latinName !== 'No Data' ? latinName.split(',')[0].trim() : null;
     const cleanCommon = commonName ? commonName.split('(')[0].trim() : null;
-    
     const query = cleanLatin || cleanCommon;
-    console.log(`🎵 Gramophone searching for: "${query}" (Latin: ${cleanLatin}, Common: ${cleanCommon})`);
 
-    // Using the 'raw' proxy which is usually more reliable for binary/audio data
-    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}`;
+    // 3. Use API v2 (Public/No-Key) via AllOrigins Raw Proxy
+    // Note: We use /api/2/recordings for the public search
+    const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(query)}`;
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
         const response = await fetch(proxyUrl);
         const data = await response.json();
 
-        console.log("📡 Xeno-canto v3 response:", data);
-
         if (data && data.recordings && data.recordings.length > 0) {
-            // Sort by quality (A is best)
+            // Sort to find the best quality (A or B)
             const sorted = data.recordings.sort((a, b) => (a.q || 'Z').localeCompare(b.q || 'Z'));
             const bestMatch = sorted[0];
             
             let fileUrl = bestMatch.file;
+            // Ensure the URL is secure
             if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-            
-            console.log("✅ Found recording:", fileUrl);
             
             audioPlayer.src = fileUrl;
             audioPlayer.load();
             
-            // Show the English name from the archive + Location
             recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
             loadingOverlay.style.display = 'none';
         } else {
-            console.warn("⚠️ No recordings found for query:", query);
-            recordingLoc.textContent = "No recordings in archive.";
+            recordingLoc.textContent = "No recordings in public archive.";
             loadingOverlay.style.display = 'none';
         }
     } catch (error) {
-        console.error("❌ Audio Fetch Error:", error);
+        console.error("Audio Fetch Error:", error);
         recordingLoc.textContent = "Signal lost...";
         loadingOverlay.style.display = 'none';
     }
