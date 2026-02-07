@@ -1345,63 +1345,76 @@ hr {
     margin-bottom: 12px;
 }
 
-/* --- THE GRAMOPHONE BUTTON --- */
-.gramophone-control {
-    background: #8c2e1b;
-    border: 2px solid #5d2014;
-    color: white;
-    padding: 8px 15px;
+.audio-deck {
     display: flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-family: 'DM Serif Display', serif;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-    box-shadow: 2px 2px 0px #5d2014;
-    transition: all 0.1s;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border: 1px solid rgba(140, 46, 27, 0.1);
 }
 
-.gramophone-control:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0px #5d2014;
-}
-
-.gramophone-icon::before {
-    content: '📻'; /* We can swap this for a custom SVG later if you like! */
-    font-size: 1.2rem;
-}
-
-.gramophone-control.playing {
-    background: #416863;
-    border-color: #2d4a46;
-}
-
-.gramophone-control.playing .gramophone-icon::before {
-    content: '⏸';
-}
-
-/* --- SPECTROGRAM --- */
-.spectrogram-container {
+.vinyl-container {
     position: relative;
-    width: 100%;
+    width: 80px;
     height: 80px;
-    background: #e9e5d9;
-    border: 1px solid #d1ccbc;
-    overflow: hidden;
 }
 
-#spectrogram-canvas {
+.vinyl-disc {
     width: 100%;
     height: 100%;
-    display: block;
-    filter: sepia(0.5) contrast(1.2); /* Makes the "ink" look older */
+    background: radial-gradient(circle, #333 30%, #111 100%);
+    border-radius: 50%;
+    border: 2px solid #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s ease;
 }
 
-.recording-meta {
-    font-size: 0.75rem;
-    color: #5d544b;
-    text-align: right;
+/* The spinning animation */
+.vinyl-disc.spinning {
+    animation: rotateVinyl 3s linear infinite;
+}
+
+@keyframes rotateVinyl {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.vinyl-label {
+    width: 30%;
+    height: 30%;
+    background: #8c2e1b; /* Your Naturalist Red */
+    border-radius: 50%;
+    border: 1px solid rgba(244, 241, 232, 0.5);
+}
+
+.play-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f4f1e8;
+    border: 2px solid #8c2e1b;
+    color: #8c2e1b;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.play-needle:hover {
+    background: #8c2e1b;
+    color: #f4f1e8;
 }
 
 /* --- LOADING ANIMATION --- */
