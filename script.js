@@ -514,10 +514,10 @@ async function fetchBirdSong(latinName, commonName) {
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     // This order prioritizes specific audio files over general species pages
 const attempts = [
+    `${latinName} bird call`, // "Cyanistes caeruleus bird call" is 100% unique
     `${latinName} song`, 
-    `${commonName} call`, 
     latinName, 
-    commonName
+    `${commonName} bird sound`
 ];
     
     if (!audioPlayer) return;
@@ -784,11 +784,11 @@ function filterAndDisplayBirds() {
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
 
-        // --- 1. CLEAN THE TEMPLATE ---
+        // Clean template
         card.classList.remove('verified-card', 'seen');
         imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
 
-        // --- 2. SET BASIC DATA ---
+        // Basic Data
         if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
         card.querySelector('.card-common-name').textContent = bird.CommonName;
         
@@ -796,24 +796,23 @@ function filterAndDisplayBirds() {
         rarityTag.textContent = bird.Rarity;
         rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        // --- 3. LOAD IMAGES (The fix for your loading issue) ---
-        // Ensure this function exists and is robust!
-        applyBirdImageData(card, imageContainer, imageEl, bird);
+        // FORCE IMAGE LOAD: Bypass the complex apply function for a second to test
+        getBirdImage(bird.CommonName, bird.LatinName).then(result => {
+            if (result && result.url && imageEl) {
+                imageEl.src = result.url;
+            }
+        }).catch(err => console.error("Image error for " + bird.CommonName, err));
 
-        // --- 4. CLICK LISTENER (The fix for your "birdData" error) ---
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
-                // We filter the sightings specifically for this bird
                 const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-                
-                // FIXED: Changed birdData to bird, and sightingsData to birdSightings
                 showSightingModal(bird.CommonName, bird, birdSightings);
                 fetchBirdSong(bird.LatinName, bird.CommonName);
             }
         });
 
-        card.style.cursor = 'pointer';
-        listContainer.appendChild(cardClone); // Use cardClone to append the fragment properly
+        // CRITICAL: We must append the cardClone (the fragment), not just the card.
+        listContainer.appendChild(cardClone);
     });
 
     // Admin check
