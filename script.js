@@ -458,95 +458,83 @@ function displaySeenBirdsSummary() {
 }
 
 async function showSightingModal(species, birdData, sightings) {
+    console.log("Opening modal for:", species, sightings); // Debug check
     const modal = document.getElementById('sighting-modal');
     if (!modal) return;
 
-    // 1. Set Basic Info
+    // 1. Basic Info (Always works)
     document.getElementById('modal-species-name').textContent = species;
-    document.getElementById('modal-species-info').textContent = `${birdData.LatinName || ''} • ${birdData.Rarity || ''}`;
+    document.getElementById('modal-species-info').textContent = `${birdData?.LatinName || ''} • ${birdData?.Rarity || ''}`;
 
-    // 2. Fetch Field Notes (Wikipedia)
+    // 2. Render YOUR Sightings (Protected)
+    try {
+        const modalList = document.getElementById('modal-sightings-list');
+        modalList.innerHTML = '';
+        if (sightings && sightings.length > 0) {
+            const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
+            sortedSightings.forEach(sighting => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
+                modalList.appendChild(li);
+            });
+        } else {
+            modalList.innerHTML = '<li>No personal sightings recorded.</li>';
+        }
+    } catch (e) { console.error("Sightings List Error:", e); }
+
+    // 3. Wikipedia (Protected)
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
-    fetchBirdDescription(species).then(desc => {
+    try {
+        const desc = await fetchBirdDescription(species);
         descriptionBox.textContent = desc;
-    });
+    } catch (e) { descriptionBox.textContent = "Field notes unavailable."; }
 
-    // 3. Render YOUR Sightings List (Fixing your missing list issue)
-    const modalList = document.getElementById('modal-sightings-list');
-    modalList.innerHTML = '';
-    
-    if (sightings && sightings.length > 0) {
-        // Sort newest to oldest
-        const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sortedSightings.forEach(sighting => {
-            const li = document.createElement('li');
-            li.style.padding = "8px 0";
-            li.style.borderBottom = "1px solid #ddd";
-            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
-            modalList.appendChild(li);
-        });
-    } else {
-        modalList.innerHTML = '<li style="font-style:italic; color:#777; padding:10px;">No personal sightings recorded yet.</li>';
-    }
-
-    // 4. Trigger Audio (V3 Archive)
-    // We do this last so if it fails, it doesn't break the sightings list above
-    fetchBirdSong(birdData.LatinName, species);
+    // 4. Audio (Protected - This is likely where the crash was happening)
+    try {
+        fetchBirdSong(birdData?.LatinName, species);
+    } catch (e) { console.error("Audio Trigger Error:", e); }
     
     modal.style.display = 'block';
 }
-
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
-    
     if (!audioPlayer) return;
 
-    // Reset UI
+    // UI Reset
     audioPlayer.pause();
-    audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Clean the names (remove extra spaces)
     const query = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
     
-    // Using a different AllOrigins method to ensure we get the data correctly
+    // Using AllOrigins "Raw" mode to avoid the JSON.parse error
     const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
         const response = await fetch(proxyUrl);
-        const wrapper = await response.json();
-        
-        // Sometimes contents is already an object, sometimes it's a string
-        const data = typeof wrapper.contents === 'string' ? JSON.parse(wrapper.contents) : wrapper.contents;
+        const data = await response.json(); // Now it fetches JSON directly
 
         if (data && data.recordings && data.recordings.length > 0) {
-            // Sort to get best quality (A is best in Xeno-Canto)
-            const bestMatch = data.recordings.sort((a,b) => a.q.localeCompare(b.q))[0];
-            
+            const bestMatch = data.recordings[0];
             let fileUrl = bestMatch.file;
             if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
             
             audioPlayer.src = fileUrl;
             audioPlayer.load();
-            
-            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
-            loadingOverlay.style.display = 'none';
+            recordingLoc.textContent = `Captured: ${bestMatch.loc}`;
         } else {
             recordingLoc.textContent = "No recordings found.";
-            loadingOverlay.style.display = 'none';
         }
     } catch (error) {
-        console.error("Audio error:", error);
-        recordingLoc.textContent = "Archive unavailable.";
+        recordingLoc.textContent = "Signal lost.";
+    } finally {
         loadingOverlay.style.display = 'none';
     }
 }
-
 // ============================================
 // E. LOCATIONS
 // ============================================
@@ -693,7 +681,7 @@ function filterAndDisplayBirds() {
     card.addEventListener('click', (e) => {
         if (!e.target.closest('.image-verify-overlay')) {
             const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-            showSightingModal(bird.CommonName, bird, birdSightings);
+            showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
         }
     });
 
