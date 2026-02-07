@@ -633,23 +633,31 @@ async function attemptSecondarySearch(name) {
 function setupAudioPlayer() {
     const gramophoneBtn = document.getElementById('gramophone-btn');
     const audioPlayer = document.getElementById('bird-audio-player');
+    const vinylDisc = document.getElementById('vinyl-disc');
 
     if (!gramophoneBtn || !audioPlayer) return;
 
     gramophoneBtn.onclick = () => {
         if (audioPlayer.paused) {
-            audioPlayer.play().catch(err => {
+            audioPlayer.play().then(() => {
+                gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                vinylDisc.classList.add('spinning');
+            }).catch(err => {
                 console.error("Playback failed:", err);
             });
-            gramophoneBtn.classList.add('playing');
         } else {
             audioPlayer.pause();
-            gramophoneBtn.classList.remove('playing');
-            
+            gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
+            vinylDisc.classList.remove('spinning');
         }
     };
-}
 
+    // Auto-stop spinning when audio finishes
+    audioPlayer.onended = () => {
+        vinylDisc.classList.remove('spinning');
+        gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
+    };
+}
 function startSpectrogram() {
     const audioPlayer = document.getElementById('bird-audio-player');
     const canvas = document.getElementById('spectrogram-canvas');
