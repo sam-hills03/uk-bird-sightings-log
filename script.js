@@ -459,36 +459,92 @@ function displaySeenBirdsSummary() {
 
 async function showSightingModal(species, birdData, sightings) {
     const modal = document.getElementById('sighting-modal');
-    
-    // Set Names
+    if (!modal) return;
+
+    // 1. Set Basic Info
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData.LatinName || ''} • ${birdData.Rarity || ''}`;
 
-    // --- TRIGGER THE AUDIO SEARCH ---
-    if (birdData.LatinName && birdData.LatinName !== 'No Data') {
-        fetchBirdSong(birdData.LatinName);
-    } else {
-        document.getElementById('recording-location').textContent = "Scientific name missing.";
-    }
-    // Field Notes
+    // 2. Fetch Field Notes (Wikipedia)
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
-    const description = await fetchBirdDescription(species);
-    descriptionBox.textContent = description;
-    
-    // Sightings List
+    fetchBirdDescription(species).then(desc => {
+        descriptionBox.textContent = desc;
+    });
+
+    // 3. Render YOUR Sightings List (Fixing your missing list issue)
     const modalList = document.getElementById('modal-sightings-list');
     modalList.innerHTML = '';
     
     if (sightings && sightings.length > 0) {
-        sightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
+        // Sort newest to oldest
+        const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
+        sortedSightings.forEach(sighting => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${new Date(sighting.date).toLocaleDateString()}</span> - <span>${sighting.location}</span>`;
+            li.style.padding = "8px 0";
+            li.style.borderBottom = "1px solid #ddd";
+            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
             modalList.appendChild(li);
         });
+    } else {
+        modalList.innerHTML = '<li style="font-style:italic; color:#777; padding:10px;">No personal sightings recorded yet.</li>';
     }
+
+    // 4. Trigger Audio (V3 Archive)
+    // We do this last so if it fails, it doesn't break the sightings list above
+    fetchBirdSong(birdData.LatinName, species);
     
     modal.style.display = 'block';
+}
+
+async function fetchBirdSong(latinName, commonName) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+    const recordingLoc = document.getElementById('recording-location');
+    
+    if (!audioPlayer) return;
+
+    // Reset UI
+    audioPlayer.pause();
+    audioPlayer.src = ""; 
+    loadingOverlay.style.display = 'flex';
+    recordingLoc.textContent = "Tuning signal...";
+
+    // Clean the names (remove extra spaces)
+    const query = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
+    
+    // Using a different AllOrigins method to ensure we get the data correctly
+    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
+
+    try {
+        const response = await fetch(proxyUrl);
+        const wrapper = await response.json();
+        
+        // Sometimes contents is already an object, sometimes it's a string
+        const data = typeof wrapper.contents === 'string' ? JSON.parse(wrapper.contents) : wrapper.contents;
+
+        if (data && data.recordings && data.recordings.length > 0) {
+            // Sort to get best quality (A is best in Xeno-Canto)
+            const bestMatch = data.recordings.sort((a,b) => a.q.localeCompare(b.q))[0];
+            
+            let fileUrl = bestMatch.file;
+            if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+            
+            audioPlayer.src = fileUrl;
+            audioPlayer.load();
+            
+            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+            loadingOverlay.style.display = 'none';
+        } else {
+            recordingLoc.textContent = "No recordings found.";
+            loadingOverlay.style.display = 'none';
+        }
+    } catch (error) {
+        console.error("Audio error:", error);
+        recordingLoc.textContent = "Archive unavailable.";
+        loadingOverlay.style.display = 'none';
+    }
 }
 
 // ============================================
@@ -1323,58 +1379,6 @@ function createMonthlyChart() {
             plugins: { legend: { display: false } }
         }
     });
-}
-
-async function fetchBirdSong(latinName, commonName) {
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-    const recordingLoc = document.getElementById('recording-location');
-    
-    if (!audioPlayer) return;
-
-    audioPlayer.pause();
-    audioPlayer.src = ""; 
-    loadingOverlay.style.display = 'flex';
-    recordingLoc.textContent = "Tuning signal...";
-
-    // Use Latin name if available, otherwise Common name. 
-    // We trim it to make sure there are no hidden spaces.
-    let searchQuery = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
-    
-    // We removed the +q:A to ensure we find SOMETHING
-    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchQuery)}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
-
-    try {
-        const response = await fetch(proxyUrl);
-        const wrapper = await response.json();
-        
-        if (wrapper && wrapper.contents) {
-            const data = JSON.parse(wrapper.contents);
-
-            if (data.recordings && data.recordings.length > 0) {
-                // Sort by quality so we still try to get the best one first
-                const sorted = data.recordings.sort((a, b) => a.q.localeCompare(b.q));
-                const bestMatch = sorted[0];
-                
-                let fileUrl = bestMatch.file;
-                if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-                
-                audioPlayer.src = fileUrl;
-                audioPlayer.load();
-                
-                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
-                loadingOverlay.style.display = 'none';
-            } else {
-                recordingLoc.textContent = "No recordings found in v3 archive.";
-                loadingOverlay.style.display = 'none';
-            }
-        }
-    } catch (error) {
-        console.error("Audio fetch error:", error);
-        recordingLoc.textContent = "Signal lost (Archive mismatch)";
-        loadingOverlay.style.display = 'none';
-    }
 }
 // --- UPDATED AUTHENTICATION LOGIC ---
 
