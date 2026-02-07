@@ -258,22 +258,16 @@ function switchTab(targetTabId) {
     if (targetContent && targetButton) {
         targetContent.classList.add('active-content');
         targetButton.classList.add('active');
+
+        // --- STEP 1 GOES HERE ---
+        // If the user switched to the stats view, recalculate everything
+        if (targetTabId === 'stats-view') {
+            console.log("📈 Refreshing Expedition Stats...");
+            calculateAndDisplayStats();
+            // createMonthlyChart(); // Only include this if it's not already inside calculateAndDisplayStats
+        }
     }
 }
-
-// Ensure this part is inside your DOMContentLoaded or a setup function
-function setupTabs() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            switchTab(button.getAttribute('data-tab'));
-        });
-    });
-
-    // Set the default view
-    switchTab('database-view');
-}
-
 // ============================================
 // C. PAGINATION
 // ============================================
