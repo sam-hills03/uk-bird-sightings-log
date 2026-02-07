@@ -249,22 +249,20 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 1. Hide all contents and deactivate buttons
-    tabContents.forEach(content => content.classList.remove('active-content'));
+    tabContents.forEach(content => {
+        content.classList.remove('active-content');
+        content.style.display = 'none'; // Force hide everything
+    });
+    
     tabButtons.forEach(button => button.classList.remove('active'));
 
-    // 2. Show the target content
     const targetContent = document.getElementById(targetTabId);
-    const targetButton = document.querySelector(`.tab-button[data-tab="${targetTabId}"]`);
-
-    if (targetContent && targetButton) {
+    if (targetContent) {
         targetContent.classList.add('active-content');
-        targetButton.classList.add('active');
-
-        // --- THE TRIGGER ---
-        // Every time the user clicks 'My Stats', we recalculate and redraw the chart
+        targetContent.style.display = 'block'; // FORCE SHOW THE TAB
+        
+        // This triggers the stats math only when the tab is clicked
         if (targetTabId === 'stats-view') {
-            console.log("📊 Stats Tab Activated: Calculating...");
             calculateAndDisplayStats();
             createMonthlyChart();
         }
@@ -513,93 +511,46 @@ document.getElementById('refresh-audio').onclick = () => {
 }
 
 // 1. The main function
-async function fetchBirdSong(latinName, commonName, isRetry = false) {
+async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-
-    recordingLoc.innerHTML = `
-    Captured: Archive Recording 
-    <span id="refresh-audio" title="Try a different recording">
-        Not the right bird?
-    </span>
-`;
-
-// Keep the click listener logic exactly as it was:
-document.getElementById('refresh-audio').onclick = () => {
-    fetchBirdSong(latinName, commonName, true);
-};
-    
     if (!audioPlayer) return;
 
-    // Reset UI
     audioPlayer.pause();
-    audioPlayer.src = ""; 
-    if (loadingOverlay) loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Define search variations. 
-    // If it's a retry (user clicked "Not the right bird"), we force Latin vocalization first.
-    let queries = isRetry 
-        ? [`${latinName} vocalization`, `${latinName} bird call`] 
-        : [commonName, latinName, `${commonName} (bird)`];
-
-    // Special fix for Blue Tit vs Great Tit confusion
-    if (commonName === "Blue Tit") {
-        queries = [`${latinName} vocalization`, `Cyanistes caeruleus song`].concat(queries);
-    }
-
-    let foundUrl = null;
+    // We use only the Latin Name to ensure we don't get a Great Tit for a Blue Tit
+    const query = latinName || commonName;
 
     try {
-        for (let query of queries) {
-            if (!query || query === 'No Data') continue;
+        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=5`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=3&prop=images&imlimit=50`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.query && data.query.pages) {
-                const pages = data.query.pages;
-                for (let id in pages) {
-                    const images = pages[id].images || [];
-                    const audioFile = images.find(img => 
-                        ['.ogg', '.oga', '.mp3', '.wav'].some(ext => img.title.toLowerCase().endsWith(ext))
-                    );
-
-                    if (audioFile) {
-                        const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-                        const infoRes = await fetch(infoUrl);
-                        const infoData = await infoRes.json();
-                        const infoPage = infoData.query.pages[Object.keys(infoData.query.pages)[0]];
-                        
-                        if (infoPage && infoPage.imageinfo) {
-                            foundUrl = infoPage.imageinfo[0].url;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (foundUrl) break;
-        }
-
-        if (foundUrl) {
-            audioPlayer.src = foundUrl;
-            audioPlayer.load();
-            recordingLoc.innerHTML = `Captured: Archive Recording <span id="refresh-audio" style="cursor:pointer; margin-left:10px; text-decoration:underline; font-size:0.8em; color: #8c2e1b;">[Not the right bird?]</span>`;
+        if (data.query && data.query.pages) {
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            const images = pages[pageId].images || [];
             
-            // Re-attach the retry listener
-            document.getElementById('refresh-audio').onclick = () => {
-                fetchBirdSong(latinName, commonName, true);
-            };
-        } else {
-            recordingLoc.textContent = "No recordings found.";
+            const audioFile = images.find(img => 
+                ['.ogg', '.oga', '.mp3'].some(ext => img.title.toLowerCase().endsWith(ext))
+            );
+
+            if (audioFile) {
+                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                const infoRes = await fetch(infoUrl);
+                const infoData = await infoRes.json();
+                const fileUrl = infoData.query.pages[Object.keys(infoData.query.pages)[0]].imageinfo[0].url;
+                
+                audioPlayer.src = fileUrl;
+                recordingLoc.textContent = "Captured: Archive Recording";
+            } else {
+                recordingLoc.textContent = "No recordings found.";
+            }
         }
-    } catch (error) {
-        console.error("Audio Fetch Error:", error);
+    } catch (e) {
+        console.log("Audio skipped to prevent crash.");
         recordingLoc.textContent = "Signal lost.";
-    } finally {
-        if (loadingOverlay) loadingOverlay.style.display = 'none';
     }
 }
 async function attemptSecondarySearch(name) {
