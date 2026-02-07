@@ -512,6 +512,13 @@ async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
+    // This order prioritizes specific audio files over general species pages
+const attempts = [
+    `${latinName} song`, 
+    `${commonName} call`, 
+    latinName, 
+    commonName
+];
     
     if (!audioPlayer) return;
 
@@ -772,39 +779,44 @@ function filterAndDisplayBirds() {
     const cardTemplate = document.getElementById('bird-card-template');
 
     filteredBirds.forEach(bird => {
-    const cardClone = cardTemplate.content.cloneNode(true);
-    const card = cardClone.querySelector('.bird-card');
-    const imageContainer = card.querySelector('.card-image-container');
-    const imageEl = card.querySelector('.card-image');
+        const cardClone = cardTemplate.content.cloneNode(true);
+        const card = cardClone.querySelector('.bird-card');
+        const imageContainer = card.querySelector('.card-image-container');
+        const imageEl = card.querySelector('.card-image');
 
-    // --- CRITICAL CLEANSE ---
-    // Remove any classes or badges that might have "leaked" into the template
-    card.classList.remove('verified-card', 'seen');
-    imageContainer.querySelectorAll('.verified-check-badge').forEach(b => b.remove());
+        // --- 1. CLEAN THE TEMPLATE ---
+        card.classList.remove('verified-card', 'seen');
+        imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
 
-    // Basic Data
-    if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
-    card.querySelector('.card-common-name').textContent = bird.CommonName;
-    
-    const rarityTag = card.querySelector('.card-rarity-tag');
-    rarityTag.textContent = bird.Rarity;
-    rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
+        // --- 2. SET BASIC DATA ---
+        if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
+        card.querySelector('.card-common-name').textContent = bird.CommonName;
+        
+        const rarityTag = card.querySelector('.card-rarity-tag');
+        rarityTag.textContent = bird.Rarity;
+        rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-    // Apply Image Logic (Passing unique references)
-    applyBirdImageData(card, imageContainer, imageEl, bird);
+        // --- 3. LOAD IMAGES (The fix for your loading issue) ---
+        // Ensure this function exists and is robust!
+        applyBirdImageData(card, imageContainer, imageEl, bird);
 
-    card.addEventListener('click', (e) => {
-        if (!e.target.closest('.image-verify-overlay')) {
-            const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-            showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
-        }
+        // --- 4. CLICK LISTENER (The fix for your "birdData" error) ---
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                // We filter the sightings specifically for this bird
+                const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
+                
+                // FIXED: Changed birdData to bird, and sightingsData to birdSightings
+                showSightingModal(bird.CommonName, bird, birdSightings);
+                fetchBirdSong(bird.LatinName, bird.CommonName);
+            }
+        });
+
+        card.style.cursor = 'pointer';
+        listContainer.appendChild(cardClone); // Use cardClone to append the fragment properly
     });
 
-    card.style.cursor = 'pointer';
-    listContainer.appendChild(card);
-});
-
-    // Admin check once the loop is done
+    // Admin check
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         const isAdmin = session?.user?.id === ADMIN_UID;
         toggleAdminControls(isAdmin);
