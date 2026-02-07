@@ -519,50 +519,57 @@ async function fetchBirdSong(latinName, commonName) {
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Use the Latin name primarily as eBird uses scientific taxonomy
-    const speciesQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
+    // Try Common Name, then Latin Name
+    const queries = [commonName, latinName];
+    let foundUrl = null;
 
     try {
-        // We fetch the eBird/Macaulay redirector
-        // This search specifically looks for 'Sound' type media
-        const eBirdUrl = `https://api.ebird.org/v2/ref/taxonomy/ebird?species=${encodeURIComponent(speciesQuery)}`;
-        
-        // Since eBird also has CORS, we'll use a very simple fallback to the 
-        // Wikimedia 'Global Search' that focuses ONLY on MP3 files for compatibility
-        const fallbackUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(speciesQuery)}&gsrlimit=10&prop=imageinfo&iiprop=url`;
+        for (let query of queries) {
+            if (!query || query === 'No Data') continue;
 
-        const response = await fetch(fallbackUrl);
-        const data = await response.json();
-
-        if (data.query && data.query.pages) {
-            const pages = data.query.pages;
+            // Deep search Wikipedia for any media files attached to this bird's name
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=5&prop=images&imlimit=50`;
             
-            // Look for an MP3 specifically for better browser support
-            let bestFile = null;
-            for (let id in pages) {
-                const url = pages[id].imageinfo[0].url;
-                if (url.toLowerCase().endsWith('.mp3')) {
-                    bestFile = url;
-                    break;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.query && data.query.pages) {
+                const pages = data.query.pages;
+                for (let id in pages) {
+                    const images = pages[id].images || [];
+                    // Look for any audio format
+                    const audioFile = images.find(img => 
+                        ['.ogg', '.oga', '.mp3', '.wav'].some(ext => img.title.toLowerCase().endsWith(ext))
+                    );
+
+                    if (audioFile) {
+                        // Get the actual direct link
+                        const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                        const infoRes = await fetch(infoUrl);
+                        const infoData = await infoRes.json();
+                        const infoPages = infoData.query.pages;
+                        foundUrl = infoPages[Object.keys(infoPages)[0]].imageinfo[0].url;
+                        break;
+                    }
                 }
             }
+            if (foundUrl) break;
+        }
 
-            // If no MP3, take the first available audio file
-            const finalUrl = bestFile || pages[Object.keys(pages)[0]].imageinfo[0].url;
-
-            audioPlayer.src = finalUrl;
+        if (foundUrl) {
+            audioPlayer.src = foundUrl;
             audioPlayer.load();
-            recordingLoc.textContent = "Captured: Field Recording (Archive)";
+            recordingLoc.textContent = "Captured: Archive Recording";
             
             audioPlayer.onplay = () => {
                 if (typeof startSpectrogram === 'function') startSpectrogram();
             };
         } else {
-            recordingLoc.textContent = "No recordings found.";
+            recordingLoc.textContent = "No recordings in archive.";
         }
     } catch (error) {
-        console.error("Audio Error:", error);
-        recordingLoc.textContent = "Archive signal lost.";
+        console.error("Audio Fetch Error:", error);
+        recordingLoc.textContent = "Signal lost.";
     } finally {
         loadingOverlay.style.display = 'none';
     }
