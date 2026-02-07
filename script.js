@@ -514,62 +514,54 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
-    // 1. Reset everything
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // 2. Define our targets
-    const species = commonName || latinName;
-    // We try the common name first for Wikipedia as it matches article titles better
-    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(species)}&imlimit=50`;
+    // List of variations to try in order
+    const attempts = [commonName, latinName, `${commonName} (bird)`];
+    let foundFile = false;
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
+    for (const term of attempts) {
+        if (!term || term === 'No Data') continue;
 
-        if (pageId !== "-1" && pages[pageId].images) {
-            const images = pages[pageId].images;
-            // Filter for common audio extensions
-            const audioFile = images.find(img => 
-                img.title.toLowerCase().endsWith('.ogg') || 
-                img.title.toLowerCase().endsWith('.oga') || 
-                img.title.toLowerCase().endsWith('.mp3') ||
-                img.title.toLowerCase().endsWith('.wav')
-            );
+        try {
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(term)}&imlimit=50`;
+            const response = await fetch(url);
+            const data = await response.json();
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
 
-            if (audioFile) {
-                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-                const infoRes = await fetch(infoUrl);
-                const infoData = await infoRes.json();
-                const infoPages = infoData.query.pages;
-                const infoId = Object.keys(infoPages)[0];
-                const finalUrl = infoPages[infoId].imageinfo[0].url;
+            if (pageId !== "-1" && pages[pageId].images) {
+                const audioFile = pages[pageId].images.find(img => 
+                    ['.ogg', '.oga', '.mp3', '.wav'].some(ext => img.title.toLowerCase().endsWith(ext))
+                );
 
-                audioPlayer.src = finalUrl;
-                audioPlayer.load();
-                recordingLoc.textContent = "Captured: Archive Recording";
-                
-                audioPlayer.onplay = () => {
-                    if (typeof startSpectrogram === 'function') startSpectrogram();
-                };
-            } else {
-                recordingLoc.textContent = "No audio in this file.";
+                if (audioFile) {
+                    const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                    const infoRes = await fetch(infoUrl);
+                    const infoData = await infoRes.json();
+                    const infoPageId = Object.keys(infoData.query.pages)[0];
+                    const finalUrl = infoData.query.pages[infoPageId].imageinfo[0].url;
+
+                    audioPlayer.src = finalUrl;
+                    audioPlayer.load();
+                    recordingLoc.textContent = `Captured: ${term} Recording`;
+                    foundFile = true;
+                    break; // Exit the loop because we found one!
+                }
             }
-        } else {
-            recordingLoc.textContent = "Species not found in archive.";
+        } catch (err) {
+            console.error("Search failed for:", term);
         }
-    } catch (error) {
-        console.error("Audio Fetch Error:", error);
-        recordingLoc.textContent = "Archive signal lost.";
-    } finally {
-        loadingOverlay.style.display = 'none';
     }
-}
 
+    if (!foundFile) {
+        recordingLoc.textContent = "No recordings found in archive.";
+    }
+    loadingOverlay.style.display = 'none';
+}
 async function attemptSecondarySearch(name) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
@@ -617,6 +609,50 @@ function setupAudioPlayer() {
             cancelAnimationFrame(animationId);
         }
     };
+}
+let audioContext, analyser, dataArray, animationId;
+
+function startSpectrogram() {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const canvas = document.getElementById('spectrogram-canvas');
+    if (!canvas || !audioPlayer.src) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Initialize Audio Context if it doesn't exist
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audioPlayer);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        analyser.fftSize = 256;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+    }
+
+    function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        // Clear canvas with a slight fade for an "ink bleed" effect
+        ctx.fillStyle = 'rgba(244, 241, 232, 0.2)'; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / dataArray.length) * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < dataArray.length; i++) {
+            const barHeight = dataArray[i] / 2;
+            // Use your "Naturalist Red" color for the ink
+            ctx.fillStyle = `rgba(140, 46, 27, ${barHeight / 100})`;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+    
+    // Stop any previous animation before starting a new one
+    if (animationId) cancelAnimationFrame(animationId);
+    draw();
 }
 // ============================================
 // E. LOCATIONS
