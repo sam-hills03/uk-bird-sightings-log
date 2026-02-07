@@ -407,7 +407,7 @@ function displaySeenBirdsSummary() {
     
     const cardTemplate = document.getElementById('bird-card-template');
     
-    // 3. Render the cards
+    // 3. Render the Summary Cards
     filteredSpecies.forEach(species => {
         const birdData = allUKBirds.find(b => b.CommonName.trim() === species);
         if (!birdData) return;
@@ -420,25 +420,22 @@ function displaySeenBirdsSummary() {
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
         
-        card.classList.add('seen');
+        // ADD 'summary-card' class to keep these styles separate from the main DB
+        card.classList.add('seen', 'summary-card');
 
         // Set Text Data
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
         card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
         card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
 
-        // Set Badges (matching your new HTML)
+        // Set Badges (ONLY if it's a summary card)
         const countBadge = card.querySelector('.sighting-count-badge');
         if (countBadge) {
             countBadge.textContent = sightingCount;
             countBadge.style.display = 'flex';
         }
-
-        const rarityTag = card.querySelector('.card-rarity-tag');
-        if (rarityTag) {
-            rarityTag.textContent = birdData.Rarity;
-            rarityTag.className = `card-rarity-tag rarity-${birdData.Rarity}`;
-        }
+        const seenBadge = card.querySelector('.seen-badge');
+        if (seenBadge) seenBadge.style.display = 'flex';
 
         // Image Logic
         getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
@@ -455,9 +452,10 @@ function displaySeenBirdsSummary() {
             }
         });
         
-        // Modal & Audio Trigger
+        // --- THE CRITICAL FIX FOR SIGHTINGS LIST ---
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
+                // Pass the EXACT list of sightings we just calculated above
                 showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
                 fetchBirdSong(birdData.LatinName, birdData.CommonName);
             }
