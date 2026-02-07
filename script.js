@@ -513,13 +513,13 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     // This order prioritizes specific audio files over general species pages
+// Specifically designed to bypass the 'Great Tit' confusion
 const attempts = [
-    `${latinName} bird call`, // "Cyanistes caeruleus bird call" is 100% unique
-    `${latinName} song`, 
-    latinName, 
-    `${commonName} bird sound`
-];
-    
+    `${latinName} vocalization`, 
+    `${latinName} call`, 
+    `${latinName} song`,
+    `${commonName} (bird)`
+];  
     if (!audioPlayer) return;
 
     // Reset
@@ -779,41 +779,42 @@ function filterAndDisplayBirds() {
     const cardTemplate = document.getElementById('bird-card-template');
 
     filteredBirds.forEach(bird => {
-        const cardClone = cardTemplate.content.cloneNode(true);
-        const card = cardClone.querySelector('.bird-card');
-        const imageContainer = card.querySelector('.card-image-container');
-        const imageEl = card.querySelector('.card-image');
+    const cardClone = cardTemplate.content.cloneNode(true);
+    const card = cardClone.querySelector('.bird-card');
+    const imageContainer = card.querySelector('.card-image-container');
+    const imageEl = card.querySelector('.card-image');
 
-        // Clean template
-        card.classList.remove('verified-card', 'seen');
-        imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
+    // 1. Clean the template
+    card.classList.remove('verified-card', 'seen');
+    imageContainer.querySelectorAll('.verified-check-badge, .seen-badge, .sighting-count-badge').forEach(b => b.remove());
 
-        // Basic Data
-        if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
-        card.querySelector('.card-common-name').textContent = bird.CommonName;
-        
-        const rarityTag = card.querySelector('.card-rarity-tag');
-        rarityTag.textContent = bird.Rarity;
-        rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
+    // 2. Set Text Data
+    if (seenSpecies.has(bird.CommonName)) card.classList.add('seen');
+    card.querySelector('.card-common-name').textContent = bird.CommonName;
+    
+    const rarityTag = card.querySelector('.card-rarity-tag');
+    rarityTag.textContent = bird.Rarity;
+    rarityTag.className = `card-rarity-tag rarity-${bird.Rarity}`;
 
-        // FORCE IMAGE LOAD: Bypass the complex apply function for a second to test
-        getBirdImage(bird.CommonName, bird.LatinName).then(result => {
-            if (result && result.url && imageEl) {
-                imageEl.src = result.url;
-            }
-        }).catch(err => console.error("Image error for " + bird.CommonName, err));
+    // 3. RESTORE THE VERIFIED IMAGE SYSTEM
+    // We use applyBirdImageData again but we've made it safer
+    applyBirdImageData(card, imageContainer, imageEl, bird);
 
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.image-verify-overlay')) {
-                const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
-                showSightingModal(bird.CommonName, bird, birdSightings);
-                fetchBirdSong(bird.LatinName, bird.CommonName);
-            }
-        });
-
-        // CRITICAL: We must append the cardClone (the fragment), not just the card.
-        listContainer.appendChild(cardClone);
+    // 4. Click Listener
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest('.image-verify-overlay')) {
+            const birdSightings = mySightings.filter(s => s.species === bird.CommonName);
+            
+            // Open modal
+            showSightingModal(bird.CommonName, bird, birdSightings);
+            
+            // Fetch song with stricter Latin-first query
+            fetchBirdSong(bird.LatinName, bird.CommonName);
+        }
     });
+
+    listContainer.appendChild(cardClone);
+});
 
     // Admin check
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
