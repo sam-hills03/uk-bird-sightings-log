@@ -420,15 +420,17 @@ function displaySeenBirdsSummary() {
         const imageContainer = card.querySelector('.card-image-container');
         const imageEl = card.querySelector('.card-image');
         
-        // ADD 'summary-card' class to keep these styles separate from the main DB
         card.classList.add('seen', 'summary-card');
+
+        // Store the sightings data directly on the card element "backpack"
+        card.dataset.sightings = JSON.stringify(sightingsData.sightings);
 
         // Set Text Data
         card.querySelector('.card-common-name').textContent = birdData.CommonName;
         card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
         card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
 
-        // Set Badges (ONLY if it's a summary card)
+        // Set Badges
         const countBadge = card.querySelector('.sighting-count-badge');
         if (countBadge) {
             countBadge.textContent = sightingCount;
@@ -452,95 +454,72 @@ function displaySeenBirdsSummary() {
             }
         });
         
-        // --- THE CRITICAL FIX FOR SIGHTINGS LIST ---
+        // --- THE CONSOLIDATED CLICK LISTENER ---
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
-                // Pass the EXACT list of sightings we just calculated above
-                showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
-                fetchBirdSong(birdData.LatinName, birdData.CommonName);
+                // Pull data from the backpack we created above
+                const storedSightings = JSON.parse(card.dataset.sightings);
+                showSightingModal(birdData.CommonName, birdData, storedSightings);
             }
         });
-        // Inside your displaySeenBirdsSummary loop:
-const cardClone = cardTemplate.content.cloneNode(true);
-const card = cardClone.querySelector('.bird-card');
-
-// Store the sightings data directly on the card element
-card.dataset.sightings = JSON.stringify(sightingsData.sightings);
-
-card.addEventListener('click', (e) => {
-    if (!e.target.closest('.image-verify-overlay')) {
-        // Retrieve the data from the "backpack"
-        const storedSightings = JSON.parse(card.dataset.sightings);
-        console.log("Opening modal with sightings:", storedSightings);
-        
-        showSightingModal(birdData.CommonName, birdData, storedSightings);
-        fetchBirdSong(birdData.LatinName, birdData.CommonName);
-    }
-});
         
         summaryContainer.appendChild(card);
     });
 }
+
 async function showSightingModal(species, birdData, sightings) {
-    console.log("Opening modal for:", species, sightings); // Debug check
     const modal = document.getElementById('sighting-modal');
     if (!modal) return;
 
-    // 1. Basic Info (Always works)
+    // 1. Basic Info
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData?.LatinName || ''} • ${birdData?.Rarity || ''}`;
 
-    // 2. Render YOUR Sightings (Protected)
-    try {
-        const modalList = document.getElementById('modal-sightings-list');
-        modalList.innerHTML = '';
-        if (sightings && sightings.length > 0) {
-            const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
-            sortedSightings.forEach(sighting => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
-                modalList.appendChild(li);
-            });
-        } else {
-            modalList.innerHTML = '<li>No personal sightings recorded.</li>';
-        }
-    } catch (e) { console.error("Sightings List Error:", e); }
+    // 2. Render Sightings List
+    const modalList = document.getElementById('modal-sightings-list');
+    modalList.innerHTML = '';
+    
+    if (sightings && sightings.length > 0) {
+        const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
+        sortedSightings.forEach(sighting => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
+            modalList.appendChild(li);
+        });
+    } else {
+        modalList.innerHTML = '<li>No personal sightings recorded.</li>';
+    }
 
-    // 3. Wikipedia (Protected)
+    // 3. Field Notes & Audio
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
-    try {
-        const desc = await fetchBirdDescription(species);
+    
+    fetchBirdDescription(species).then(desc => {
         descriptionBox.textContent = desc;
-    } catch (e) { descriptionBox.textContent = "Field notes unavailable."; }
+    });
 
-    // 4. Audio (Protected - This is likely where the crash was happening)
-    try {
-        fetchBirdSong(birdData?.LatinName, species);
-    } catch (e) { console.error("Audio Trigger Error:", e); }
+    fetchBirdSong(birdData?.LatinName, species);
     
     modal.style.display = 'block';
 }
+
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
-    // UI Reset
     audioPlayer.pause();
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
     const query = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
-    
-    // Using AllOrigins "Raw" mode to avoid the JSON.parse error
     const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}`;
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
         const response = await fetch(proxyUrl);
-        const data = await response.json(); // Now it fetches JSON directly
+        const data = await response.json();
 
         if (data && data.recordings && data.recordings.length > 0) {
             const bestMatch = data.recordings[0];
