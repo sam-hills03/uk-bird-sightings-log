@@ -313,28 +313,28 @@
             </div>
         </div>
     </div>
-</template> <div class="bug-report-container">
-    <button type="button" id="bug-fab" title="Report a Bug">
-        <span style="font-size: 1.2rem;">🪲</span>
-    </button>
-    </div>
+</template> 
 
-<script src="script.js"></script>
-    <div id="bug-form-popup" class="bug-popup" style="display: none;">
-        <div class="bug-popup-header">
-            <h4>Report an Issue</h4>
-            <button type="button" id="close-bug-btn">&times;</button>
+    <div class="bug-report-container">
+        <button type="button" id="bug-fab" title="Report a Bug">
+            <span style="font-size: 1.2rem;">🪲</span>
+        </button>
+
+        <div id="bug-form-popup" class="bug-popup" style="display: none;">
+            <div class="bug-popup-header">
+                <h4>Report an Issue</h4>
+                <button type="button" id="close-bug-btn">&times;</button>
+            </div>
+            <form id="help-form" action="https://formspree.io/f/meeljgyz" method="POST">
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Describe the issue..." required></textarea>
+                <button type="submit" class="id-close-btn" style="width: 100%;">Send Report</button>
+                <p id="form-status" style="display: none; font-size: 0.8rem; margin-top: 10px;"></p>
+            </form>
         </div>
-        <form id="help-form" action="https://formspree.io/f/meeljgyz" method="POST">
-            <input type="email" name="email" placeholder="Your Email" required>
-            <textarea name="message" placeholder="Describe the issue..." required></textarea>
-            <button type="submit" class="id-close-btn" style="width: 100%;">Send Report</button>
-            <p id="form-status" style="display: none; font-size: 0.8rem; margin-top: 10px;"></p>
-        </form>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
