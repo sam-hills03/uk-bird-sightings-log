@@ -67,34 +67,27 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
-        // 1. Core Data Loading
+        // 1. Core Data
         populateSpeciesDatalist(); 
-        await loadSightings(); 
+        await loadSightings(); // This fetches your data for the stats!
         await loadLocations(); 
         
-        // 2. UI Setup (The stuff that was being overwritten)
+        // 2. UI Systems
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
         setupSummaryFilter();
         setupSearchBar();
         setupRarityFilter();
-        setupModal();            // From version 2
-        setupExpeditionSearch(); // From version 1
+        setupModal();            
+        setupExpeditionSearch(); 
+        setupAudioPlayer(); 
         
-        // 3. Initial Display
+        // 3. Kickoff
         filterAndDisplayBirds(); 
-        
-        // 4. Load the most recent trip as a default display
-        if (mySightings.length > 0) {
-            const latest = mySightings[0];
-            const data = getExpeditionData(latest.date, latest.location);
-            if (data) displayExpeditionCard(data);
-        }
-
-        console.log("UK Bird Database and UI successfully initialized.");
+        console.log("Expedition Log Initialized.");
     } catch (error) {
-        console.error("Failed to load UK bird list:", error);
+        console.error("Initialization Failed:", error);
     }
 }
    
@@ -493,7 +486,7 @@ function setupAudioPlayer() {
                 gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 gramophoneBtn.classList.add('on-record');
                 vinylDisc.classList.add('spinning');
-                startSpectrogram(); // Start the ink-bleed effect
+                if (typeof startSpectrogram === 'function') startSpectrogram();
             }).catch(err => console.error("Playback failed:", err));
         } else {
             audioPlayer.pause();
@@ -503,7 +496,6 @@ function setupAudioPlayer() {
         }
     };
 
-    // Auto-stop spinning when audio finishes
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
         gramophoneBtn.classList.remove('on-record');
