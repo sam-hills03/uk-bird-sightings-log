@@ -510,26 +510,25 @@ async function showSightingModal(species, birdData) {
 // 1. The main function
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+    
     if (!audioPlayer) return;
 
+    // Reset
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // Try Common Name, then Latin Name
-    const queries = [commonName, latinName];
+    const queries = [commonName, latinName, `${commonName} (bird)`];
     let foundUrl = null;
 
     try {
         for (let query of queries) {
             if (!query || query === 'No Data') continue;
 
-            // Deep search Wikipedia for any media files attached to this bird's name
-            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=5&prop=images&imlimit=50`;
-            
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=3&prop=images&imlimit=50`;
             const response = await fetch(url);
             const data = await response.json();
 
@@ -537,18 +536,15 @@ async function fetchBirdSong(latinName, commonName) {
                 const pages = data.query.pages;
                 for (let id in pages) {
                     const images = pages[id].images || [];
-                    // Look for any audio format
                     const audioFile = images.find(img => 
                         ['.ogg', '.oga', '.mp3', '.wav'].some(ext => img.title.toLowerCase().endsWith(ext))
                     );
 
                     if (audioFile) {
-                        // Get the actual direct link
                         const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
                         const infoRes = await fetch(infoUrl);
                         const infoData = await infoRes.json();
-                        const infoPages = infoData.query.pages;
-                        foundUrl = infoPages[Object.keys(infoPages)[0]].imageinfo[0].url;
+                        foundUrl = infoData.query.pages[Object.keys(infoData.query.pages)[0]].imageinfo[0].url;
                         break;
                     }
                 }
@@ -560,15 +556,10 @@ async function fetchBirdSong(latinName, commonName) {
             audioPlayer.src = foundUrl;
             audioPlayer.load();
             recordingLoc.textContent = "Captured: Archive Recording";
-            
-            audioPlayer.onplay = () => {
-                if (typeof startSpectrogram === 'function') startSpectrogram();
-            };
         } else {
-            recordingLoc.textContent = "No recordings in archive.";
+            recordingLoc.textContent = "No recordings found.";
         }
     } catch (error) {
-        console.error("Audio Fetch Error:", error);
         recordingLoc.textContent = "Signal lost.";
     } finally {
         loadingOverlay.style.display = 'none';
@@ -605,23 +596,17 @@ function setupAudioPlayer() {
     if (!gramophoneBtn || !audioPlayer) return;
 
     gramophoneBtn.onclick = () => {
-        // Create or resume the audio context on click (Browser requirement)
-        if (audioContext && audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
-
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            gramophoneBtn.classList.add('playing');
-            // The Spectrogram is triggered here
-            startSpectrogram(); 
-        } else {
-            audioPlayer.pause();
-            gramophoneBtn.classList.remove('playing');
-            cancelAnimationFrame(animationId);
-        }
-    };
-}
+    if (audioPlayer.paused) {
+        audioPlayer.play().catch(e => {
+            console.error("Playback blocked:", e);
+            recordingLoc.textContent = "Format error - try another bird.";
+        });
+        gramophoneBtn.classList.add('playing');
+    } else {
+        audioPlayer.pause();
+        gramophoneBtn.classList.remove('playing');
+    }
+};
 
 function startSpectrogram() {
     const audioPlayer = document.getElementById('bird-audio-player');
