@@ -521,6 +521,18 @@ async function fetchBirdSong(latinName, commonName, isRetry = false) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
+
+    recordingLoc.innerHTML = `
+    Captured: Archive Recording 
+    <span id="refresh-audio" title="Try a different recording">
+        Not the right bird?
+    </span>
+`;
+
+// Keep the click listener logic exactly as it was:
+document.getElementById('refresh-audio').onclick = () => {
+    fetchBirdSong(latinName, commonName, true);
+};
     
     if (!audioPlayer) return;
 
@@ -633,6 +645,7 @@ function setupAudioPlayer() {
         } else {
             audioPlayer.pause();
             gramophoneBtn.classList.remove('playing');
+            
         }
     };
 }
