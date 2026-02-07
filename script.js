@@ -507,56 +507,62 @@ async function showSightingModal(species, birdData) {
     modal.style.display = 'block';
 }
 
-async function fetchBirdSong(latinName, commonName) {
+// 1. The main function
+function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
-    // 1. Reset UI
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // 2. Clean names
-    const cleanLatin = latinName && latinName !== 'No Data' ? latinName.split(',')[0].trim() : null;
-    const cleanCommon = commonName ? commonName.split('(')[0].trim() : null;
-    const query = cleanLatin || cleanCommon;
+    const query = (latinName && latinName !== 'No Data') ? latinName.split(',')[0].trim() : commonName.split('(')[0].trim();
 
-    // 3. Use API v2 (Public/No-Key) via AllOrigins Raw Proxy
-    // Note: We use /api/2/recordings for the public search
-    const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(query)}`;
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(xenoUrl)}`;
+    // Remove any old script tags to keep the page clean
+    const oldScript = document.getElementById('xeno-jsonp');
+    if (oldScript) oldScript.remove();
 
-    try {
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
-
-        if (data && data.recordings && data.recordings.length > 0) {
-            // Sort to find the best quality (A or B)
-            const sorted = data.recordings.sort((a, b) => (a.q || 'Z').localeCompare(b.q || 'Z'));
-            const bestMatch = sorted[0];
-            
-            let fileUrl = bestMatch.file;
-            // Ensure the URL is secure
-            if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-            
-            audioPlayer.src = fileUrl;
-            audioPlayer.load();
-            
-            recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
-            loadingOverlay.style.display = 'none';
-        } else {
-            recordingLoc.textContent = "No recordings in public archive.";
-            loadingOverlay.style.display = 'none';
-        }
-    } catch (error) {
-        console.error("Audio Fetch Error:", error);
-        recordingLoc.textContent = "Signal lost...";
+    // Create a new Script Tag (JSONP)
+    // We point to v2 and add "&callback=handleXenoResponse"
+    const script = document.createElement('script');
+    script.id = 'xeno-jsonp';
+    script.src = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(query)}&callback=handleXenoResponse`;
+    
+    // If the script fails to load (e.g. 404), clear the overlay
+    script.onerror = () => {
+        recordingLoc.textContent = "Archive link broken.";
         loadingOverlay.style.display = 'none';
-    }
+    };
+
+    document.body.appendChild(script);
 }
+
+// 2. The global "Receiver" function (Must be outside of other functions)
+window.handleXenoResponse = function(data) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+    const recordingLoc = document.getElementById('recording-location');
+
+    if (data && data.recordings && data.recordings.length > 0) {
+        // Sort to find the best quality
+        const sorted = data.recordings.sort((a, b) => (a.q || 'Z').localeCompare(b.q || 'Z'));
+        const bestMatch = sorted[0];
+        
+        let fileUrl = bestMatch.file;
+        if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+        
+        audioPlayer.src = fileUrl;
+        audioPlayer.load();
+        
+        recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
+    } else {
+        recordingLoc.textContent = "No recordings in archive.";
+    }
+    loadingOverlay.style.display = 'none';
+};
 // ============================================
 // E. LOCATIONS
 // ============================================
