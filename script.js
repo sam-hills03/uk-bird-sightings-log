@@ -1332,7 +1332,6 @@ async function fetchBirdSong(latinName, commonName) {
     
     if (!audioPlayer) return;
 
-    // 1. Immediate Reset
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
@@ -1340,18 +1339,12 @@ async function fetchBirdSong(latinName, commonName) {
 
     let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
     
-    // Using a different AllOrigins endpoint that is sometimes less restricted
-    const xenoUrl = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
+    // UPDATED TO API V3
+    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
-        // We add a timeout so it doesn't hang forever
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second limit
-
-        const response = await fetch(proxyUrl, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
+        const response = await fetch(proxyUrl);
         const wrapper = await response.json();
         
         if (wrapper && wrapper.contents) {
@@ -1359,23 +1352,25 @@ async function fetchBirdSong(latinName, commonName) {
 
             if (data.recordings && data.recordings.length > 0) {
                 const bestMatch = data.recordings[0];
+                
+                // v3 might use 'file' or 'file-name' depending on the mirror
                 let fileUrl = bestMatch.file;
                 if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
                 
                 audioPlayer.src = fileUrl;
                 audioPlayer.load();
                 
-                recordingLoc.textContent = `Captured: ${bestMatch.loc}`;
+                // Show the specific location of the recording
+                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
                 loadingOverlay.style.display = 'none';
             } else {
-                recordingLoc.textContent = "No recordings found.";
+                recordingLoc.textContent = "No recordings found in v3 archive.";
                 loadingOverlay.style.display = 'none';
             }
         }
     } catch (error) {
         console.error("Audio fetch error:", error);
-        // If the proxy fails, we give the user a clear message
-        recordingLoc.textContent = "Archive signal weak. Try again later.";
+        recordingLoc.textContent = "Signal lost (Archive mismatch)";
         loadingOverlay.style.display = 'none';
     }
 }
