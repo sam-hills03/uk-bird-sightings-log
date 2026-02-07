@@ -60,6 +60,32 @@ window.deleteSighting = async function(idToDelete) {
 // A. INITIAL LOAD FUNCTIONS
 // ============================================
 
+async function loadSightings() {
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (!user) {
+            mySightings = [];
+            updateAllDisplays();
+            return;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*');
+            
+        if (error) throw error;
+
+        if (data) {
+            mySightings = data;
+            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            updateAllDisplays(); 
+        }
+        console.log("Loaded sightings from archive.");
+    } catch (error) {
+        console.error("Error loading sightings:", error);
+    }
+}
 async function loadUKBirds() {
     try {
         const response = await fetch('uk_birds.json');
@@ -67,12 +93,12 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
-        // 1. Load Data
+        // 1. DATA LOADING
         populateSpeciesDatalist(); 
-        await loadSightings(); 
+        await loadSightings(); // Now it will find the restored function below
         await loadLocations(); 
         
-        // 2. Initialize UI (Added missing setup calls)
+        // 2. UI INITIALIZATION
         addSightingEntry(); 
         setupTabSwitching();
         setupPagination();
@@ -80,22 +106,22 @@ async function loadUKBirds() {
         setupSearchBar();
         setupRarityFilter();
         setupModal();            
-        setupExpeditionSearch(); // Restored from version 1
-        setupAudioPlayer();      // Ensure audio button works
+        setupExpeditionSearch(); 
+        setupAudioPlayer();      
         
-        // 3. Initial Display
+        // 3. INITIAL RENDER
         filterAndDisplayBirds(); 
         
-        // 4. Load the most recent trip
+        // 4. LOAD LATEST TRIP
         if (mySightings.length > 0) {
             const latest = mySightings[0];
             const data = getExpeditionData(latest.date, latest.location);
             if (data) displayExpeditionCard(data);
         }
         
-        console.log("Field Journal fully initialized.");
+        console.log("Journal System fully online.");
     } catch (error) {
-        console.error("Failed to load UK bird list:", error);
+        console.error("Initialization Failed:", error);
     }
 }
    
@@ -185,7 +211,7 @@ function switchTab(targetTabId) {
 
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        content.style.display = 'none'; // Ensure hidden sections are truly gone
+        content.style.display = 'none'; // Clear everything first
     });
     
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -195,14 +221,10 @@ function switchTab(targetTabId) {
         targetContent.classList.add('active-content');
         targetContent.style.display = 'block'; // FORCE VISIBILITY
         
-        // This triggers the stats calculations and chart drawing
         if (targetTabId === 'stats-view') {
-            console.log("📊 Stats Tab Activated");
+            console.log("📊 Refreshing Stats Page...");
             calculateAndDisplayStats();
-            // Wrap in a check in case Chart.js hasn't loaded yet
-            if (typeof createMonthlyChart === 'function') {
-                createMonthlyChart();
-            }
+            if (typeof createMonthlyChart === 'function') createMonthlyChart();
         }
     }
 }
