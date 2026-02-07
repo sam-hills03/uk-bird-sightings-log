@@ -175,22 +175,24 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
+    // Hide everything first
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        content.style.display = 'none'; // Force hide everything
+        content.style.display = 'none'; 
     });
     
     tabButtons.forEach(button => button.classList.remove('active'));
 
-    // Inside switchTab(targetTabId)...
-const targetContent = document.getElementById(targetTabId);
-if (targetContent) {
-    targetContent.classList.add('active-content');
-    targetContent.style.display = 'block'; // This forces it to be visible
-    
-    if (targetTabId === 'stats-view') {
-        calculateAndDisplayStats();
-        createMonthlyChart();
+    const targetContent = document.getElementById(targetTabId);
+    if (targetContent) {
+        targetContent.classList.add('active-content');
+        targetContent.style.display = 'block'; // THIS IS THE SIMPLE FIX
+        
+        if (targetTabId === 'stats-view') {
+            console.log("📊 Refreshing Stats...");
+            calculateAndDisplayStats();
+            if (typeof createMonthlyChart === 'function') createMonthlyChart();
+        }
     }
 }
 // ============================================
@@ -1700,3 +1702,6 @@ document.addEventListener('click', function(e) {
 
 // Initialize the gramophone listeners
 setupAudioPlayer();
+function setupAudioPlayer() {
+    console.log("Audio player system standby.");
+}
