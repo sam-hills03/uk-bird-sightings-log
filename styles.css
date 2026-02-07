@@ -1426,3 +1426,23 @@ hr {
 .bird-card.seen .sighting-count-badge {
     display: flex;
 }
+#refresh-audio {
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 12px;
+    padding: 2px 8px;
+    font-family: 'EB Garamond', serif; /* Matching your journal font */
+    font-size: 0.85em;
+    font-style: italic;
+    color: #8c2e1b; /* Your Naturalist Red */
+    border: 1px dashed #8c2e1b;
+    border-radius: 4px;
+    background-color: rgba(140, 46, 27, 0.05); /* Very faint red tint */
+    transition: all 0.3s ease;
+}
+
+#refresh-audio:hover {
+    background-color: #8c2e1b;
+    color: #f4f1e8; /* Your parchment color */
+    border-style: solid;
+}
