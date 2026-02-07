@@ -460,6 +460,23 @@ function displaySeenBirdsSummary() {
                 fetchBirdSong(birdData.LatinName, birdData.CommonName);
             }
         });
+        // Inside your displaySeenBirdsSummary loop:
+const cardClone = cardTemplate.content.cloneNode(true);
+const card = cardClone.querySelector('.bird-card');
+
+// Store the sightings data directly on the card element
+card.dataset.sightings = JSON.stringify(sightingsData.sightings);
+
+card.addEventListener('click', (e) => {
+    if (!e.target.closest('.image-verify-overlay')) {
+        // Retrieve the data from the "backpack"
+        const storedSightings = JSON.parse(card.dataset.sightings);
+        console.log("Opening modal with sightings:", storedSightings);
+        
+        showSightingModal(birdData.CommonName, birdData, storedSightings);
+        fetchBirdSong(birdData.LatinName, birdData.CommonName);
+    }
+});
         
         summaryContainer.appendChild(card);
     });
