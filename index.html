@@ -181,24 +181,22 @@
         <p id="modal-species-info" class="rarity-subtitle"></p>
 
         <div class="audio-section vintage-panel">
-            <div class="audio-controls">
-                <button id="gramophone-btn" class="gramophone-control" title="Listen to Song">
-                    <span class="gramophone-icon"></span>
-                    <span class="play-text">PLAY RECORDING</span>
-                </button>
-                <div class="recording-meta">
-                    <span id="recording-location" class="handwritten">Searching archives...</span>
-                </div>
-            </div>
-            
-            <div class="spectrogram-container">
-                <canvas id="spectrogram-canvas"></canvas>
-                <div id="audio-loading-overlay" class="loading-ink" style="display: none;">
-                    Tuning signal...
-                </div>
-            </div>
-            <audio id="bird-audio-player"></audio>
+           <div class="audio-deck">
+    <div class="vinyl-container">
+        <div class="vinyl-disc" id="vinyl-disc">
+            <div class="vinyl-label"></div>
         </div>
+        <button id="gramophone-btn" class="play-needle">
+            <i class="fas fa-play"></i>
+        </button>
+    </div>
+    <div class="audio-info-labels">
+        <div id="recording-location">Tuning signal...</div>
+        <div class="audio-controls-row">
+             <audio id="bird-audio-player" crossorigin="anonymous"></audio>
+        </div>
+    </div>
+</div>
 
         <div id="modal-field-notes" class="museum-note-box">
             <h4 class="note-label">Field Notes (via Wikipedia)</h4>
