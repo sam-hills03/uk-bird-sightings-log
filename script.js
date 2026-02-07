@@ -514,47 +514,59 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
+    // 1. Reset everything
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // We try the Latin name first as it is the "Global ID" for birds
-    const query = latinName && latinName !== 'No Data' ? latinName : commonName;
+    // 2. Define our targets
+    const species = commonName || latinName;
+    // We try the common name first for Wikipedia as it matches article titles better
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(species)}&imlimit=50`;
 
     try {
-        // Search Commons for any media file matching the bird name and 'audio'
-        const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(query)}&gsrlimit=5&prop=imageinfo&iiprop=url`;
-        
-        const response = await fetch(searchUrl);
+        const response = await fetch(url);
         const data = await response.json();
-        
-        if (data.query && data.query.pages) {
-            const pages = data.query.pages;
-            // Get the first result
-            const firstPageId = Object.keys(pages)[0];
-            const fileUrl = pages[firstPageId].imageinfo[0].url;
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
 
-            audioPlayer.src = fileUrl;
-            audioPlayer.load();
-            recordingLoc.textContent = "Captured: Field Recording (Commons)";
-            
-            audioPlayer.onplay = () => {
-                if (typeof startSpectrogram === 'function') startSpectrogram();
-            };
+        if (pageId !== "-1" && pages[pageId].images) {
+            const images = pages[pageId].images;
+            // Filter for common audio extensions
+            const audioFile = images.find(img => 
+                img.title.toLowerCase().endsWith('.ogg') || 
+                img.title.toLowerCase().endsWith('.oga') || 
+                img.title.toLowerCase().endsWith('.mp3') ||
+                img.title.toLowerCase().endsWith('.wav')
+            );
+
+            if (audioFile) {
+                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                const infoRes = await fetch(infoUrl);
+                const infoData = await infoRes.json();
+                const infoPages = infoData.query.pages;
+                const infoId = Object.keys(infoPages)[0];
+                const finalUrl = infoPages[infoId].imageinfo[0].url;
+
+                audioPlayer.src = finalUrl;
+                audioPlayer.load();
+                recordingLoc.textContent = "Captured: Archive Recording";
+                
+                audioPlayer.onplay = () => {
+                    if (typeof startSpectrogram === 'function') startSpectrogram();
+                };
+            } else {
+                recordingLoc.textContent = "No audio in this file.";
+            }
         } else {
-            // Fallback: If Latin fails, try common name one last time
-            recordingLoc.textContent = "Searching deeper...";
-            attemptSecondarySearch(commonName);
+            recordingLoc.textContent = "Species not found in archive.";
         }
     } catch (error) {
-        console.error("Audio Error:", error);
-        recordingLoc.textContent = "Signal lost...";
+        console.error("Audio Fetch Error:", error);
+        recordingLoc.textContent = "Archive signal lost.";
     } finally {
-        // Only hide if we aren't doing the secondary search
-        if (recordingLoc.textContent !== "Searching deeper...") {
-            loadingOverlay.style.display = 'none';
-        }
+        loadingOverlay.style.display = 'none';
     }
 }
 
