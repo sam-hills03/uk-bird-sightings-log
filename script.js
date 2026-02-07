@@ -1337,10 +1337,12 @@ async function fetchBirdSong(latinName, commonName) {
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    let searchQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
+    // Use Latin name if available, otherwise Common name. 
+    // We trim it to make sure there are no hidden spaces.
+    let searchQuery = (latinName && latinName !== 'No Data') ? latinName.trim() : commonName.trim();
     
-    // UPDATED TO API V3
-    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchQuery)}+q:A`;
+    // We removed the +q:A to ensure we find SOMETHING
+    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchQuery)}`;
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
 
     try {
@@ -1351,17 +1353,17 @@ async function fetchBirdSong(latinName, commonName) {
             const data = JSON.parse(wrapper.contents);
 
             if (data.recordings && data.recordings.length > 0) {
-                const bestMatch = data.recordings[0];
+                // Sort by quality so we still try to get the best one first
+                const sorted = data.recordings.sort((a, b) => a.q.localeCompare(b.q));
+                const bestMatch = sorted[0];
                 
-                // v3 might use 'file' or 'file-name' depending on the mirror
                 let fileUrl = bestMatch.file;
                 if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
                 
                 audioPlayer.src = fileUrl;
                 audioPlayer.load();
                 
-                // Show the specific location of the recording
-                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.cnt})`;
+                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
                 loadingOverlay.style.display = 'none';
             } else {
                 recordingLoc.textContent = "No recordings found in v3 archive.";
