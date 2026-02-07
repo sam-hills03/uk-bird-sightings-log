@@ -107,11 +107,11 @@ h3 {
 }
 
 .tab-content {
-    display: none;
+    display: none !important; /* Force it to stay hidden */
 }
 
 .tab-content.active-content {
-    display: block;
+    display: block !important; /* Force it to appear when active */
 }
 
 /* PAGINATION STYLES */
@@ -484,6 +484,15 @@ h3 {
 
 #stats-page span {
     color: var(--color-primary);
+}
+#stats-view {
+    min-height: 500px; /* Ensures the parchment "stretches" to fit the chart */
+}
+
+#stats-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* Seen Birds Summary Styles */
