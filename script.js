@@ -249,9 +249,11 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
+    // 1. Hide all contents and deactivate buttons
     tabContents.forEach(content => content.classList.remove('active-content'));
     tabButtons.forEach(button => button.classList.remove('active'));
 
+    // 2. Show the target content
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`.tab-button[data-tab="${targetTabId}"]`);
 
@@ -259,12 +261,12 @@ function switchTab(targetTabId) {
         targetContent.classList.add('active-content');
         targetButton.classList.add('active');
 
-        // --- STEP 1 GOES HERE ---
-        // If the user switched to the stats view, recalculate everything
+        // --- THE TRIGGER ---
+        // Every time the user clicks 'My Stats', we recalculate and redraw the chart
         if (targetTabId === 'stats-view') {
-            console.log("📈 Refreshing Expedition Stats...");
+            console.log("📊 Stats Tab Activated: Calculating...");
             calculateAndDisplayStats();
-            // createMonthlyChart(); // Only include this if it's not already inside calculateAndDisplayStats
+            createMonthlyChart();
         }
     }
 }
@@ -1446,7 +1448,12 @@ let birdChart = null;
 function createMonthlyChart() {
     const ctx = document.getElementById('monthly-chart');
     if (!ctx) return;
-
+    
+    // Safety: ensure the canvas is visible and has a size before drawing
+    ctx.style.width = '100%'; 
+    ctx.style.height = '300px'; 
+    
+}
     const sightingsToUse = getFilteredSightings();
     let labels = [];
     let data = [];
