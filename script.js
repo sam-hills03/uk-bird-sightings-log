@@ -457,47 +457,51 @@ function displaySeenBirdsSummary() {
         // --- THE CONSOLIDATED CLICK LISTENER ---
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.image-verify-overlay')) {
-                // Pull data from the backpack we created above
-                const storedSightings = JSON.parse(card.dataset.sightings);
-                showSightingModal(birdData.CommonName, birdData, storedSightings);
-            }
-        });
+        // We don't need to pass the sightings array anymore, the modal finds it itself!
+        showSightingModal(birdData.CommonName, birdData);
+    }
+});
         
         summaryContainer.appendChild(card);
     });
 }
 
-async function showSightingModal(species, birdData, sightings) {
+async function showSightingModal(species, birdData) {
     const modal = document.getElementById('sighting-modal');
     if (!modal) return;
 
-    // 1. Basic Info
+    // 1. Set Basic Info
     document.getElementById('modal-species-name').textContent = species;
     document.getElementById('modal-species-info').textContent = `${birdData?.LatinName || ''} • ${birdData?.Rarity || ''}`;
 
-    // 2. Render Sightings List
+    // 2. FETCH SIGHTINGS DIRECTLY FROM THE SOURCE
     const modalList = document.getElementById('modal-sightings-list');
     modalList.innerHTML = '';
     
-    if (sightings && sightings.length > 0) {
-        const sortedSightings = [...sightings].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sortedSightings.forEach(sighting => {
+    // We look at the global mySightings array and filter for this specific bird
+    const personalSightings = mySightings.filter(s => s.species.trim().toLowerCase() === species.trim().toLowerCase());
+
+    if (personalSightings.length > 0) {
+        // Sort newest to oldest
+        personalSightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString()}</strong> — ${sighting.location}`;
+            li.style.padding = "10px";
+            li.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
+            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString('en-GB')}</strong> — ${sighting.location}`;
             modalList.appendChild(li);
         });
     } else {
-        modalList.innerHTML = '<li>No personal sightings recorded.</li>';
+        modalList.innerHTML = '<li style="font-style:italic; padding:10px;">No personal sightings recorded in your journal yet.</li>';
     }
 
-    // 3. Field Notes & Audio
+    // 3. Field Notes
     const descriptionBox = document.getElementById('modal-description-text');
     descriptionBox.textContent = "Consulting the archives...";
-    
     fetchBirdDescription(species).then(desc => {
         descriptionBox.textContent = desc;
     });
 
+    // 4. Audio
     fetchBirdSong(birdData?.LatinName, species);
     
     modal.style.display = 'block';
