@@ -372,8 +372,100 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 // ============================================
 
 
-script.js:467 Uncaught SyntaxError: Unexpected token ')'
+function displaySeenBirdsSummary() {
+    const summaryContainer = document.getElementById('seen-birds-summary');
+    if (!summaryContainer) return;
+    
+    summaryContainer.innerHTML = '';
+    const speciesMap = new Map();
+    
+    // 1. Group sightings by species
+    const validSightings = mySightings.filter(sighting => isSpeciesValid(sighting.species)); 
 
+    validSightings.forEach(sighting => {
+        const species = sighting.species.trim();
+        if (speciesMap.has(species)) {
+            speciesMap.get(species).sightings.push(sighting);
+        } else {
+            speciesMap.set(species, { sightings: [sighting] });
+        }
+    });
+
+    if (speciesMap.size === 0) {
+        summaryContainer.innerHTML = '<p style="padding: 20px; text-align: center;">No unique birds seen yet.</p>';
+        return;
+    }
+
+    // 2. Filter species by rarity
+    let filteredSpecies = Array.from(speciesMap.keys());
+    if (currentSummaryRarityFilter && currentSummaryRarityFilter !== 'All') {
+        filteredSpecies = filteredSpecies.filter(speciesName => {
+            const birdData = allUKBirds.find(b => b.CommonName.trim().toLowerCase() === speciesName.trim().toLowerCase());
+            return birdData && birdData.Rarity.trim().toLowerCase() === currentSummaryRarityFilter.trim().toLowerCase();
+        });
+    }
+    
+    const cardTemplate = document.getElementById('bird-card-template');
+    
+    // 3. Render the cards
+    filteredSpecies.forEach(species => {
+        const birdData = allUKBirds.find(b => b.CommonName.trim() === species);
+        if (!birdData) return;
+        
+        const sightingsData = speciesMap.get(species);
+        const sightingCount = sightingsData.sightings.length;
+        
+        const cardClone = cardTemplate.content.cloneNode(true);
+        const card = cardClone.querySelector('.bird-card');
+        const imageContainer = card.querySelector('.card-image-container');
+        const imageEl = card.querySelector('.card-image');
+        
+        card.classList.add('seen');
+
+        // Set Text Data
+        card.querySelector('.card-common-name').textContent = birdData.CommonName;
+        card.querySelector('.card-latin-name').textContent = birdData.LatinName !== 'No Data' ? birdData.LatinName : '';
+        card.querySelector('.card-status-text').textContent = `Seen ${sightingCount} time${sightingCount === 1 ? '' : 's'}`;
+
+        // Set Badges (matching your new HTML)
+        const countBadge = card.querySelector('.sighting-count-badge');
+        if (countBadge) {
+            countBadge.textContent = sightingCount;
+            countBadge.style.display = 'flex';
+        }
+
+        const rarityTag = card.querySelector('.card-rarity-tag');
+        if (rarityTag) {
+            rarityTag.textContent = birdData.Rarity;
+            rarityTag.className = `card-rarity-tag rarity-${birdData.Rarity}`;
+        }
+
+        // Image Logic
+        getBirdImage(birdData.CommonName, birdData.LatinName).then(result => {
+            if (result && result.url) {
+                imageEl.src = result.url;
+                if (result.isVerified) {
+                    card.classList.add('verified-card');
+                    const vBadge = document.createElement('div');
+                    vBadge.className = 'verified-check-badge';
+                    vBadge.innerHTML = '✓ Verified';
+                    imageContainer.appendChild(vBadge);
+                }
+                handleImageVerification(card, birdData);
+            }
+        });
+        
+        // Modal & Audio Trigger
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.image-verify-overlay')) {
+                showSightingModal(birdData.CommonName, birdData, sightingsData.sightings);
+                fetchBirdSong(birdData.LatinName, birdData.CommonName);
+            }
+        });
+        
+        summaryContainer.appendChild(card);
+    });
+}
 async function showSightingModal(species, birdData, sightings) {
     console.log("Opening modal for:", species, sightings); // Debug check
     const modal = document.getElementById('sighting-modal');
