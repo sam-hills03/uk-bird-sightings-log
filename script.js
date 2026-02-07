@@ -480,9 +480,33 @@ async function fetchBirdSong(latinName, commonName) {
         recordingLoc.textContent = "Signal lost.";
     }
 }
+function setupAudioPlayer() {
+    const gramophoneBtn = document.getElementById('gramophone-btn');
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const vinylDisc = document.getElementById('vinyl-disc');
+
+    if (!gramophoneBtn || !audioPlayer || !vinylDisc) return;
+
+    gramophoneBtn.onclick = () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play().then(() => {
+                gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                gramophoneBtn.classList.add('on-record');
+                vinylDisc.classList.add('spinning');
+                startSpectrogram(); // Start the ink-bleed effect
+            }).catch(err => console.error("Playback failed:", err));
+        } else {
+            audioPlayer.pause();
+            gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
+            gramophoneBtn.classList.remove('on-record');
+            vinylDisc.classList.remove('spinning');
+        }
+    };
+
     // Auto-stop spinning when audio finishes
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
+        gramophoneBtn.classList.remove('on-record');
         gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
     };
 }
