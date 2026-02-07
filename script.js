@@ -514,66 +514,73 @@ async function fetchBirdSong(latinName, commonName) {
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
-    // 1. Reset everything
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // 2. Try multiple search variations
-    const searchTerms = [commonName, `${commonName} (bird)`, latinName];
-    let audioUrl = null;
+    // We try the Latin name first as it is the "Global ID" for birds
+    const query = latinName && latinName !== 'No Data' ? latinName : commonName;
 
     try {
-        for (const term of searchTerms) {
-            if (!term) continue;
-            
-            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(term)}&imlimit=100`;
-            const res = await fetch(url);
-            const data = await res.json();
+        // Search Commons for any media file matching the bird name and 'audio'
+        const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(query)}&gsrlimit=5&prop=imageinfo&iiprop=url`;
+        
+        const response = await fetch(searchUrl);
+        const data = await response.json();
+        
+        if (data.query && data.query.pages) {
             const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            
-            if (pageId === "-1") continue; // Page not found, try next term
+            // Get the first result
+            const firstPageId = Object.keys(pages)[0];
+            const fileUrl = pages[firstPageId].imageinfo[0].url;
 
-            const images = pages[pageId].images || [];
-            // We look for audio files - Wikipedia uses .oga often for bird calls
-            const audioFile = images.find(img => 
-                img.title.toLowerCase().endsWith('.oga') || 
-                img.title.toLowerCase().endsWith('.ogg') || 
-                img.title.toLowerCase().endsWith('.mp3')
-            );
-
-            if (audioFile) {
-                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-                const infoRes = await fetch(infoUrl);
-                const infoData = await infoRes.json();
-                const infoPages = infoData.query.pages;
-                const infoId = Object.keys(infoPages)[0];
-                audioUrl = infoPages[infoId].imageinfo[0].url;
-                break; // Found one! Stop searching
-            }
-        }
-
-        if (audioUrl) {
-            audioPlayer.src = audioUrl;
-            // Crucial: Pre-load the metadata
+            audioPlayer.src = fileUrl;
             audioPlayer.load();
-            recordingLoc.textContent = "Captured: Wikipedia Audio Archive";
+            recordingLoc.textContent = "Captured: Field Recording (Commons)";
             
-            // Ensure the sonograph is ready to react
             audioPlayer.onplay = () => {
-                startSpectrogram();
+                if (typeof startSpectrogram === 'function') startSpectrogram();
             };
         } else {
-            recordingLoc.textContent = "No recordings found in archive.";
+            // Fallback: If Latin fails, try common name one last time
+            recordingLoc.textContent = "Searching deeper...";
+            attemptSecondarySearch(commonName);
         }
     } catch (error) {
-        console.error("Audio Archive Error:", error);
+        console.error("Audio Error:", error);
         recordingLoc.textContent = "Signal lost...";
     } finally {
-        loadingOverlay.style.display = 'none';
+        // Only hide if we aren't doing the secondary search
+        if (recordingLoc.textContent !== "Searching deeper...") {
+            loadingOverlay.style.display = 'none';
+        }
     }
+}
+
+async function attemptSecondarySearch(name) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const recordingLoc = document.getElementById('recording-location');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+
+    try {
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(name)}&gsrlimit=1&prop=imageinfo&iiprop=url`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.query && data.query.pages) {
+            const pages = data.query.pages;
+            const fileUrl = pages[Object.keys(pages)[0]].imageinfo[0].url;
+            audioPlayer.src = fileUrl;
+            audioPlayer.load();
+            recordingLoc.textContent = "Captured: Common Archive";
+        } else {
+            recordingLoc.textContent = "No recordings in archive.";
+        }
+    } catch (e) {
+        recordingLoc.textContent = "Archive silent.";
+    }
+    loadingOverlay.style.display = 'none';
 }
 function setupAudioPlayer() {
     const gramophoneBtn = document.getElementById('gramophone-btn');
