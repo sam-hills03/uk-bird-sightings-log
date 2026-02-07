@@ -59,31 +59,40 @@ window.deleteSighting = async function(idToDelete) {
 // ============================================
 // A. INITIAL LOAD FUNCTIONS
 // ============================================
-async function loadSightings() {
+
+async function loadUKBirds() {
     try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
+        const response = await fetch('uk_birds.json');
+        if (response.ok) {
+            allUKBirds = await response.json();
+        }
         
-        if (!user) {
-            mySightings = [];
-            if (typeof updateAllDisplays === 'function') updateAllDisplays();
-            return;
+        populateSpeciesDatalist(); 
+        await loadSightings(); 
+        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
+        
+        // --- THE FIX ---
+        // This ensures the first input box is there on launch
+        addSightingEntry(); 
+        // ---------------
+
+        setupTabSwitching();
+        setupPagination();
+        setupSummaryFilter();
+        setupSearchBar();
+        setupRarityFilter();
+        setupExpeditionSearch();
+        
+        filterAndDisplayBirds();
+        
+        // Load the most recent trip as a default display
+        if (mySightings.length > 0) {
+            const latest = mySightings[0]; // Assuming most recent is first
+            const data = getExpeditionData(latest.date, latest.location);
+            displayExpeditionCard(data);
         }
-
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('*');
-            
-        if (error) throw error;
-
-        if (data) {
-            mySightings = data;
-            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (typeof updateAllDisplays === 'function') updateAllDisplays(); 
-        }
-
-        console.log("Loaded", mySightings.length, "sightings.");
     } catch (error) {
-        console.error("Error loading sightings:", error);
+        console.error("Failed to load:", error);
     }
 }
 async function loadUKBirds() {
@@ -93,31 +102,101 @@ async function loadUKBirds() {
             allUKBirds = await response.json();
         }
         
-        // This is where the error was happening. Now it will work!
+        populateSpeciesDatalist(); 
         await loadSightings(); 
+        await loadLocations(); // Ensure this is correct (you had 'loads()' before)
         
-        if (typeof loadLocations === 'function') await loadLocations(); 
+        // --- THE FIX ---
+        // This ensures the first input box is there on launch
+        addSightingEntry(); 
+        // ---------------
+
+        setupTabSwitching();
+        setupPagination();
+        setupSummaryFilter();
+        setupSearchBar();
+        setupRarityFilter();
+        setupModal();
         
-        // Standard UI Setup
-        if (typeof populateSpeciesDatalist === 'function') populateSpeciesDatalist(); 
-        if (typeof addSightingEntry === 'function') addSightingEntry(); 
-        if (typeof setupTabSwitching === 'function') setupTabSwitching();
-        if (typeof setupPagination === 'function') setupPagination();
-        if (typeof setupSummaryFilter === 'function') setupSummaryFilter();
-        if (typeof setupSearchBar === 'function') setupSearchBar();
-        if (typeof setupRarityFilter === 'function') setupRarityFilter();
-        if (typeof setupModal === 'function') setupModal();            
-        if (typeof setupExpeditionSearch === 'function') setupExpeditionSearch(); 
-        if (typeof setupAudioPlayer === 'function') setupAudioPlayer(); 
+        filterAndDisplayBirds(); 
         
-        // Final Kickoff
-        if (typeof filterAndDisplayBirds === 'function') filterAndDisplayBirds(); 
-        
-        console.log("System Initialized Successfully.");
     } catch (error) {
-        console.error("Initialization Failed:", error);
+        console.error("Failed to load UK bird list:", error);
     }
 }
+        async function loadSightings() {
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        // If no user is logged in, clear sightings and stop
+        if (!user) {
+            mySightings = [];
+            updateAllDisplays();
+            return;
+        }
+
+        // 1. Fetch the actual data from Supabase
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*');
+            
+        if (error) throw error;
+
+        // 2. Now 'data' exists!
+        if (data) {
+            mySightings = data;
+            
+            // SORT: Newest sightings first
+            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // This tells all other parts of the app to refresh
+            updateAllDisplays(); 
+        }
+        // Add this inside the 'if (data)' block of loadSightings, after the sort
+if (mySightings.length > 0) {
+    const latest = mySightings[0];
+    const tripData = getExpeditionData(latest.date, latest.location);
+    if (tripData) displayExpeditionCard(tripData);
+}
+
+        console.log("Loaded", mySightings.length, "sightings.");
+    } catch (error) {
+        console.error("Error loading sightings:", error);
+    }
+}
+   
+async function saveSighting(sighting) {
+    try {
+        // Get the logged-in user's data
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
+        if (!user) {
+            alert("You must be logged in to save sightings.");
+            return false;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .insert([{
+                species: sighting.species,
+                date: sighting.date,
+                location: sighting.location,
+                user_id: user.id // <--- Ensure this matches your column name exactly
+            }]);
+        
+        if (error) {
+            console.error("Supabase Insert Error:", error.message);
+            throw error;
+        }
+        
+        console.log("Sighting saved successfully!");
+        return true;
+    } catch (error) {
+        alert("Failed to save: " + error.message);
+        return false;
+    }
+}
+
 async function deleteSightingFromDB(idToDelete) {
     try {
         const { data: { user } } = await supabaseClient.auth.getUser();
@@ -170,10 +249,9 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // Hide everything first
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        content.style.display = 'none'; 
+        content.style.display = 'none'; // Force hide everything
     });
     
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -181,12 +259,12 @@ function switchTab(targetTabId) {
     const targetContent = document.getElementById(targetTabId);
     if (targetContent) {
         targetContent.classList.add('active-content');
-        targetContent.style.display = 'block'; // THIS IS THE SIMPLE FIX
+        targetContent.style.display = 'block'; // FORCE SHOW THE TAB
         
+        // This triggers the stats math only when the tab is clicked
         if (targetTabId === 'stats-view') {
-            console.log("📊 Refreshing Stats...");
             calculateAndDisplayStats();
-            if (typeof createMonthlyChart === 'function') createMonthlyChart();
+            createMonthlyChart();
         }
     }
 }
@@ -436,23 +514,27 @@ document.getElementById('refresh-audio').onclick = () => {
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    if (!audioPlayer || !recordingLoc) return;
+    if (!audioPlayer) return;
 
     audioPlayer.pause();
     recordingLoc.textContent = "Tuning signal...";
 
-    // Simple search to prevent Great Tit confusion
+    // We use only the Latin Name to ensure we don't get a Great Tit for a Blue Tit
     const query = latinName || commonName;
 
     try {
-        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=10`;
+        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=5`;
         const response = await fetch(url);
         const data = await response.json();
 
         if (data.query && data.query.pages) {
-            const pageId = Object.keys(data.query.pages)[0];
-            const images = data.query.pages[pageId].images || [];
-            const audioFile = images.find(img => img.title.toLowerCase().match(/\.(ogg|oga|mp3)$/));
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            const images = pages[pageId].images || [];
+            
+            const audioFile = images.find(img => 
+                ['.ogg', '.oga', '.mp3'].some(ext => img.title.toLowerCase().endsWith(ext))
+            );
 
             if (audioFile) {
                 const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
@@ -467,35 +549,59 @@ async function fetchBirdSong(latinName, commonName) {
             }
         }
     } catch (e) {
+        console.log("Audio skipped to prevent crash.");
         recordingLoc.textContent = "Signal lost.";
     }
+}
+async function attemptSecondarySearch(name) {
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const recordingLoc = document.getElementById('recording-location');
+    const loadingOverlay = document.getElementById('audio-loading-overlay');
+
+    try {
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(name)}&gsrlimit=1&prop=imageinfo&iiprop=url`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.query && data.query.pages) {
+            const pages = data.query.pages;
+            const fileUrl = pages[Object.keys(pages)[0]].imageinfo[0].url;
+            audioPlayer.src = fileUrl;
+            audioPlayer.load();
+            recordingLoc.textContent = "Captured: Common Archive";
+        } else {
+            recordingLoc.textContent = "No recordings in archive.";
+        }
+    } catch (e) {
+        recordingLoc.textContent = "Archive silent.";
+    }
+    loadingOverlay.style.display = 'none';
 }
 function setupAudioPlayer() {
     const gramophoneBtn = document.getElementById('gramophone-btn');
     const audioPlayer = document.getElementById('bird-audio-player');
     const vinylDisc = document.getElementById('vinyl-disc');
 
-    if (!gramophoneBtn || !audioPlayer || !vinylDisc) return;
+    if (!gramophoneBtn || !audioPlayer) return;
 
     gramophoneBtn.onclick = () => {
         if (audioPlayer.paused) {
             audioPlayer.play().then(() => {
                 gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                gramophoneBtn.classList.add('on-record');
                 vinylDisc.classList.add('spinning');
-                if (typeof startSpectrogram === 'function') startSpectrogram();
-            }).catch(err => console.error("Playback failed:", err));
+            }).catch(err => {
+                console.error("Playback failed:", err);
+            });
         } else {
             audioPlayer.pause();
             gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
-            gramophoneBtn.classList.remove('on-record');
             vinylDisc.classList.remove('spinning');
         }
     };
 
+    // Auto-stop spinning when audio finishes
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
-        gramophoneBtn.classList.remove('on-record');
         gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
     };
 }
@@ -1697,6 +1803,3 @@ document.addEventListener('click', function(e) {
 
 // Initialize the gramophone listeners
 setupAudioPlayer();
-function setupAudioPlayer() {
-    console.log("Audio player system standby.");
-}
