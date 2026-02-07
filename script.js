@@ -550,24 +550,25 @@ function setupAudioPlayer() {
             audioPlayer.play().then(() => {
                 gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 vinylDisc.classList.add('spinning');
-            });
+            }).catch(err => console.error("Audio failed:", err));
         } else {
             audioPlayer.pause();
             gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
             vinylDisc.classList.remove('spinning');
         }
     };
-}
 
-// Call this at the very end to kick off the app
-loadUKBirds();
-
-    // Auto-stop spinning when audio finishes
+    // This was the loose part causing the crash - it is now safely inside!
     audioPlayer.onended = () => {
         vinylDisc.classList.remove('spinning');
         gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
     };
 }
+
+// 2. KICK OFF THE APP (Only call this once!)
+loadUKBirds();
+
+// 3. START SPECTROGRAM
 function startSpectrogram() {
     const audioPlayer = document.getElementById('bird-audio-player');
     const canvas = document.getElementById('spectrogram-canvas');
