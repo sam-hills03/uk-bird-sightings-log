@@ -1452,8 +1452,7 @@ function createMonthlyChart() {
     // Safety: ensure the canvas is visible and has a size before drawing
     ctx.style.width = '100%'; 
     ctx.style.height = '300px'; 
-    
-}
+
     const sightingsToUse = getFilteredSightings();
     let labels = [];
     let data = [];
@@ -1475,9 +1474,7 @@ function createMonthlyChart() {
         
         mySightings.forEach(sighting => {
             const date = new Date(sighting.date);
-            // SortKey: "2025-01" (Reliable for alphabetical sorting of chronological dates)
             const sortKey = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
-            // DisplayLabel: "Jan 2025"
             const label = date.toLocaleString('default', { month: 'short', year: 'numeric' });
             
             if (!monthCounts[sortKey]) {
@@ -1486,10 +1483,7 @@ function createMonthlyChart() {
             monthCounts[sortKey].count++;
         });
 
-        // Sort keys chronologically (e.g., 2024-12 before 2025-01)
         const sortedKeys = Object.keys(monthCounts).sort();
-        
-        // Map data in the sorted order
         labels = sortedKeys.map(key => monthCounts[key].label);
         data = sortedKeys.map(key => monthCounts[key].count);
     }
@@ -1497,7 +1491,7 @@ function createMonthlyChart() {
     // 2. Destroy old chart instance if it exists
     if (birdChart) { birdChart.destroy(); }
 
-    // 3. Create the Chart
+    // 3. Create the Chart (Now ctx is properly enclosed inside the function!)
     birdChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1525,7 +1519,7 @@ function createMonthlyChart() {
                 x: {
                     ticks: { 
                         font: { family: 'Courier New', size: 10 },
-                        autoSkip: true, // Prevents overlapping labels on narrow mobile screens
+                        autoSkip: true,
                         maxRotation: 45
                     },
                     grid: { display: false }
@@ -1534,6 +1528,7 @@ function createMonthlyChart() {
             plugins: { legend: { display: false } }
         }
     });
+} // <--- This is the only closing brace that should be at the end!
 // --- UPDATED AUTHENTICATION LOGIC ---
 
 function getExpeditionData(date, location) {
