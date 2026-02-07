@@ -1534,7 +1534,6 @@ function createMonthlyChart() {
             plugins: { legend: { display: false } }
         }
     });
-}
 // --- UPDATED AUTHENTICATION LOGIC ---
 
 function getExpeditionData(date, location) {
