@@ -508,12 +508,16 @@ async function showSightingModal(species, birdData) {
 }
 
 // 1. The main function
-function fetchBirdSong(latinName, commonName) {
+async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const loadingOverlay = document.getElementById('audio-loading-overlay');
     const recordingLoc = document.getElementById('recording-location');
     if (!audioPlayer) return;
 
+    // 1. Your Secret Key (Keep the quotes around it!)
+    const apiKey = '626963a01ee1652fe36f8ebd56d2481276640882'; 
+
+    // 2. Reset UI
     audioPlayer.pause();
     audioPlayer.src = ""; 
     loadingOverlay.style.display = 'flex';
@@ -521,48 +525,40 @@ function fetchBirdSong(latinName, commonName) {
 
     const query = (latinName && latinName !== 'No Data') ? latinName.split(',')[0].trim() : commonName.split('(')[0].trim();
 
-    // Remove any old script tags to keep the page clean
-    const oldScript = document.getElementById('xeno-jsonp');
-    if (oldScript) oldScript.remove();
+    // 3. Use v3 with the API Key
+    // We still use AllOrigins because the browser itself will still block the 'CORS' request
+    const xenoUrl = `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(query)}&key=${apiKey}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(xenoUrl)}`;
 
-    // Create a new Script Tag (JSONP)
-    // We point to v2 and add "&callback=handleXenoResponse"
-    const script = document.createElement('script');
-    script.id = 'xeno-jsonp';
-    script.src = `https://xeno-canto.org/api/2/recordings?query=${encodeURIComponent(query)}&callback=handleXenoResponse`;
-    
-    // If the script fails to load (e.g. 404), clear the overlay
-    script.onerror = () => {
-        recordingLoc.textContent = "Archive link broken.";
+    try {
+        const response = await fetch(proxyUrl);
+        const wrapper = await response.json();
+        
+        if (wrapper && wrapper.contents) {
+            const data = JSON.parse(wrapper.contents);
+
+            if (data && data.recordings && data.recordings.length > 0) {
+                const bestMatch = data.recordings[0];
+                let fileUrl = bestMatch.file;
+                
+                if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
+                
+                audioPlayer.src = fileUrl;
+                audioPlayer.load();
+                
+                recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
+                console.log("🎵 API Key search successful!");
+            } else {
+                recordingLoc.textContent = "No recordings found.";
+            }
+        }
+    } catch (error) {
+        console.error("❌ Audio Fetch Error:", error);
+        recordingLoc.textContent = "Archive signal lost.";
+    } finally {
         loadingOverlay.style.display = 'none';
-    };
-
-    document.body.appendChild(script);
-}
-
-// 2. The global "Receiver" function (Must be outside of other functions)
-window.handleXenoResponse = function(data) {
-    const audioPlayer = document.getElementById('bird-audio-player');
-    const loadingOverlay = document.getElementById('audio-loading-overlay');
-    const recordingLoc = document.getElementById('recording-location');
-
-    if (data && data.recordings && data.recordings.length > 0) {
-        // Sort to find the best quality
-        const sorted = data.recordings.sort((a, b) => (a.q || 'Z').localeCompare(b.q || 'Z'));
-        const bestMatch = sorted[0];
-        
-        let fileUrl = bestMatch.file;
-        if (fileUrl.startsWith('//')) fileUrl = 'https:' + fileUrl;
-        
-        audioPlayer.src = fileUrl;
-        audioPlayer.load();
-        
-        recordingLoc.textContent = `Captured: ${bestMatch.loc} (${bestMatch.en})`;
-    } else {
-        recordingLoc.textContent = "No recordings in archive.";
     }
-    loadingOverlay.style.display = 'none';
-};
+}
 // ============================================
 // E. LOCATIONS
 // ============================================
