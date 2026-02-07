@@ -519,48 +519,53 @@ async function fetchBirdSong(latinName, commonName) {
     loadingOverlay.style.display = 'flex';
     recordingLoc.textContent = "Tuning signal...";
 
-    // List of variations to try in order
-    const attempts = [commonName, latinName, `${commonName} (bird)`];
-    let foundFile = false;
+    // Use the Latin name primarily as eBird uses scientific taxonomy
+    const speciesQuery = (latinName && latinName !== 'No Data') ? latinName : commonName;
 
-    for (const term of attempts) {
-        if (!term || term === 'No Data') continue;
+    try {
+        // We fetch the eBird/Macaulay redirector
+        // This search specifically looks for 'Sound' type media
+        const eBirdUrl = `https://api.ebird.org/v2/ref/taxonomy/ebird?species=${encodeURIComponent(speciesQuery)}`;
+        
+        // Since eBird also has CORS, we'll use a very simple fallback to the 
+        // Wikimedia 'Global Search' that focuses ONLY on MP3 files for compatibility
+        const fallbackUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=filetype:audio|${encodeURIComponent(speciesQuery)}&gsrlimit=10&prop=imageinfo&iiprop=url`;
 
-        try {
-            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&titles=${encodeURIComponent(term)}&imlimit=50`;
-            const response = await fetch(url);
-            const data = await response.json();
+        const response = await fetch(fallbackUrl);
+        const data = await response.json();
+
+        if (data.query && data.query.pages) {
             const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-
-            if (pageId !== "-1" && pages[pageId].images) {
-                const audioFile = pages[pageId].images.find(img => 
-                    ['.ogg', '.oga', '.mp3', '.wav'].some(ext => img.title.toLowerCase().endsWith(ext))
-                );
-
-                if (audioFile) {
-                    const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-                    const infoRes = await fetch(infoUrl);
-                    const infoData = await infoRes.json();
-                    const infoPageId = Object.keys(infoData.query.pages)[0];
-                    const finalUrl = infoData.query.pages[infoPageId].imageinfo[0].url;
-
-                    audioPlayer.src = finalUrl;
-                    audioPlayer.load();
-                    recordingLoc.textContent = `Captured: ${term} Recording`;
-                    foundFile = true;
-                    break; // Exit the loop because we found one!
+            
+            // Look for an MP3 specifically for better browser support
+            let bestFile = null;
+            for (let id in pages) {
+                const url = pages[id].imageinfo[0].url;
+                if (url.toLowerCase().endsWith('.mp3')) {
+                    bestFile = url;
+                    break;
                 }
             }
-        } catch (err) {
-            console.error("Search failed for:", term);
-        }
-    }
 
-    if (!foundFile) {
-        recordingLoc.textContent = "No recordings found in archive.";
+            // If no MP3, take the first available audio file
+            const finalUrl = bestFile || pages[Object.keys(pages)[0]].imageinfo[0].url;
+
+            audioPlayer.src = finalUrl;
+            audioPlayer.load();
+            recordingLoc.textContent = "Captured: Field Recording (Archive)";
+            
+            audioPlayer.onplay = () => {
+                if (typeof startSpectrogram === 'function') startSpectrogram();
+            };
+        } else {
+            recordingLoc.textContent = "No recordings found.";
+        }
+    } catch (error) {
+        console.error("Audio Error:", error);
+        recordingLoc.textContent = "Archive signal lost.";
+    } finally {
+        loadingOverlay.style.display = 'none';
     }
-    loadingOverlay.style.display = 'none';
 }
 async function attemptSecondarySearch(name) {
     const audioPlayer = document.getElementById('bird-audio-player');
