@@ -537,20 +537,19 @@ async function attemptSecondarySearch(name) {
     }
     loadingOverlay.style.display = 'none';
 }
+// Ensure this function exists to clear the "ReferenceError"
 function setupAudioPlayer() {
     const gramophoneBtn = document.getElementById('gramophone-btn');
     const audioPlayer = document.getElementById('bird-audio-player');
     const vinylDisc = document.getElementById('vinyl-disc');
 
-    if (!gramophoneBtn || !audioPlayer) return;
+    if (!gramophoneBtn || !audioPlayer || !vinylDisc) return;
 
     gramophoneBtn.onclick = () => {
         if (audioPlayer.paused) {
             audioPlayer.play().then(() => {
                 gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 vinylDisc.classList.add('spinning');
-            }).catch(err => {
-                console.error("Playback failed:", err);
             });
         } else {
             audioPlayer.pause();
@@ -558,6 +557,10 @@ function setupAudioPlayer() {
             vinylDisc.classList.remove('spinning');
         }
     };
+}
+
+// Call this at the very end to kick off the app
+loadUKBirds();
 
     // Auto-stop spinning when audio finishes
     audioPlayer.onended = () => {
@@ -875,27 +878,21 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const failedBirdsCache = new Set();
 
 async function getiNaturalistImage(commonName, latinName, page = 1, retries = 3) {
-    // 1. If we already tried this bird and it failed, don't try again this session
     if (failedBirdsCache.has(commonName) || verifiedImageCache.has(commonName)) {
         return verifiedImageCache.get(commonName) || null;
     }
 
-    await sleep(300); // 0.3 second delay between every request
+    await sleep(300); 
 
     const searchTerm = (latinName && latinName !== 'No Data') ? latinName : commonName;
-    
-    // Using a different endpoint (taxon_id search) often bypasses the strict CORS throttle
     const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&iconic_taxa=Aves&rank=species&per_page=1`;
 
     try {
         const resp = await fetch(url);
-
         if (resp.status === 429 && retries > 0) {
             await sleep(2000); 
             return getiNaturalistImage(commonName, latinName, page, retries - 1);
         }
-
-        // If the API blocks us (CORS), it usually returns no status or 0
         if (!resp.ok) throw new Error('CORS or Network Block');
 
         const data = await resp.json();
@@ -904,12 +901,10 @@ async function getiNaturalistImage(commonName, latinName, page = 1, retries = 3)
         if (photoUrl) {
             verifiedImageCache.set(commonName, photoUrl);
         } else {
-            failedBirdsCache.add(commonName); // Mark as "no photo found"
+            failedBirdsCache.add(commonName);
         }
-        
         return photoUrl;
     } catch (error) {
-        // SILENT FAIL: We stop logging the error to clear your console
         failedBirdsCache.add(commonName); 
         return null;
     }
