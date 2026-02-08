@@ -555,29 +555,33 @@ async function attemptSecondarySearch(name) {
 }
 // Ensure this function exists to clear the "ReferenceError"
 function setupAudioPlayer() {
-	const gramophoneBtn = document.getElementById('gramophone-btn');
-	const audioPlayer = document.getElementById('bird-audio-player');
-	const vinylDisc = document.getElementById('vinyl-disc');
+    const tonearm = document.getElementById('tonearm');
+    const disc = document.getElementById('vinyl-disc-group');
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const labelText = document.getElementById('svg-label-text');
 
-	if (!gramophoneBtn || !audioPlayer || !vinylDisc) return;
+    if (!tonearm || !audioPlayer) return;
 
-	gramophoneBtn.onclick = () => {
-		if (audioPlayer.paused) {
-			audioPlayer.play().then(() => {
-				gramophoneBtn.innerHTML = '<i class="fas fa-pause"></i>';
-				vinylDisc.classList.add('spinning');
-			});
-		} else {
-			audioPlayer.pause();
-			gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
-			vinylDisc.classList.remove('spinning');
-		}
-	};
+    tonearm.onclick = () => {
+        if (audioPlayer.paused) {
+            // Play logic
+            audioPlayer.play().then(() => {
+                tonearm.classList.add('arm-on-record');
+                disc.classList.add('spinning-disc');
+                if (typeof startSpectrogram === 'function') startSpectrogram();
+            }).catch(err => console.error("Playback failed", err));
+        } else {
+            // Pause logic
+            audioPlayer.pause();
+            tonearm.classList.remove('arm-on-record');
+            disc.classList.remove('spinning-disc');
+        }
+    };
 
-	audioPlayer.onended = () => {
-		vinylDisc.classList.remove('spinning');
-		gramophoneBtn.innerHTML = '<i class="fas fa-play"></i>';
-	};
+    audioPlayer.onended = () => {
+        tonearm.classList.remove('arm-on-record');
+        disc.classList.remove('spinning-disc');
+    };
 }
 
 // 2. KICK OFF THE APP (Only call this once!)
