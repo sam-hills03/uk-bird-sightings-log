@@ -1475,17 +1475,14 @@ hr {
 }
 
 /* The spinning animation */
-.vinyl-disc.spinning {
-  animation: rotateVinyl 3s linear infinite;
+.spinning-disc {
+    animation: record-spin 3s linear infinite;
+    transform-origin: 100px 100px;
 }
 
-@keyframes rotateVinyl {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes record-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .vinyl-label {
@@ -1583,4 +1580,13 @@ hr {
     width: 100%;
     max-width: 300px;
     margin: 0 auto;
+}
+.audio-status-label {
+    text-align: center;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    color: var(--color-secondary);
+    margin-top: 10px;
+    font-style: italic;
+    letter-spacing: 0.5px;
 }
