@@ -1563,3 +1563,24 @@ hr {
   color: #f4f1e8; /* Your parchment color */
   border-style: solid;
 }
+@keyframes record-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* When this class is added, the disc spins around its center */
+.spinning-disc {
+    animation: record-spin 3s linear infinite;
+    transform-origin: 100px 100px;
+}
+
+/* When this is added, the arm moves onto the record */
+.arm-on-record {
+    transform: rotate(25deg);
+}
+
+.vinyl-player-area {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
