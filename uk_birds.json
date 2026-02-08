@@ -20,8 +20,8 @@
  {
    "CommonName": "Allen's Gallinule",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Porphyrio alleni"
  },
  {
    "CommonName": "Alpine Accentor",
@@ -80,8 +80,8 @@
  {
    "CommonName": "American Pipit",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Anthus rubescens"
  },
  {
    "CommonName": "American Redstart",
@@ -104,8 +104,8 @@
  {
    "CommonName": "American Yellow Warbler",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Setophaga aestiva"
  },
  {
    "CommonName": "Amur Falcon",
@@ -116,8 +116,8 @@
  {
    "CommonName": "Amur Stonechat",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Passage Visitor",
+   "LatinName": "Saxicola stejnegeri"
  },
  {
    "CommonName": "Ancient Murrelet",
@@ -170,8 +170,8 @@
  {
    "CommonName": "Asian Houbara",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Chlamydotis macqueenii"
  },
  {
    "CommonName": "Atlantic Yellow-nosed Albatross",
@@ -200,14 +200,14 @@
  {
    "CommonName": "Baillon's Crake",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Zapornia pusilla"
  },
  {
    "CommonName": "Baird's Sandpiper",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Calidris bairdii"
  },
  {
    "CommonName": "Balearic Shearwater",
@@ -217,9 +217,9 @@
  },
  {
    "CommonName": "Bar-headed goose",
-   "Rarity": "",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Rarity": "Rare",
+   "Status": "Passave Visitor",
+   "LatinName": "Anser indicus"
  },
  {
    "CommonName": "Bar-tailed Godwit",
@@ -254,8 +254,8 @@
  {
    "CommonName": "Barrow's Goldeneye",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Bucephala islandica"
  },
  {
    "CommonName": "Bay-breasted Warbler",
@@ -325,9 +325,9 @@
  },
  {
    "CommonName": "Black swan",
-   "Rarity": "",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Rarity": "Local",
+   "Status": "Escape",
+   "LatinName": "Cygnus atratus"
  },
  {
    "CommonName": "Black Tern",
@@ -361,9 +361,9 @@
  },
  {
    "CommonName": "Black-crowned Night Heron",
-   "Rarity": "Scarce",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Rarity": "Rare",
+   "Status": "Accidental",
+   "LatinName": "Nycticorax nycticorax"
  },
  {
    "CommonName": "Black-headed Gull",
@@ -398,8 +398,8 @@
  {
    "CommonName": "Black-winged Kite",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Elanus caeruleus"
  },
  {
    "CommonName": "Black-winged Pratincole",
@@ -464,8 +464,8 @@
  {
    "CommonName": "Blyth's Pipit",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Anthus godlewskii"
  },
  {
    "CommonName": "Blyth's Reed Warbler",
