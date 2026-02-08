@@ -1614,12 +1614,6 @@
    "LatinName": "Perdix perdix"
  },
  {
-   "CommonName": "Grey Phalarope",
-   "Rarity": "Scarce",
-   "Status": "Passage Visitor",
-   "LatinName": "Phalaropus fulicarius"
- },
- {
    "CommonName": "Grey Plover",
    "Rarity": "Common",
    "Status": "Passage/Winter Visitor",
@@ -2644,6 +2638,12 @@
    "Rarity": "Local",
    "Status": "No Data",
    "LatinName": "No Data"
+ },
+ {
+   "CommonName": "Red Phalarope",
+   "Rarity": "Scarce",
+   "Status": "Passage Visitor",
+   "LatinName": "Phalaropus fulicarius"
  },
  {
    "CommonName": "Redwing",
