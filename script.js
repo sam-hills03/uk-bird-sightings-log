@@ -439,63 +439,62 @@ function displaySeenBirdsSummary() {
 }
 
 async function showSightingModal(species, birdData) {
-	const modal = document.getElementById('sighting-modal');
-	if (!modal) return;
+    const modal = document.getElementById('sighting-modal');
+    if (!modal) return;
 
-	// 1. Set Basic Info
-	document.getElementById('modal-species-name').textContent = species;
-	document.getElementById('modal-species-info').textContent = `${birdData?.LatinName || ''} • ${birdData?.Rarity || ''}`;
+    document.getElementById('modal-species-name').textContent = species;
+    document.getElementById('modal-species-info').textContent = `${birdData?.LatinName || ''} • ${birdData?.Rarity || ''}`;
 
-	// 2. FETCH SIGHTINGS DIRECTLY FROM THE SOURCE
-	const modalList = document.getElementById('modal-sightings-list');
-	modalList.innerHTML = '';
+    const modalList = document.getElementById('modal-sightings-list');
+    modalList.innerHTML = '';
 
-	// We look at the global mySightings array and filter for this specific bird
-	const personalSightings = mySightings.filter(s => s.species.trim().toLowerCase() === species.trim().toLowerCase());
+    const personalSightings = mySightings.filter(s => s.species.trim().toLowerCase() === species.trim().toLowerCase());
 
-	// Inside showSightingModal...
-	const recordingLoc = document.getElementById('recording-location');
-	recordingLoc.innerHTML = `Tuning signal... <span id="refresh-audio" style="cursor:pointer; margin-left:10px; text-decoration:underline; font-size:0.8em;">[Not the right bird?]</span>`;
+    // Fix for the SVG text element
+    const recordingLoc = document.getElementById('recording-location');
+    if (recordingLoc) {
+        recordingLoc.textContent = "Tuning signal...";
+    }
 
-	document.getElementById('refresh-audio').onclick = () => {
-		// This will try the Latin name specifically to force accuracy
-		fetchBirdSong(birdData.LatinName, birdData.CommonName, true);
-	};
+    // Update the record label to show the bird name
+    const svgLabel = document.getElementById('svg-label-text');
+    if (svgLabel) svgLabel.textContent = species.toUpperCase();
 
-	if (personalSightings.length > 0) {
-		// Sort newest to oldest
-		personalSightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
-			const li = document.createElement('li');
-			li.style.padding = "10px";
-			li.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
-			li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString('en-GB')}</strong> — ${sighting.location}`;
-			modalList.appendChild(li);
-		});
-	} else {
-		modalList.innerHTML = '<li style="font-style:italic; padding:10px;">No personal sightings recorded in your journal yet.</li>';
-	}
+    if (personalSightings.length > 0) {
+        personalSightings.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sighting => {
+            const li = document.createElement('li');
+            li.style.padding = "10px";
+            li.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
+            li.innerHTML = `<strong>${new Date(sighting.date).toLocaleDateString('en-GB')}</strong> — ${sighting.location}`;
+            modalList.appendChild(li);
+        });
+    } else {
+        modalList.innerHTML = '<li style="font-style:italic; padding:10px;">No personal sightings recorded in your journal yet.</li>';
+    }
 
-	// 3. Field Notes
-	const descriptionBox = document.getElementById('modal-description-text');
-	descriptionBox.textContent = "Consulting the archives...";
-	fetchBirdDescription(species).then(desc => {
-		descriptionBox.textContent = desc;
-	});
+    const descriptionBox = document.getElementById('modal-description-text');
+    descriptionBox.textContent = "Consulting the archives...";
+    fetchBirdDescription(species).then(desc => {
+        descriptionBox.textContent = desc;
+    });
 
-	// 4. Audio
-	fetchBirdSong(birdData?.LatinName, species);
-
-	modal.style.display = 'block';
+    fetchBirdSong(birdData?.LatinName, species);
+    modal.style.display = 'block';
 }
 
 // 1. The main function
 async function fetchBirdSong(latinName, commonName) {
-	const audioPlayer = document.getElementById('bird-audio-player');
-	const recordingLoc = document.getElementById('recording-location');
-	if (!audioPlayer) return;
+    const audioPlayer = document.getElementById('bird-audio-player');
+    const recordingLoc = document.getElementById('recording-location');
+    if (!audioPlayer || !recordingLoc) return; // Safety check
 
-	audioPlayer.pause();
-	recordingLoc.textContent = "Tuning signal...";
+    audioPlayer.pause();
+    recordingLoc.textContent = "Scanning frequencies...";
+    
+    // ... rest of your fetch code ...
+    // When success:
+    recordingLoc.textContent = "Captured: Archive Recording";
+}
 
 	// We use only the Latin Name to ensure we don't get a Great Tit for a Blue Tit
 	const query = latinName || commonName;
