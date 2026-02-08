@@ -1,11 +1,9 @@
 const SUPABASE_URL = 'https://vpfoyxvkkttzlitfajgf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZm95eHZra3R0emxpdGZhamdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDAxMTQsImV4cCI6MjA3NjUxNjExNH0._vyK8s2gXPSu18UqEEWujLU2tAqNZEh3mNwVQcbskxA';
 const ADMIN_UID = 'ec7bdc5d-fff1-4708-b161-15315c402920';
-// Renamed to supabaseClient to avoid conflict with the library itself
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 // ============================================
-// GLOBAL VARIABLES
+// Global variables
 // ============================================
 let allUKBirds = [];
 let mySightings = [];
@@ -21,14 +19,18 @@ let currentSummaryRarityFilter = 'All';
 // Search filter
 let currentSearchQuery = '';
 
+// Audio display
 let audioContext, analyser, dataArray, animationId;
 
+// Containers
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
 const sightingForm = document.getElementById('sighting-form');
 
+// Year filter
 let currentYearFilter = 'Lifetime';
 
+// Filter results from date select 
 function getFilteredSightings() {
 	if (currentYearFilter === 'Lifetime') return mySightings;
 
@@ -38,9 +40,10 @@ function getFilteredSightings() {
 	});
 }
 
+// Actually change year on change
 window.handleYearChange = function(year) {
 	currentYearFilter = year;
-	updateAllDisplays(); // This will now trigger everything to redraw with the new year
+	updateAllDisplays();
 };
 
 // Make deleteSighting global
@@ -57,9 +60,10 @@ window.deleteSighting = async function(idToDelete) {
 };
 
 // ============================================
-// A. INITIAL LOAD FUNCTIONS
+// Initial loading
 // ============================================
 
+// Load sightings from supabase
 async function loadSightings() {
 	try {
 		const {
@@ -86,6 +90,8 @@ async function loadSightings() {
 		console.error("Error loading sightings:", error);
 	}
 }
+
+//Load all birds on UK birds database
 async function loadUKBirds() {
 	try {
 		const response = await fetch('uk_birds.json');
@@ -93,12 +99,12 @@ async function loadUKBirds() {
 			allUKBirds = await response.json();
 		}
 
-		// 1. DATA LOADING
+		// Data loading
 		populateSpeciesDatalist();
-		await loadSightings(); // Now it will find the restored function below
+		await loadSightings(); 
 		await loadLocations();
 
-		// 2. UI INITIALIZATION
+		// UI initialisation
 		addSightingEntry();
 		setupTabSwitching();
 		setupPagination();
@@ -109,10 +115,10 @@ async function loadUKBirds() {
 		setupExpeditionSearch();
 		setupAudioPlayer();
 
-		// 3. INITIAL RENDER
+		// 3. Render database birds
 		filterAndDisplayBirds();
 
-		// 4. LOAD LATEST TRIP
+		// 4. Load latest trip report
 		if (mySightings.length > 0) {
 			const latest = mySightings[0];
 			const data = getExpeditionData(latest.date, latest.location);
@@ -125,6 +131,7 @@ async function loadUKBirds() {
 	}
 }
 
+// Save sightings to database
 async function saveSighting(sighting) {
 	try {
 		// Get the logged-in user's data
@@ -135,7 +142,7 @@ async function saveSighting(sighting) {
 		} = await supabaseClient.auth.getUser();
 
 		if (!user) {
-			alert("You must be logged in to save sightings.");
+			alert("You must be logged in to save sightings."); // Only shows if not logged in 
 			return false;
 		}
 
@@ -148,7 +155,7 @@ async function saveSighting(sighting) {
 				species: sighting.species,
 				date: sighting.date,
 				location: sighting.location,
-				user_id: user.id // <--- Ensure this matches your column name exactly
+				user_id: user.id
 			}]);
 
 		if (error) {
@@ -164,6 +171,7 @@ async function saveSighting(sighting) {
 	}
 }
 
+// Delete sighting from raw datalist 
 async function deleteSightingFromDB(idToDelete) {
 	try {
 		const {
@@ -183,7 +191,7 @@ async function deleteSightingFromDB(idToDelete) {
 			.from('sightings')
 			.delete()
 			.eq('id', idToDelete)
-			.eq('user_id', user.id); // Extra security: ensure the ID belongs to the user
+			.eq('user_id', user.id); 
 
 		if (error) throw error;
 
@@ -197,6 +205,7 @@ async function deleteSightingFromDB(idToDelete) {
 	}
 }
 
+// Updates seen birds, raw list, and stats page
 function updateAllDisplays() {
 	displaySightings();
 	displaySeenBirdsSummary();
@@ -215,7 +224,7 @@ function updateAllDisplays() {
 }
 
 // ============================================
-// B. TAB SWITCHING LOGIC
+// Tab switch logic
 // ============================================
 
 function switchTab(targetTabId) {
@@ -224,7 +233,7 @@ function switchTab(targetTabId) {
 
 	tabContents.forEach(content => {
 		content.classList.remove('active-content');
-		content.style.display = 'none'; // Clear everything first
+		content.style.display = 'none'; 
 	});
 
 	tabButtons.forEach(button => button.classList.remove('active'));
@@ -232,7 +241,7 @@ function switchTab(targetTabId) {
 	const targetContent = document.getElementById(targetTabId);
 	if (targetContent) {
 		targetContent.classList.add('active-content');
-		targetContent.style.display = 'block'; // FORCE VISIBILITY
+		targetContent.style.display = 'block'; 
 
 		if (targetTabId === 'stats-view') {
 			console.log("📊 Refreshing Stats Page...");
@@ -241,10 +250,8 @@ function switchTab(targetTabId) {
 		}
 	}
 }
-// ============================================
-// C. PAGINATION
-// ============================================
 
+// Pagnation on the raw checklist page
 function setupPagination() {
 	const prevBtn = document.getElementById('prev-page-btn');
 	const nextBtn = document.getElementById('next-page-btn');
@@ -275,6 +282,7 @@ function changePage(direction) {
 	}
 }
 
+// Display on raw checklist page
 function displaySightings() {
 	const list = document.getElementById('sightings-list');
 	if (!list) return;
@@ -312,6 +320,7 @@ function displaySightings() {
 	updatePaginationControls(totalPages, startIndex, endIndex);
 }
 
+// More pagnation controls
 function updatePaginationControls(totalPages, startIndex, endIndex) {
 	const pageInfo = totalPages > 0 ?
 		`Page ${currentPage} of ${totalPages} (Showing ${startIndex + 1}-${endIndex} of ${mySightings.length})` :
@@ -338,10 +347,10 @@ function updatePaginationControls(totalPages, startIndex, endIndex) {
 }
 
 // ============================================
-// D. SUMMARY & MODALS
+// Summary and modals
 // ============================================
 
-
+// 
 function displaySeenBirdsSummary() {
 	const summaryContainer = document.getElementById('seen-birds-summary');
 	if (!summaryContainer) return;
