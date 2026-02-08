@@ -255,12 +255,16 @@
         
         <g id="vinyl-disc-group">
             <circle cx="100" cy="100" r="80" fill="#111" />
+            
             <circle cx="100" cy="100" r="70" fill="none" stroke="#222" stroke-width="0.5" />
             <circle cx="100" cy="100" r="60" fill="none" stroke="#222" stroke-width="0.5" />
             <circle cx="100" cy="100" r="50" fill="none" stroke="#222" stroke-width="0.5" />
+            <circle cx="100" cy="100" r="40" fill="none" stroke="#222" stroke-width="0.5" />
+
             <circle cx="100" cy="100" r="25" fill="#fdfaf0" stroke="#8c2e1b" stroke-width="1" />
-            <text x="100" y="103" id="svg-label-text" font-family="EB Garamond" font-size="6" text-anchor="middle" fill="#3d342d">ARCHIVE</text>
-            <path d="M 100 20 A 80 80 0 0 1 180 100" fill="none" stroke="white" stroke-width="4" opacity="0.1" stroke-linecap="round" />
+            
+            <path d="M 100 30 A 70 70 0 0 1 170 100" fill="none" stroke="white" stroke-width="8" opacity="0.1" stroke-linecap="round" />
+            <path d="M 40 120 A 60 60 0 0 0 80 160" fill="none" stroke="white" stroke-width="4" opacity="0.05" stroke-linecap="round" />
         </g>
 
         <g id="tonearm" style="cursor: pointer; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 160px 40px;">
@@ -268,9 +272,10 @@
             <rect x="157" y="40" width="6" height="100" rx="3" fill="#c4bca6" transform="rotate(-15, 160, 40)" />
             <rect x="135" y="130" width="12" height="20" rx="2" fill="#2c2621" transform="rotate(-15, 160, 40)" />
         </g>
-
-        <text x="100" y="180" id="recording-location" font-family="EB Garamond" font-size="8" text-anchor="middle" fill="#5d544b">Ready to Play</text>
     </svg>
+
+    <div id="recording-location" class="audio-status-label">Ready to Play</div>
+    
     <audio id="bird-audio-player" crossorigin="anonymous"></audio>
 </div>
     <!-- Bird card wiki info -->
