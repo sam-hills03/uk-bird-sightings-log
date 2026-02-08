@@ -486,47 +486,44 @@ async function showSightingModal(species, birdData) {
 async function fetchBirdSong(latinName, commonName) {
     const audioPlayer = document.getElementById('bird-audio-player');
     const recordingLoc = document.getElementById('recording-location');
-    if (!audioPlayer || !recordingLoc) return; // Safety check
+    if (!audioPlayer || !recordingLoc) return;
 
     audioPlayer.pause();
     recordingLoc.textContent = "Scanning frequencies...";
-    
-    // ... rest of your fetch code ...
-    // When success:
-    recordingLoc.textContent = "Captured: Archive Recording";
-}
 
-	// We use only the Latin Name to ensure we don't get a Great Tit for a Blue Tit
-	const query = latinName || commonName;
+    // We use the Latin Name to ensure accuracy
+    const query = latinName || commonName;
 
-	try {
-		const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=5`;
-		const response = await fetch(url);
-		const data = await response.json();
+    try {
+        const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=images&imlimit=5`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-		if (data.query && data.query.pages) {
-			const pages = data.query.pages;
-			const pageId = Object.keys(pages)[0];
-			const images = pages[pageId].images || [];
+        if (data.query && data.query.pages) {
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            const images = pages[pageId].images || [];
 
-			const audioFile = images.find(img => ['.ogg', '.oga', '.mp3'].some(ext => img.title.toLowerCase().endsWith(ext)));
+            const audioFile = images.find(img => 
+                ['.ogg', '.oga', '.mp3'].some(ext => img.title.toLowerCase().endsWith(ext))
+            );
 
-			if (audioFile) {
-				const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
-				const infoRes = await fetch(infoUrl);
-				const infoData = await infoRes.json();
-				const fileUrl = infoData.query.pages[Object.keys(infoData.query.pages)[0]].imageinfo[0].url;
+            if (audioFile) {
+                const infoUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(audioFile.title)}`;
+                const infoRes = await fetch(infoUrl);
+                const infoData = await infoRes.json();
+                const fileUrl = infoData.query.pages[Object.keys(infoData.query.pages)[0]].imageinfo[0].url;
 
-				audioPlayer.src = fileUrl;
-				recordingLoc.textContent = "Captured: Archive Recording";
-			} else {
-				recordingLoc.textContent = "No recordings found.";
-			}
-		}
-	} catch (e) {
-		console.log("Audio skipped to prevent crash.");
-		recordingLoc.textContent = "Signal lost.";
-	}
+                audioPlayer.src = fileUrl;
+                recordingLoc.textContent = "Captured: Archive Recording";
+            } else {
+                recordingLoc.textContent = "No recordings found.";
+            }
+        }
+    } catch (e) {
+        console.log("Audio skipped:", e);
+        recordingLoc.textContent = "Signal lost.";
+    }
 }
 async function attemptSecondarySearch(name) {
 	const audioPlayer = document.getElementById('bird-audio-player');
