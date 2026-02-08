@@ -451,10 +451,11 @@ async function showSightingModal(species, birdData) {
     const personalSightings = mySightings.filter(s => s.species.trim().toLowerCase() === species.trim().toLowerCase());
 
     // Fix for the SVG text element
-    const recordingLoc = document.getElementById('recording-location');
-    if (recordingLoc) {
-        recordingLoc.textContent = "Tuning signal...";
-    }
+    // Inside showSightingModal
+const recordingLoc = document.getElementById('recording-location');
+if (recordingLoc) {
+    recordingLoc.textContent = "Scanning frequencies...";
+}
 
     // Update the record label to show the bird name
     const svgLabel = document.getElementById('svg-label-text');
