@@ -1622,3 +1622,48 @@ hr {
     width: 100% !important;
     height: 100% !important;
 }
+.registry-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-image: url('https://www.transparenttextures.com/patterns/lined-paper-2.png');
+}
+
+.registry-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    font-weight: bold;
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: 10px;
+    color: var(--color-secondary);
+    font-variant: small-caps;
+    letter-spacing: 1px;
+}
+
+.registry-entry {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.registry-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+}
+
+.registry-rank-badge {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    width: fit-content;
+    color: white;
+}
+
+.registry-count {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
