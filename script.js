@@ -1636,98 +1636,35 @@ function createRarityChart() {
 }
 
 function getExpeditionData(date, location) {
-	// Filter sightings for this specific trip
-	const tripSightings = mySightings.filter(s => s.date === date && s.location === location);
+    const tripSightings = mySightings.filter(s => s.date === date && s.location === location);
+    if (tripSightings.length === 0) return null;
 
-	if (tripSightings.length === 0) return null;
+    let rarestBird = tripSightings[0].species;
+    let highestRarityValue = 0;
+    const rarityRank = { "Common": 1, "Local": 2, "Scarce": 3, "Rare": 4, "Mega": 5 };
 
-	// Find the rarest bird in this group
-	// We look up each bird in allUKBirds to get its Rarity rank
-	let rarestBird = tripSightings[0].species;
-	let highestRarityValue = 0;
-	const rarityRank = {
-		"Common": 1,
-		"Local": 2,
-		"Scarce": 3,
-		"Rare": 4,
-		"Mega": 5
-	};
+    tripSightings.forEach(s => {
+        const birdInfo = allUKBirds.find(b => b.CommonName === s.species);
+        const currentRank = birdInfo ? rarityRank[birdInfo.Rarity] || 0 : 0;
+        if (currentRank > highestRarityValue) {
+            highestRarityValue = currentRank;
+            rarestBird = s.species;
+        }
+    });
 
-	tripSightings.forEach(s => {
-		const birdInfo = allUKBirds.find(b => b.CommonName === s.species);
-		const currentRank = birdInfo ? rarityRank[birdInfo.Rarity] || 0 : 0;
-		if (currentRank > highestRarityValue) {
-			highestRarityValue = currentRank;
-			rarestBird = s.species;
-		}
-	});
-
-	return {
-		date: date,
-		location: location,
-		speciesCount: new Set(tripSightings.map(s => s.species)).size,
-		rarestSpecies: rarestBird,
-		allSpecies: Array.from(new Set(tripSightings.map(s => s.species)))
-	};
+    return {
+        date: date,
+        location: location,
+        speciesCount: new Set(tripSightings.map(s => s.species)).size,
+        rarestSpecies: rarestBird,
+        allSpecies: Array.from(new Set(tripSightings.map(s => s.species)))
+    };
 }
+
 async function fetchRegistryData() {
     const listContainer = document.getElementById('leaderboard-list');
     if (!listContainer) return;
 
-    // Helper function moved inside so it's always available
-    const getRankInfo = (count) => {
-        if (count >= 300) return { name: "Aquiline", color: "#a4624c" };
-        if (count >= 150) return { name: "Falconiform", color: "#a1b5aa" };
-        if (count >= 50) return { name: "Charadriiform", color: "#dfa478" };
-        if (count >= 10) return { name: "Corvid", color: "#cbb093" };
-        return { name: "Passerine", color: "#f5e0c5" };
-    };
-
-    try {
-        const [sightingsRes, profilesRes] = await Promise.all([
-            supabaseClient.from('sightings').select('user_id, species'),
-            supabaseClient.from('profiles').select('id, username')
-        ]);
-
-        if (sightingsRes.error) throw sightingsRes.error;
-
-        // DEBUG: See if data is actually arriving
-        console.log("Registry sightings:", sightingsRes.data);
-        console.log("Registry profiles:", profilesRes.data);
-
-        const nameMap = {};
-        if (profilesRes.data) {
-            profilesRes.data.forEach(p => {
-                nameMap[p.id] = p.username;
-            });
-        }
-
-        const userStats = {};
-        sightingsRes.data.forEach(s => {
-            // Ensure ID is treated as a string to avoid mismatch
-            const uid = String(s.user_id);
-            if (!userStats[uid]) userStats[uid] = new Set();
-            userStats[uid].add(s.species);
-        });
-
-        const leaderboard = Object.keys(userStats).map(uid => ({
-            id: uid,
-            username: nameMap[uid] || `Observer ${uid.substring(0, 5)}`,
-            count: userStats[uid].size
-        })).sort((a, b) => b.count - a.count);
-
-        listContainer.innerHTML = '';
-        const { data: { user } } = await supabaseClient.auth.getUser();
-
-        if (leaderboard.length === 0) {
-            listContainer.innerHTML = '<p class="loading-text">No distinguished observers found in the archives.</p>';
-            return;
-        }
-
-        async function fetchRegistryData() {
-    const listContainer = document.getElementById('leaderboard-list');
-    if (!listContainer) return;
-
     const getRankInfo = (count) => {
         if (count >= 300) return { name: "Aquiline", color: "#a4624c" };
         if (count >= 150) return { name: "Falconiform", color: "#a1b5aa" };
@@ -1768,17 +1705,17 @@ async function fetchRegistryData() {
         const { data: { user } } = await supabaseClient.auth.getUser();
 
         if (leaderboard.length === 0) {
-            listContainer.innerHTML = '<p class="loading-text">No distinguished observers found in the archives.</p>';
+            listContainer.innerHTML = '<p class="loading-text">No distinguished observers found.</p>';
             return;
         }
 
-        // Render each observer
+        // Render rows
         leaderboard.forEach((obs, index) => {
             const rank = getRankInfo(obs.count);
             const entry = document.createElement('div');
             entry.className = 'registry-entry';
-            
             const isMe = user && String(obs.id) === String(user.id);
+            
             if (isMe) {
                 entry.style.backgroundColor = "rgba(65, 104, 99, 0.1)";
                 entry.style.borderLeft = "4px solid var(--color-primary)";
@@ -1792,7 +1729,7 @@ async function fetchRegistryData() {
             listContainer.appendChild(entry);
         });
 
-        // Add the footer once at the very end
+        // Add the single footer
         const grandTotal = sightingsRes.data.length;
         const footer = document.createElement('div');
         footer.className = 'registry-footer';
