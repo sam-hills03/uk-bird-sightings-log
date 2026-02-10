@@ -1724,6 +1724,60 @@ async function fetchRegistryData() {
             return;
         }
 
+        async function fetchRegistryData() {
+    const listContainer = document.getElementById('leaderboard-list');
+    if (!listContainer) return;
+
+    // Helper function moved inside so it's always available
+    const getRankInfo = (count) => {
+        if (count >= 300) return { name: "Aquiline", color: "#a4624c" };
+        if (count >= 150) return { name: "Falconiform", color: "#a1b5aa" };
+        if (count >= 50) return { name: "Charadriiform", color: "#dfa478" };
+        if (count >= 10) return { name: "Corvid", color: "#cbb093" };
+        return { name: "Passerine", color: "#f5e0c5" };
+    };
+
+    try {
+        const [sightingsRes, profilesRes] = await Promise.all([
+            supabaseClient.from('sightings').select('user_id, species'),
+            supabaseClient.from('profiles').select('id, username')
+        ]);
+
+        if (sightingsRes.error) throw sightingsRes.error;
+
+        // DEBUG: See if data is actually arriving
+        console.log("Registry sightings:", sightingsRes.data);
+        console.log("Registry profiles:", profilesRes.data);
+
+        const nameMap = {};
+        if (profilesRes.data) {
+            profilesRes.data.forEach(p => {
+                nameMap[p.id] = p.username;
+            });
+        }
+
+        const userStats = {};
+        sightingsRes.data.forEach(s => {
+            // Ensure ID is treated as a string to avoid mismatch
+            const uid = String(s.user_id);
+            if (!userStats[uid]) userStats[uid] = new Set();
+            userStats[uid].add(s.species);
+        });
+
+        const leaderboard = Object.keys(userStats).map(uid => ({
+            id: uid,
+            username: nameMap[uid] || `Observer ${uid.substring(0, 5)}`,
+            count: userStats[uid].size
+        })).sort((a, b) => b.count - a.count);
+
+        listContainer.innerHTML = '';
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
+        if (leaderboard.length === 0) {
+            listContainer.innerHTML = '<p class="loading-text">No distinguished observers found in the archives.</p>';
+            return;
+        }
+
         leaderboard.forEach((obs, index) => {
             const rank = getRankInfo(obs.count);
             const entry = document.createElement('div');
