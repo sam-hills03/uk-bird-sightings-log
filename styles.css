@@ -501,7 +501,7 @@ h3 {
 }
 
 #stats-page span {
-  color: #fdfaf0;
+  color: #2c2c2c
 }
 #stats-view {
   min-height: 500px; /* Ensures the parchment "stretches" to fit the chart */
