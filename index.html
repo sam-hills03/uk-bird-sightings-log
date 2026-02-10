@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -77,6 +79,7 @@
         <button class="tab-button" data-tab="checklist-view">Raw Checklist</button>
         <button class="tab-button" data-tab="summary-view">Species Summary</button>
         <button class="tab-button" data-tab="stats-view">My Stats</button>
+        <button class="tab-button" data-tab="map-tab">Sightings Map</button>
     </div>
 <!-- UK birds database tab -->
     <section id="database-view" class="tab-content active-content">
@@ -205,6 +208,14 @@
             <div class="select-arrow">▼</div>
         </div>
     </div>
+    <!-- Map tab -->
+    <div id="map-tab" class="tab-content" style="display: none;">
+    <div class="map-header">
+        <h2 class="archive-title">Geographic Archives</h2>
+        <p class="archive-subtitle">Every recorded sighting across the landscape.</p>
+    </div>
+    <div id="bird-map"></div>
+</div>
     <!-- Milestones section -->
             <div class="milestones-container">
                 <h3> Field Milestones</h3>
