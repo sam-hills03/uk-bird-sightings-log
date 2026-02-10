@@ -1596,15 +1596,15 @@ hr {
     gap: 20px;
     margin-top: 20px;
     width: 100%;
-    max-width: 100%; /* Prevents horizontal growth */
-    overflow: hidden; /* Safety kill-switch for expansion */
+    max-width: 100%; 
+    overflow: overlay; 
 }
 
 .chart-container {
     position: relative;
     height: 300px; /* MUST be a fixed pixel value */
     width: 100%;
-    padding: 10px;
+    padding: 0px;
     background-color: var(--color-background-soft);
     border: 1px solid var(--color-border);
     border-radius: 8px;
