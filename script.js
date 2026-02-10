@@ -1674,27 +1674,40 @@ async function fetchRegistryData() {
     const listContainer = document.getElementById('leaderboard-list');
     if (!listContainer) return;
 
+    // Helper function moved inside so it's always available
+    const getRankInfo = (count) => {
+        if (count >= 300) return { name: "Aquiline", color: "#d4af37" };
+        if (count >= 150) return { name: "Falconiform", color: "#2c2621" };
+        if (count >= 50) return { name: "Charadriiform", color: "#416863" };
+        if (count >= 10) return { name: "Corvid", color: "#5d544b" };
+        return { name: "Passerine", color: "#8c2e1b" };
+    };
+
     try {
-        // 1. Fetch sightings AND profiles in parallel for speed
         const [sightingsRes, profilesRes] = await Promise.all([
-    supabaseClient.from('sightings').select('user_id, species'),
-    supabaseClient.from('profiles').select('id, username')
+            supabaseClient.from('sightings').select('user_id, species'),
+            supabaseClient.from('profiles').select('id, username')
         ]);
 
         if (sightingsRes.error) throw sightingsRes.error;
 
-        // 2. Map IDs to Usernames for easy lookup
-       const nameMap = {};
+        // DEBUG: See if data is actually arriving
+        console.log("Registry sightings:", sightingsRes.data);
+        console.log("Registry profiles:", profilesRes.data);
+
+        const nameMap = {};
         if (profilesRes.data) {
             profilesRes.data.forEach(p => {
                 nameMap[p.id] = p.username;
-            }); // <--- YOU WERE MISSING THIS });
+            });
         }
-        // 3. Process sightings into counts
+
         const userStats = {};
         sightingsRes.data.forEach(s => {
-            if (!userStats[s.user_id]) userStats[s.user_id] = new Set();
-            userStats[s.user_id].add(s.species);
+            // Ensure ID is treated as a string to avoid mismatch
+            const uid = String(s.user_id);
+            if (!userStats[uid]) userStats[uid] = new Set();
+            userStats[uid].add(s.species);
         });
 
         const leaderboard = Object.keys(userStats).map(uid => ({
@@ -1703,25 +1716,35 @@ async function fetchRegistryData() {
             count: userStats[uid].size
         })).sort((a, b) => b.count - a.count);
 
-        // 4. Render
         listContainer.innerHTML = '';
         const { data: { user } } = await supabaseClient.auth.getUser();
+
+        if (leaderboard.length === 0) {
+            listContainer.innerHTML = '<p class="loading-text">No distinguished observers found in the archives.</p>';
+            return;
+        }
 
         leaderboard.forEach((obs, index) => {
             const rank = getRankInfo(obs.count);
             const entry = document.createElement('div');
             entry.className = 'registry-entry';
-            if (user && obs.id === user.id) entry.style.backgroundColor = "rgba(65, 104, 99, 0.05)";
+            
+            // Highlight your row
+            if (user && String(obs.id) === String(user.id)) {
+                entry.style.backgroundColor = "rgba(65, 104, 99, 0.1)";
+                entry.style.borderLeft = "4px solid var(--color-primary)";
+            }
 
             entry.innerHTML = `
-                <span class="registry-name">${index + 1}. ${obs.username} ${user && obs.id === user.id ? '(You)' : ''}</span>
+                <span class="registry-name">${index + 1}. ${obs.username} ${user && String(obs.id) === String(user.id) ? '(You)' : ''}</span>
                 <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
-                <span class="registry-count">${obs.count} Species</span>
+                <span class="registry-count">${user.count} Species</span>
             `;
             listContainer.appendChild(entry);
         });
     } catch (err) {
         console.error("Registry failed:", err);
+        listContainer.innerHTML = "<p>Archives inaccessible.</p>";
     }
 }
 // 1. SIGN UP
