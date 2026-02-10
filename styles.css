@@ -1666,3 +1666,19 @@ hr {
     font-family: 'Courier New', monospace;
     font-weight: bold;
 }
+.registry-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 5px;
+    margin-top: 10px;
+    border-top: 2px solid var(--color-primary); /* A solid line to "close" the ledger */
+    font-size: 0.9rem;
+    color: var(--color-secondary);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.total-count-value {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
