@@ -1730,15 +1730,16 @@ async function fetchRegistryData() {
             entry.className = 'registry-entry';
             
             // Highlight your row
-            if (user && String(obs.id) === String(user.id)) {
+            const isMe = user && String(obs.id) === String(user.id);
+            if (isMe) {
                 entry.style.backgroundColor = "rgba(65, 104, 99, 0.1)";
                 entry.style.borderLeft = "4px solid var(--color-primary)";
             }
 
             entry.innerHTML = `
-                <span class="registry-name">${index + 1}. ${obs.username} ${user && String(obs.id) === String(user.id) ? '(You)' : ''}</span>
+                <span class="registry-name">${index + 1}. ${obs.username} ${isMe ? '(You)' : ''}</span>
                 <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
-                <span class="registry-count">${user.count} Species</span>
+                <span class="registry-count" style="font-family: 'Courier New', monospace;">${obs.count} Species</span>
             `;
             listContainer.appendChild(entry);
         });
