@@ -1894,35 +1894,35 @@ if (bugFab && bugPopup) {
 }
 
 // 2. Handle the Formspree submission
+// --- BUG REPORT / HELP FORM LOGIC ---
 if (helpForm) {
-	helpForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const data = new FormData(helpForm);
-		try {
-			const response = await fetch(helpForm.action, {
-				method: 'POST',
-				body: data,
-				headers: {
-					'Accept': 'application/json'
-				}
-			});
-			if (response.ok) {
-				formStatus.style.display = 'block';
-				formStatus.style.color = '#416863';
-				formStatus.textContent = "Thank you. The report has been filed.";
-				helpForm.reset();
-				setTimeout(() => {
-					bugPopup.style.display = 'none';
-				}, 2000);
-			}
-		} catch (error) {
-			formStatus.style.display = 'block';
-			formStatus.style.color = '#682d1f';
-			formStatus.textContent = "Submission failed.";
-		}
-	});
+    helpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(helpForm);
+        try {
+            const response = await fetch(helpForm.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                formStatus.style.display = 'block';
+                formStatus.style.color = '#416863';
+                formStatus.textContent = "Thank you. The report has been filed.";
+                helpForm.reset();
+                setTimeout(() => {
+                    if (bugPopup) bugPopup.style.display = 'none';
+                }, 2000);
+            }
+        } catch (error) {
+            formStatus.style.display = 'block';
+            formStatus.style.color = '#682d1f';
+            formStatus.textContent = "Submission failed.";
+        }
+    });
 }
-// Attach Event Listeners (Removed duplicates to prevent double-firing)
+
+// Attach Auth Event Listeners
 const signupBtn = document.getElementById('signup-btn');
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -1931,54 +1931,52 @@ if (signupBtn) signupBtn.onclick = handleSignUp;
 if (loginBtn) loginBtn.onclick = handleLogin;
 if (logoutBtn) logoutBtn.onclick = handleLogout;
 
-// 1. Setup Search and Filters
+// Setup Filters
 setupSearchBar();
-
 const rarityFilterEl = document.getElementById('rarity-filter');
 if (rarityFilterEl) {
-	rarityFilterEl.addEventListener('change', filterAndDisplayBirds);
+    rarityFilterEl.addEventListener('change', filterAndDisplayBirds);
 }
 
 window.handleSummaryFilterChange = function(value) {
-	currentSummaryRarityFilter = value;
-	displaySeenBirdsSummary();
+    currentSummaryRarityFilter = value;
+    displaySeenBirdsSummary();
 };
 
-// 2. Setup Expedition Hub
+// Expedition Hub Setup
 setupExpeditionSearch();
 
-// 3. Audio & Modal Listener
+// Main Global Click Listener
 document.addEventListener('click', function(e) {
-	const birdCard = e.target.closest('.bird-card');
-	if (birdCard) {
-		if (!e.target.closest('.image-verify-overlay')) {
-			const nameEl = birdCard.querySelector('.card-common-name');
-			if (nameEl) {
-				const speciesName = nameEl.textContent;
-				const bird = allUKBirds.find(b => b.CommonName === speciesName);
-				if (bird) {
-					const sightings = mySightings.filter(s => s.species === bird.CommonName);
-					showSightingModal(bird.CommonName, bird, sightings);
-					fetchBirdSong(bird.LatinName, bird.CommonName);
-				}
-			}
-		}
-	}
+    const birdCard = e.target.closest('.bird-card');
+    if (birdCard && !e.target.closest('.image-verify-overlay')) {
+        const nameEl = birdCard.querySelector('.card-common-name');
+        if (nameEl) {
+            const speciesName = nameEl.textContent;
+            const bird = allUKBirds.find(b => b.CommonName === speciesName);
+            if (bird) {
+                const sightings = mySightings.filter(s => s.species === bird.CommonName);
+                showSightingModal(bird.CommonName, bird, sightings);
+                fetchBirdSong(bird.LatinName, bird.CommonName);
+            }
+        }
+    }
 
-	if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
-		const audioPlayer = document.getElementById('bird-audio-player');
-		const disc = document.getElementById('vinyl-disc-group');
+    if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
+        const audioPlayer = document.getElementById('bird-audio-player');
+        const disc = document.getElementById('vinyl-disc-group');
         const tonearm = document.getElementById('tonearm');
         
-		if (audioPlayer) {
-			audioPlayer.pause();
+        if (audioPlayer) {
+            audioPlayer.pause();
             if (disc) disc.classList.remove('spinning-disc');
             if (tonearm) tonearm.classList.remove('arm-on-record');
-		}
-		document.getElementById('sighting-modal').style.display = 'none';
-	}
+        }
+        const modal = document.getElementById('sighting-modal');
+        if (modal) modal.style.display = 'none';
+    }
 });
 
-// 4. Initialize Player and KICK OFF APP
+// Final Initializations
 setupAudioPlayer();
 loadUKBirds();
