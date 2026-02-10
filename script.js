@@ -1485,8 +1485,6 @@ function getFilteredSightings() {
 	});
 }
 
-let birdChart = null;
-
 function createMonthlyChart() {
 	const ctx = document.getElementById('monthly-chart');
 	if (!ctx) return;
