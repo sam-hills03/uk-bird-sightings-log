@@ -510,7 +510,6 @@ h3 {
 #stats-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 /* Seen Birds Summary Styles */
