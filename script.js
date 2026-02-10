@@ -1765,26 +1765,41 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
+    // 1. Initialize the map
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    // 1. Create the cluster group
+    // 2. Create the Cluster Group (The "Heavy Lifter")
     const markers = L.markerClusterGroup();
 
-    const { data: sightings } = await supabaseClient
+    // 3. Fetch sightings with coordinates
+    const { data: sightings, error } = await supabaseClient
         .from('sightings')
         .select('species, location, date, lat, lng')
         .not('lat', 'is', null);
 
+    if (error) return console.error("Map fetch failed:", error);
+
+    // 4. Loop through and add to the CLUSTER, not the map directly
     sightings.forEach(s => {
         const marker = L.marker([s.lat, s.lng]);
-        marker.bindPopup(`<strong>${s.species}</strong><br>${s.location}`);
+
+        // Merging your vintage popup style here
+        marker.bindPopup(`
+            <div style="font-family: 'EB Garamond', serif;">
+                <strong style="font-size: 1.1rem; color: #8c2e1b;">${s.species}</strong><br>
+                <span style="font-style: italic;">${s.location}</span><br>
+                <small>${new Date(s.date).toLocaleDateString('en-GB')}</small>
+            </div>
+        `);
         
-        // 2. Add marker to the cluster instead of the map
+        // Add marker to cluster
         markers.addLayer(marker);
     });
 
-    // 3. Add the whole group to the map at once
+    // 5. Finally, add the cluster group to the map
     map.addLayer(markers);
 }
 
