@@ -249,6 +249,7 @@ function switchTab(targetTabId) {
 
         if (targetTabId === 'stats-view') {
             calculateAndDisplayStats();
+			fetchRegistryData()
             
             if (birdChart) birdChart.destroy();
             if (rarityChart) rarityChart.destroy();
@@ -1669,7 +1670,67 @@ function getExpeditionData(date, location) {
 		allSpecies: Array.from(new Set(tripSightings.map(s => s.species)))
 	};
 }
+async function fetchRegistryData() {
+    const listContainer = document.getElementById('leaderboard-list');
+    if (!listContainer) return;
 
+    try {
+        // 1. Fetch species counts grouped by user_id
+        // Note: This requires your 'sightings' table to have 'user_id' and 'species' columns
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('user_id, species');
+
+        if (error) throw error;
+
+        // 2. Process the data into unique counts per user
+        const userStats = {};
+        data.forEach(s => {
+            if (!userStats[s.user_id]) {
+                userStats[s.user_id] = new Set();
+            }
+            userStats[s.user_id].add(s.species);
+        });
+
+        // 3. Convert to an array and sort by count (highest first)
+        const leaderboard = Object.keys(userStats).map(uid => ({
+            id: uid,
+            count: userStats[uid].size
+        })).sort((a, b) => b.count - a.count);
+
+        // 4. Render the list
+        listContainer.innerHTML = '';
+        
+        // Ranking labels helper (reusing your rank logic)
+        const getRankInfo = (count) => {
+            if (count >= 300) return { name: "Aquiline", color: "#d4af37" };
+            if (count >= 150) return { name: "Falconiform", color: "#2c2621" };
+            if (count >= 50) return { name: "Charadriiform", color: "#416863" };
+            if (count >= 10) return { name: "Corvid", color: "#5d544b" };
+            return { name: "Passerine", color: "#8c2e1b" };
+        };
+
+        leaderboard.forEach((user, index) => {
+            const rank = getRankInfo(user.count);
+            const entry = document.createElement('div');
+            entry.className = 'registry-entry';
+            
+            // We use 'Observer #ID' or you can fetch profiles if you have a profiles table
+            const displayName = user.id === ADMIN_UID ? "Master Naturalist" : `Observer ${user.id.substring(0, 5)}`;
+
+            entry.innerHTML = `
+                <span class="registry-name">${index + 1}. ${displayName}</span>
+                <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
+                <span class="registry-count">${user.count} Species</span>
+            `;
+            listContainer.appendChild(entry);
+        });
+
+    } catch (err) {
+        console.error("Registry fetch failed:", err);
+        listContainer.innerHTML = "<p>The archives are currently sealed.</p>";
+    }
+}
 // 1. SIGN UP
 async function handleSignUp() {
 	const email = document.getElementById('auth-email').value;
