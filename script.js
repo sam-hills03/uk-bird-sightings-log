@@ -1676,11 +1676,11 @@ async function fetchRegistryData() {
 
     // Helper function moved inside so it's always available
     const getRankInfo = (count) => {
-        if (count >= 300) return { name: "Aquiline", color: "#d4af37" };
-        if (count >= 150) return { name: "Falconiform", color: "#2c2621" };
-        if (count >= 50) return { name: "Charadriiform", color: "#416863" };
-        if (count >= 10) return { name: "Corvid", color: "#5d544b" };
-        return { name: "Passerine", color: "#8c2e1b" };
+        if (count >= 300) return { name: "Aquiline", color: "#a4624c" };
+        if (count >= 150) return { name: "Falconiform", color: "#a1b5aa" };
+        if (count >= 50) return { name: "Charadriiform", color: "#dfa478" };
+        if (count >= 10) return { name: "Corvid", color: "#cbb093" };
+        return { name: "Passerine", color: "#f5e0c5" };
     };
 
     try {
