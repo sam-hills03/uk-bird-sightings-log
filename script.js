@@ -1677,16 +1677,17 @@ async function fetchRegistryData() {
     try {
         // 1. Fetch sightings AND profiles in parallel for speed
         const [sightingsRes, profilesRes] = await Promise.all([
-            supabaseClient.from('sightings').select('user_id, species'),
-            supabaseClient.from('profiles').select('id, username')
+    supabaseClient.from('sightings').select('user_id, species'),
+    supabaseClient.from('profiles').select('id, username')
         ]);
 
         if (sightingsRes.error) throw sightingsRes.error;
 
         // 2. Map IDs to Usernames for easy lookup
         const nameMap = {};
-        if (profilesRes.data) {
-            profilesRes.data.forEach(p => nameMap[p.id] = p.username);
+if (profilesRes.data) {
+    profilesRes.data.forEach(p => {
+        nameMap[p.id] = p.username;
         }
 
         // 3. Process sightings into counts
