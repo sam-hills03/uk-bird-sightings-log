@@ -1687,8 +1687,9 @@ hr {
 }
 
 #bird-map {
-    height: 600px; /* Tall enough to see Worthing and surroundings */
+    height: 600px !important;
     width: 100%;
+    display: block !important;
     border-radius: 12px;
     border: 1px solid var(--color-primary);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
