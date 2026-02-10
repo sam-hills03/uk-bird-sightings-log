@@ -1710,21 +1710,34 @@ async function fetchRegistryData() {
             return { name: "Passerine", color: "#8c2e1b" };
         };
 
-        leaderboard.forEach((user, index) => {
-            const rank = getRankInfo(user.count);
-            const entry = document.createElement('div');
-            entry.className = 'registry-entry';
-            
-            // We use 'Observer #ID' or you can fetch profiles if you have a profiles table
-            const displayName = user.id === ADMIN_UID ? "Master Naturalist" : `Observer ${user.id.substring(0, 5)}`;
+        // Get your current user ID to identify yourself in the ledger
+const { data: { user } } = await supabaseClient.auth.getUser();
+const myId = user ? user.id : null;
+const myEmailPrefix = user ? user.email.split('@')[0] : "Observer";
 
-            entry.innerHTML = `
-                <span class="registry-name">${index + 1}. ${displayName}</span>
-                <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
-                <span class="registry-count">${user.count} Species</span>
-            `;
-            listContainer.appendChild(entry);
-        });
+leaderboard.forEach((observer, index) => {
+    const rank = getRankInfo(observer.count);
+    const entry = document.createElement('div');
+    entry.className = 'registry-entry';
+    
+    // Logic: If it's YOU, use your email prefix. If not, use the anonymous ID.
+    let displayName;
+    if (observer.id === myId) {
+        displayName = `${myEmailPrefix} (You)`;
+        entry.style.backgroundColor = "rgba(65, 104, 99, 0.05)"; // Slight highlight for your row
+    } else if (observer.id === ADMIN_UID) {
+        displayName = "Master Naturalist";
+    } else {
+        displayName = `Observer ${observer.id.substring(0, 5)}`;
+    }
+
+    entry.innerHTML = `
+        <span class="registry-name">${index + 1}. ${displayName}</span>
+        <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
+        <span class="registry-count">${observer.count} Species</span>
+    `;
+    listContainer.appendChild(entry);
+});
 
     } catch (err) {
         console.error("Registry fetch failed:", err);
