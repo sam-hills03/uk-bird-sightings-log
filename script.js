@@ -247,12 +247,14 @@ function switchTab(targetTabId) {
 		targetContent.style.display = 'block'; 
 
 		if (targetTabId === 'stats-view') {
-			console.log("📊 Refreshing Stats Page...");
-			calculateAndDisplayStats();
-			createRarityChart();
-			if (typeof createMonthlyChart === 'function') createMonthlyChart();
-		}
-	}
+    calculateAndDisplayStats();
+    // Use setTimeout to give the browser a millisecond to render the 
+    // container before the chart engine tries to measure it.
+    setTimeout(() => {
+        createMonthlyChart();
+        createRarityChart();
+    }, 50); 
+}}
 }
 
 // Pagnation on the raw checklist page
