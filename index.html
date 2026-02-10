@@ -181,21 +181,30 @@
             <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
             <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
     <!-- Line chart -->
-            <h3>Sightings Over Time</h3>
+            <div class="stats-dashboard-grid">
+        <div class="chart-container vintage-panel">
+            <h3 class="serif-subtitle">Observation Trends</h3>
             <canvas id="monthly-chart"></canvas>
+        </div>
+
+        <div class="chart-container vintage-panel">
+            <h3 class="serif-subtitle">Collection Rarity</h3>
+            <canvas id="rarity-pie-chart"></canvas>
+        </div>
+    </div>
     <!-- Year selector under chart -->
             <div class="year-filter-container vintage-panel">
-                <div class="vintage-select-wrapper">
-                    <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
-                    <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
-                        <option value="Lifetime">LIFETIME LOG</option>
-                        <option value="2026">ANNUAL LOG: 2026</option>
-                        <option value="2025">ANNUAL LOG: 2025</option>
-                        <option value="2024">ANNUAL LOG: 2024</option>
-                    </select>
-                    <div class="select-arrow">▼</div>
-                </div>
-            </div>
+        <div class="vintage-select-wrapper">
+            <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
+            <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
+                <option value="Lifetime">LIFETIME LOG</option>
+                <option value="2026">ANNUAL LOG: 2026</option>
+                <option value="2025">ANNUAL LOG: 2025</option>
+                <option value="2024">ANNUAL LOG: 2024</option>
+            </select>
+            <div class="select-arrow">▼</div>
+        </div>
+    </div>
     <!-- Milestones section -->
             <div class="milestones-container">
                 <h3> Field Milestones</h3>
@@ -239,6 +248,7 @@
                 </div>
             </div>
     </section>
+    
 <!-- Bird cards after click -->
     <div id="sighting-modal" class="modal">
         <div class="modal-content">
