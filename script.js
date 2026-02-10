@@ -1765,28 +1765,28 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
-    // 1. Initialize the map (centered on Worthing)
-    // view is [latitude, longitude], zoom level 13
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
-	// A test pin on Worthing Pier
-L.marker([50.806, -0.371]).addTo(map).bindPopup("Test Pin: Worthing Pier");
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // 2. Add the "Skin" of the map (OpenStreetMap tiles)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+    // 1. Create the cluster group
+    const markers = L.markerClusterGroup();
 
-    // 3. Fetch ONLY the sightings that have coordinates
-    const { data: sightings, error } = await supabaseClient
+    const { data: sightings } = await supabaseClient
         .from('sightings')
         .select('species, location, date, lat, lng')
         .not('lat', 'is', null);
 
-    if (error) {
-        console.error("Map data fetch failed:", error);
-        return;
-    }
+    sightings.forEach(s => {
+        const marker = L.marker([s.lat, s.lng]);
+        marker.bindPopup(`<strong>${s.species}</strong><br>${s.location}`);
+        
+        // 2. Add marker to the cluster instead of the map
+        markers.addLayer(marker);
+    });
+
+    // 3. Add the whole group to the map at once
+    map.addLayer(markers);
+}
 
     // 4. Drop the pins!
     sightings.forEach(s => {
