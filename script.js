@@ -1765,32 +1765,39 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
-    // 1. Initialize the map centered on Worthing
-    // [50.81, -0.37] is Worthing's rough center
+    // 1. Initialize the map (centered on Worthing)
+    // view is [latitude, longitude], zoom level 13
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
 
-    // 2. Add the OpenStreetMap tiles (the actual map images)
+    // 2. Add the "Skin" of the map (OpenStreetMap tiles)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 3. Fetch sightings that have coordinates
+    // 3. Fetch ONLY the sightings that have coordinates
     const { data: sightings, error } = await supabaseClient
         .from('sightings')
         .select('species, location, date, lat, lng')
         .not('lat', 'is', null);
 
-    if (error) return console.error("Map fetch failed:", error);
+    if (error) {
+        console.error("Map data fetch failed:", error);
+        return;
+    }
 
-    // 4. Drop the pins
+    // 4. Drop the pins!
     sightings.forEach(s => {
+        // Create a marker for each coordinate
         const marker = L.marker([s.lat, s.lng]).addTo(map);
-        
-        // Add a "Popup" so when you click a pin, it tells you the bird
+
+        // Add a "Naturalist Note" popup when clicked
         marker.bindPopup(`
-            <strong>${s.species}</strong><br>
-            ${s.location}<br>
-            <small>${new Date(s.date).toLocaleDateString()}</small>
+            <div style="font-family: 'EB Garamond', serif;">
+                <strong style="font-size: 1.1rem; color: #8c2e1b;">${s.species}</strong><br>
+                <span style="font-style: italic;">${s.location}</span><br>
+                <small>${new Date(s.date).toLocaleDateString('en-GB')}</small>
+            </div>
         `);
     });
 }
