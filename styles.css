@@ -1602,7 +1602,9 @@ hr {
     background-color: var(--color-background-soft);
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    min-height: 350px;
+    position: relative;
+    height: 350px;      
+    width: 100%;
 }
 
 .serif-subtitle {
