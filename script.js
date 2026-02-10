@@ -1767,11 +1767,12 @@ async function fetchRegistryData() {
 async function initBirdMap() {
     // 1. Initialize the map
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 2. Create the Cluster Group (The "Heavy Lifter")
+    // 2. Create the Cluster Group (The "Heavy Lifter" for performance)
     const markers = L.markerClusterGroup();
 
     // 3. Fetch sightings with coordinates
@@ -1780,13 +1781,15 @@ async function initBirdMap() {
         .select('species, location, date, lat, lng')
         .not('lat', 'is', null);
 
-    if (error) return console.error("Map fetch failed:", error);
+    if (error) {
+        console.error("Map fetch failed:", error);
+        return;
+    }
 
-    // 4. Loop through and add to the CLUSTER, not the map directly
+    // 4. Loop through and add to the CLUSTER
     sightings.forEach(s => {
         const marker = L.marker([s.lat, s.lng]);
 
-        // Merging your vintage popup style here
         marker.bindPopup(`
             <div style="font-family: 'EB Garamond', serif;">
                 <strong style="font-size: 1.1rem; color: #8c2e1b;">${s.species}</strong><br>
@@ -1795,28 +1798,12 @@ async function initBirdMap() {
             </div>
         `);
         
-        // Add marker to cluster
+        // Add marker to the cluster group
         markers.addLayer(marker);
     });
 
-    // 5. Finally, add the cluster group to the map
+    // 5. Add the whole cluster group to the map
     map.addLayer(markers);
-}
-
-    // 4. Drop the pins!
-    sightings.forEach(s => {
-        // Create a marker for each coordinate
-        const marker = L.marker([s.lat, s.lng]).addTo(map);
-
-        // Add a "Naturalist Note" popup when clicked
-        marker.bindPopup(`
-            <div style="font-family: 'EB Garamond', serif;">
-                <strong style="font-size: 1.1rem; color: #8c2e1b;">${s.species}</strong><br>
-                <span style="font-style: italic;">${s.location}</span><br>
-                <small>${new Date(s.date).toLocaleDateString('en-GB')}</small>
-            </div>
-        `);
-    });
 }
 
 // 1. SIGN UP
