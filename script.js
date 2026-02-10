@@ -1325,31 +1325,31 @@ function calculateAndDisplayStats() {
 			name: "Passerine",
 			level: "1",
 			threshold: 0,
-			color: "#8c2e1b"
+			color: "#f5e0c5"
 		},
 		{
 			name: "Corvid",
 			level: "2",
 			threshold: 10,
-			color: "#5d544b"
+			color: "#cbb093"
 		},
 		{
 			name: "Charadriiform",
 			level: "3",
 			threshold: 50,
-			color: "#416863"
+			color: "#dfa478"
 		},
 		{
 			name: "Falconiform",
 			level: "4",
 			threshold: 150,
-			color: "#2c2621"
+			color: "#a1b5aa"
 		},
 		{
 			name: "Aquiline",
 			level: "5",
 			threshold: 300,
-			color: "#d4af37"
+			color: "#a4624c"
 		}
 	];
 
