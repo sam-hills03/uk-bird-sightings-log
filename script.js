@@ -26,6 +26,9 @@ let currentSearchQuery = '';
 // Audio display
 let audioContext, analyser, dataArray, animationId;
 
+// Map display
+let map; // Global variable to store the map instance
+
 // Containers
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
@@ -1758,6 +1761,40 @@ async function fetchRegistryData() {
         listContainer.innerHTML = "<p>Archives inaccessible.</p>";
     }
 }
+
+// Map setup
+
+async function initBirdMap() {
+    // 1. Initialize the map centered on Worthing
+    // [50.81, -0.37] is Worthing's rough center
+    map = L.map('bird-map').setView([50.8139, -0.3711], 13);
+
+    // 2. Add the OpenStreetMap tiles (the actual map images)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3. Fetch sightings that have coordinates
+    const { data: sightings, error } = await supabaseClient
+        .from('sightings')
+        .select('species, location, date, lat, lng')
+        .not('lat', 'is', null);
+
+    if (error) return console.error("Map fetch failed:", error);
+
+    // 4. Drop the pins
+    sightings.forEach(s => {
+        const marker = L.marker([s.lat, s.lng]).addTo(map);
+        
+        // Add a "Popup" so when you click a pin, it tells you the bird
+        marker.bindPopup(`
+            <strong>${s.species}</strong><br>
+            ${s.location}<br>
+            <small>${new Date(s.date).toLocaleDateString()}</small>
+        `);
+    });
+}
+
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
