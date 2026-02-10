@@ -18,6 +18,7 @@ let currentSummaryRarityFilter = 'All';
 
 // Rarity chart
 let rarityChart = null;
+let birdChart = null;
 
 // Search filter
 let currentSearchQuery = '';
@@ -1921,48 +1922,42 @@ if (helpForm) {
 		}
 	});
 }
-// Attach Event Listeners
-document.getElementById('signup-btn').addEventListener('click', handleSignUp);
-document.getElementById('login-btn').addEventListener('click', handleLogin);
-document.getElementById('logout-btn').addEventListener('click', handleLogout);
-// Start the app
-loadUKBirds();
+// Attach Event Listeners (Removed duplicates to prevent double-firing)
+const signupBtn = document.getElementById('signup-btn');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
 
-// 1. Setup the Search Bar Listener
+if (signupBtn) signupBtn.onclick = handleSignUp;
+if (loginBtn) loginBtn.onclick = handleLogin;
+if (logoutBtn) logoutBtn.onclick = handleLogout;
+
+// 1. Setup Search and Filters
 setupSearchBar();
 
-// 2. Setup the Database Rarity Filter Listener
-const rarityFilter = document.getElementById('rarity-filter');
-if (rarityFilter) {
-	rarityFilter.addEventListener('change', filterAndDisplayBirds);
+const rarityFilterEl = document.getElementById('rarity-filter');
+if (rarityFilterEl) {
+	rarityFilterEl.addEventListener('change', filterAndDisplayBirds);
 }
 
-// 3. Setup the Summary Filter (The global window function you already have)
 window.handleSummaryFilterChange = function(value) {
 	currentSummaryRarityFilter = value;
 	displaySeenBirdsSummary();
 };
-// --- EXPEDITION HUB LINKING ---
 
-// Call the Search Setup
+// 2. Setup Expedition Hub
 setupExpeditionSearch();
 
+// 3. Audio & Modal Listener
 document.addEventListener('click', function(e) {
-	// --- 1. Open Bird Details & Fetch Song ---
 	const birdCard = e.target.closest('.bird-card');
 	if (birdCard) {
-		// Only trigger if we aren't clicking the verify buttons
 		if (!e.target.closest('.image-verify-overlay')) {
 			const nameEl = birdCard.querySelector('.card-common-name');
 			if (nameEl) {
 				const speciesName = nameEl.textContent;
 				const bird = allUKBirds.find(b => b.CommonName === speciesName);
-
 				if (bird) {
-					// Pull sightings from your global source if available
-					const sightings = typeof mySightings !== 'undefined' ?
-						mySightings.filter(s => s.species === bird.CommonName) : [];
-
+					const sightings = mySightings.filter(s => s.species === bird.CommonName);
 					showSightingModal(bird.CommonName, bird, sightings);
 					fetchBirdSong(bird.LatinName, bird.CommonName);
 				}
@@ -1970,21 +1965,20 @@ document.addEventListener('click', function(e) {
 		}
 	}
 
-	// --- 2. Stop Audio when Closing Modal ---
 	if (e.target.classList.contains('modal-close') || e.target.id === 'sighting-modal') {
 		const audioPlayer = document.getElementById('bird-audio-player');
-		const gramophoneBtn = document.getElementById('gramophone-btn');
-		const modal = document.getElementById('sighting-modal');
-
+		const disc = document.getElementById('vinyl-disc-group');
+        const tonearm = document.getElementById('tonearm');
+        
 		if (audioPlayer) {
 			audioPlayer.pause();
-			audioPlayer.src = "";
-			if (gramophoneBtn) gramophoneBtn.classList.remove('playing');
+            if (disc) disc.classList.remove('spinning-disc');
+            if (tonearm) tonearm.classList.remove('arm-on-record');
 		}
-
-		if (modal) modal.style.display = 'none';
+		document.getElementById('sighting-modal').style.display = 'none';
 	}
 });
 
-// Initialize the gramophone listeners
+// 4. Initialize Player and KICK OFF APP
 setupAudioPlayer();
+loadUKBirds();
