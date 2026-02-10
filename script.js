@@ -1806,7 +1806,7 @@ async function fetchRegistryData() {
         console.error("Registry failed:", err);
         listContainer.innerHTML = "<p>Archives inaccessible.</p>";
     }
-}
+}}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
