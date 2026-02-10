@@ -1684,12 +1684,12 @@ async function fetchRegistryData() {
         if (sightingsRes.error) throw sightingsRes.error;
 
         // 2. Map IDs to Usernames for easy lookup
-        const nameMap = {};
-if (profilesRes.data) {
-    profilesRes.data.forEach(p => {
-        nameMap[p.id] = p.username;
+       const nameMap = {};
+        if (profilesRes.data) {
+            profilesRes.data.forEach(p => {
+                nameMap[p.id] = p.username;
+            }); // <--- YOU WERE MISSING THIS });
         }
-
         // 3. Process sightings into counts
         const userStats = {};
         sightingsRes.data.forEach(s => {
