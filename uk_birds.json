@@ -73,7 +73,7 @@
  },
  {
    "CommonName": "American Kestrel",
-   "Rarity": "Rare",
+   "Rarity": "Mega",
    "Status": "Accidental",
    "LatinName": "Falco sparverius"
  },
@@ -470,14 +470,14 @@
  {
    "CommonName": "Blyth's Reed Warbler",
    "Rarity": "Scarce",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Rare visitor",
+   "LatinName": "Acrocephalus dumetorum"
  },
  {
    "CommonName": "Bonaparte's Gull",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Rare visitor",
+   "LatinName": "Chroicocephalus philadelphia"
  },
  {
    "CommonName": "Booted Warbler",
@@ -512,8 +512,8 @@
  {
    "CommonName": "Brown Booby",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Sula leucogaster"
  },
  {
    "CommonName": "Brown Shrike",
@@ -530,8 +530,8 @@
  {
    "CommonName": "Brünnich's Guillemot",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Uria lomvia"
  },
  {
    "CommonName": "Buff-breasted Sandpiper",
@@ -614,8 +614,8 @@
  {
    "CommonName": "Cetti's Warbler",
    "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Cettia cetti"
  },
  {
    "CommonName": "Chaffinch",
@@ -692,44 +692,44 @@
  {
    "CommonName": "Common Buzzard",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Beuto beuto"
  },
  {
    "CommonName": "Common Chiffchaff",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Phylloscopus collybita"
  },
  {
    "CommonName": "Common Crane",
    "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Breeder",
+   "LatinName": "Grus grus"
  },
  {
    "CommonName": "Common Cuckoo",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Summer Visitor",
+   "LatinName": "Cuculus canorus"
  },
  {
    "CommonName": "Common Eider",
    "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Visitor",
+   "LatinName": "Somateria mollissima"
  },
  {
    "CommonName": "Common Gallinule",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidnental",
+   "LatinName": "Gallinula galeata"
  },
  {
    "CommonName": "Common Goldeneye",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Breeder",
+   "LatinName": "Bucephala clangula"
  },
  {
    "CommonName": "Common Gull",
@@ -740,26 +740,26 @@
  {
    "CommonName": "Common Kestrel",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Falco tinnunculus"
  },
  {
    "CommonName": "Common Kingfisher",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Alcedo atthis"
  },
  {
    "CommonName": "Common Linnet",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Breeder",
+   "LatinName": "Linaria cannabina"
  },
  {
    "CommonName": "Common Moorhen",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Gallinula chloropus"
  },
  {
    "CommonName": "Common Nighthawk",
@@ -770,44 +770,38 @@
  {
    "CommonName": "Common Nightingale",
    "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
- },
- {
-   "CommonName": "Common Pheasant",
-   "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Summer Visitor",
+   "LatinName": "Luscinia megarhynchos"
  },
  {
    "CommonName": "Common Pochard",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Aythya ferina"
  },
  {
    "CommonName": "Common Quail",
    "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Breeder",
+   "LatinName": "Coturnix coturnix"
  },
  {
    "CommonName": "Common Redshank",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Tringa totanus"
  },
  {
    "CommonName": "Common Redstart",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Summer Visitor",
+   "LatinName": "Phoenicurus phoenicurus"
  },
  {
    "CommonName": "Common Rock Thrush",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Monticola saxatilis"
  },
  {
    "CommonName": "Common Rosefinch",
@@ -830,20 +824,20 @@
  {
    "CommonName": "Common Shelduck",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Scarce Breeder",
+   "LatinName": "Tadorna tadorna"
  },
  {
    "CommonName": "Common Snipe",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Resident Breeder",
+   "LatinName": "Gallinago gallinago"
  },
  {
    "CommonName": "Common Swift",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Summer Visitor",
+   "LatinName": "Apus apus"
  },
  {
    "CommonName": "Common Tern",
@@ -854,8 +848,8 @@
  {
    "CommonName": "Common Whitethroat",
    "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Summer Visitor",
+   "LatinName": "Curruca communis"
  },
  {
    "CommonName": "Common Yellowthroat",
@@ -877,9 +871,9 @@
  },
  {
    "CommonName": "Cory's Shearwater",
-   "Rarity": "Local",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Rarity": "Rare",
+   "Status": "Scarce Visitor",
+   "LatinName": "Calonectris borealis"
  },
  {
    "CommonName": "Cream-coloured Courser",
@@ -901,9 +895,9 @@
  },
  {
    "CommonName": "Crossbill",
-   "Rarity": "Common",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Rarity": "Scarce",
+   "Status": "Resident Breeder",
+   "LatinName": "Loxia curvirostra"
  },
  {
    "CommonName": "Curlew Sandpiper",
@@ -968,14 +962,14 @@
  {
    "CommonName": "Eastern Black-eared Wheatear",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Oenanthe melanoleuca"
  },
  {
    "CommonName": "Eastern Bonelli's Warbler",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Phylloscopus orientalis"
  },
  {
    "CommonName": "Eastern Crowned Warbler",
@@ -1010,14 +1004,14 @@
  {
    "CommonName": "Eastern Red-rumped Swallow",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Cecropis daurica"
  },
  {
    "CommonName": "Eastern Subalpine Warbler",
    "Rarity": "Rare",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Rare Visitor",
+   "LatinName": "Curruca cantillans"
  },
  {
    "CommonName": "Eastern Yellow Wagtail",
@@ -1034,8 +1028,8 @@
  {
    "CommonName": "Egyptian Vulture",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Neophron percnopterus"
  },
  {
    "CommonName": "Elegant Tern",
@@ -1046,8 +1040,8 @@
  {
    "CommonName": "Eleonora's Falcon",
    "Rarity": "Mega",
-   "Status": "No Data",
-   "LatinName": "No Data"
+   "Status": "Accidental",
+   "LatinName": "Falco eleonorae"
  },
  {
    "CommonName": "Eurasian Bittern",
@@ -2686,6 +2680,12 @@
    "Rarity": "Common",
    "Status": "Introduced Breeder",
    "LatinName": "Psittacula krameri"
+ },
+ {
+   "CommonName": "Ring-necked Pheasant",
+   "Rarity": "Common",
+   "Status": "Resident Breeder",
+   "LatinName": "Phasianus colchicus"
  },
  {
    "CommonName": "Ringed Plover",
