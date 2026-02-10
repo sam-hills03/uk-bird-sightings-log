@@ -235,21 +235,35 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
+    // 1. Hide everything first
     tabContents.forEach(content => {
         content.classList.remove('active-content');
         content.style.display = 'none'; 
     });
-
     tabButtons.forEach(button => button.classList.remove('active'));
 
+    // 2. Show the target tab
     const targetContent = document.getElementById(targetTabId);
     if (targetContent) {
         targetContent.classList.add('active-content');
         targetContent.style.display = 'block'; 
 
-        if (targetTabId === 'stats-view') {
+        // --- NEW MAP LOGIC ---
+        if (targetTabId === 'map-tab') {
+            if (!map) {
+                // Initialize if it's the first time clicking the tab
+                initBirdMap(); 
+            } else {
+                // If map exists, refresh it so it fills the screen correctly
+                setTimeout(() => { 
+                    map.invalidateSize(); 
+                }, 200); 
+            }
+        } 
+        // --- EXISTING STATS LOGIC ---
+        else if (targetTabId === 'stats-view') {
             calculateAndDisplayStats();
-			fetchRegistryData()
+            fetchRegistryData();
             
             if (birdChart) birdChart.destroy();
             if (rarityChart) rarityChart.destroy();
