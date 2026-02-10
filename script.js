@@ -69,30 +69,30 @@ window.deleteSighting = async function(idToDelete) {
 
 // Load sightings from supabase
 async function loadSightings() {
-	try {
-		const {
-			data: {
-				user
-			}
-		} = await supabaseClient.auth.getUser();
-		if (!user) {
-			mySightings = [];
-			updateAllDisplays();
-			return;
-		}
-		const {
-			data,
-			error
-		} = await supabaseClient.from('sightings').select('*');
-		if (error) throw error;
-		if (data) {
-			mySightings = data;
-			mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
-			updateAllDisplays();
-		}
-	} catch (error) {
-		console.error("Error loading sightings:", error);
-	}
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            mySightings = [];
+            updateAllDisplays();
+            return;
+        }
+
+        // THE FIX: Added .eq('user_id', user.id) 
+        // This ensures YOUR checklist only shows YOUR birds
+        const { data, error } = await supabaseClient
+            .from('sightings')
+            .select('*')
+            .eq('user_id', user.id); 
+
+        if (error) throw error;
+        if (data) {
+            mySightings = data;
+            mySightings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            updateAllDisplays();
+        }
+    } catch (error) {
+        console.error("Error loading personal sightings:", error);
+    }
 }
 
 //Load all birds on UK birds database
