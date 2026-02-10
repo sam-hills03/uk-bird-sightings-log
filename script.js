@@ -232,36 +232,33 @@ function updateAllDisplays() {
 // ============================================
 
 function switchTab(targetTabId) {
-	const tabButtons = document.querySelectorAll('.tab-button');
-	const tabContents = document.querySelectorAll('.tab-content');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-	tabContents.forEach(content => {
-		content.classList.remove('active-content');
-		content.style.display = 'none'; 
-	});
+    tabContents.forEach(content => {
+        content.classList.remove('active-content');
+        content.style.display = 'none'; 
+    });
 
-	tabButtons.forEach(button => button.classList.remove('active'));
+    tabButtons.forEach(button => button.classList.remove('active'));
 
-	const targetContent = document.getElementById(targetTabId);
-	if (targetContent) {
-		targetContent.classList.add('active-content');
-		targetContent.style.display = 'block'; 
+    const targetContent = document.getElementById(targetTabId);
+    if (targetContent) {
+        targetContent.classList.add('active-content');
+        targetContent.style.display = 'block'; 
 
-		if (targetTabId === 'stats-view') {
-    calculateAndDisplayStats();
-    
-    // Check if charts already exist; if so, destroy them first 
-    // to clear memory before building new ones.
-    if (birdChart) birdChart.destroy();
-    if (rarityChart) rarityChart.destroy();
+        if (targetTabId === 'stats-view') {
+            calculateAndDisplayStats();
+            
+            if (birdChart) birdChart.destroy();
+            if (rarityChart) rarityChart.destroy();
 
-    // Use a tiny delay to let the HTML render its new width 
-    // before Chart.js tries to measure it.
-    setTimeout(() => {
-        createMonthlyChart();
-        createRarityChart();
-    }, 100);
-}
+            setTimeout(() => {
+                createMonthlyChart();
+                createRarityChart();
+            }, 100);
+        }
+    }
 }
 
 // Pagnation on the raw checklist page
