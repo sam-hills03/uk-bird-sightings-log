@@ -1772,7 +1772,7 @@ async function fetchRegistryData() {
             return;
         }
 
-        // --- 1. THE LOOP (ONLY for the people) ---
+        // Render each observer
         leaderboard.forEach((obs, index) => {
             const rank = getRankInfo(obs.count);
             const entry = document.createElement('div');
@@ -1790,9 +1790,9 @@ async function fetchRegistryData() {
                 <span class="registry-count" style="font-family: 'Courier New', monospace;">${obs.count} Species</span>
             `;
             listContainer.appendChild(entry);
-        }); // <--- THIS correctly closes the forEach loop
+        });
 
-        // --- 2. THE FOOTER (ONLY happens once, AFTER the loop) ---
+        // Add the footer once at the very end
         const grandTotal = sightingsRes.data.length;
         const footer = document.createElement('div');
         footer.className = 'registry-footer';
@@ -1800,7 +1800,7 @@ async function fetchRegistryData() {
             <span class="total-count-label">Total Archive Records:</span>
             <span class="total-count-value">${grandTotal}</span>
         `;
-        listContainer.appendChild(footer); //
+        listContainer.appendChild(footer);
 
     } catch (err) {
         console.error("Registry failed:", err);
