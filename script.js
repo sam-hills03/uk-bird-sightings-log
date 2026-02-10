@@ -1742,6 +1742,15 @@ async function fetchRegistryData() {
                 <span class="registry-count" style="font-family: 'Courier New', monospace;">${obs.count} Species</span>
             `;
             listContainer.appendChild(entry);
+        const grandTotal = sightingsRes.data.length;
+
+        const footer = document.createElement('div');
+        footer.className = 'registry-footer';
+        footer.innerHTML = `
+            <span class="total-count-label">Total Archive Records:</span>
+            <span class="total-count-value">${grandTotal}</span>
+        `;
+        listContainer.appendChild(footer);
         });
     } catch (err) {
         console.error("Registry failed:", err);
