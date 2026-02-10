@@ -1728,7 +1728,6 @@ async function fetchRegistryData() {
     const listContainer = document.getElementById('leaderboard-list');
     if (!listContainer) return;
 
-    // Helper function moved inside so it's always available
     const getRankInfo = (count) => {
         if (count >= 300) return { name: "Aquiline", color: "#a4624c" };
         if (count >= 150) return { name: "Falconiform", color: "#a1b5aa" };
@@ -1745,10 +1744,6 @@ async function fetchRegistryData() {
 
         if (sightingsRes.error) throw sightingsRes.error;
 
-        // DEBUG: See if data is actually arriving
-        console.log("Registry sightings:", sightingsRes.data);
-        console.log("Registry profiles:", profilesRes.data);
-
         const nameMap = {};
         if (profilesRes.data) {
             profilesRes.data.forEach(p => {
@@ -1758,7 +1753,6 @@ async function fetchRegistryData() {
 
         const userStats = {};
         sightingsRes.data.forEach(s => {
-            // Ensure ID is treated as a string to avoid mismatch
             const uid = String(s.user_id);
             if (!userStats[uid]) userStats[uid] = new Set();
             userStats[uid].add(s.species);
@@ -1778,12 +1772,12 @@ async function fetchRegistryData() {
             return;
         }
 
+        // --- 1. THE LOOP (ONLY for the people) ---
         leaderboard.forEach((obs, index) => {
             const rank = getRankInfo(obs.count);
             const entry = document.createElement('div');
             entry.className = 'registry-entry';
             
-            // Highlight your row
             const isMe = user && String(obs.id) === String(user.id);
             if (isMe) {
                 entry.style.backgroundColor = "rgba(65, 104, 99, 0.1)";
@@ -1796,16 +1790,18 @@ async function fetchRegistryData() {
                 <span class="registry-count" style="font-family: 'Courier New', monospace;">${obs.count} Species</span>
             `;
             listContainer.appendChild(entry);
-        const grandTotal = sightingsRes.data.length;
+        }); // <--- THIS correctly closes the forEach loop
 
+        // --- 2. THE FOOTER (ONLY happens once, AFTER the loop) ---
+        const grandTotal = sightingsRes.data.length;
         const footer = document.createElement('div');
         footer.className = 'registry-footer';
         footer.innerHTML = `
             <span class="total-count-label">Total Archive Records:</span>
             <span class="total-count-value">${grandTotal}</span>
         `;
-        listContainer.appendChild(footer);
-        });
+        listContainer.appendChild(footer); //
+
     } catch (err) {
         console.error("Registry failed:", err);
         listContainer.innerHTML = "<p>Archives inaccessible.</p>";
