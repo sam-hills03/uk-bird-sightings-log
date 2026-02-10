@@ -2057,7 +2057,7 @@ if (helpForm) {
     });
 }
 
-// Attach Auth Event Listeners
+// --- ATTACH AUTH EVENT LISTENERS ---
 const signupBtn = document.getElementById('signup-btn');
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -2066,7 +2066,7 @@ if (signupBtn) signupBtn.onclick = handleSignUp;
 if (loginBtn) loginBtn.onclick = handleLogin;
 if (logoutBtn) logoutBtn.onclick = handleLogout;
 
-// Setup Filters
+// --- SETUP FILTERS & SEARCH ---
 setupSearchBar();
 const rarityFilterEl = document.getElementById('rarity-filter');
 if (rarityFilterEl) {
@@ -2078,10 +2078,11 @@ window.handleSummaryFilterChange = function(value) {
     displaySeenBirdsSummary();
 };
 
-// Expedition Hub Setup
+// --- EXPEDITION HUB SETUP ---
 setupExpeditionSearch();
 
-// Main Global Click Listener
+// --- MAIN GLOBAL CLICK LISTENER ---
+// We wrap this carefully to ensure it is closed
 document.addEventListener('click', function(e) {
     const birdCard = e.target.closest('.bird-card');
     if (birdCard && !e.target.closest('.image-verify-overlay')) {
@@ -2110,8 +2111,8 @@ document.addEventListener('click', function(e) {
         const modal = document.getElementById('sighting-modal');
         if (modal) modal.style.display = 'none';
     }
-});
+}); // This correctly closes the click listener
 
-// Final Initializations
+// --- FINAL INITIALIZATIONS ---
 setupAudioPlayer();
 loadUKBirds();
