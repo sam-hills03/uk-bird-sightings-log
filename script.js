@@ -1675,92 +1675,74 @@ async function fetchRegistryData() {
     if (!listContainer) return;
 
     try {
-        // 1. Fetch species counts grouped by user_id
-        // Note: This requires your 'sightings' table to have 'user_id' and 'species' columns
-        const { data, error } = await supabaseClient
-            .from('sightings')
-            .select('user_id, species');
+        // 1. Fetch sightings AND profiles in parallel for speed
+        const [sightingsRes, profilesRes] = await Promise.all([
+            supabaseClient.from('sightings').select('user_id, species'),
+            supabaseClient.from('profiles').select('id, username')
+        ]);
 
-        if (error) throw error;
+        if (sightingsRes.error) throw sightingsRes.error;
 
-        // 2. Process the data into unique counts per user
+        // 2. Map IDs to Usernames for easy lookup
+        const nameMap = {};
+        if (profilesRes.data) {
+            profilesRes.data.forEach(p => nameMap[p.id] = p.username);
+        }
+
+        // 3. Process sightings into counts
         const userStats = {};
-        data.forEach(s => {
-            if (!userStats[s.user_id]) {
-                userStats[s.user_id] = new Set();
-            }
+        sightingsRes.data.forEach(s => {
+            if (!userStats[s.user_id]) userStats[s.user_id] = new Set();
             userStats[s.user_id].add(s.species);
         });
 
-        // 3. Convert to an array and sort by count (highest first)
         const leaderboard = Object.keys(userStats).map(uid => ({
             id: uid,
+            username: nameMap[uid] || `Observer ${uid.substring(0, 5)}`,
             count: userStats[uid].size
         })).sort((a, b) => b.count - a.count);
 
-        // 4. Render the list
+        // 4. Render
         listContainer.innerHTML = '';
-        
-        // Ranking labels helper (reusing your rank logic)
-        const getRankInfo = (count) => {
-            if (count >= 300) return { name: "Aquiline", color: "#d4af37" };
-            if (count >= 150) return { name: "Falconiform", color: "#2c2621" };
-            if (count >= 50) return { name: "Charadriiform", color: "#416863" };
-            if (count >= 10) return { name: "Corvid", color: "#5d544b" };
-            return { name: "Passerine", color: "#8c2e1b" };
-        };
+        const { data: { user } } = await supabaseClient.auth.getUser();
 
-        // Get your current user ID to identify yourself in the ledger
-const { data: { user } } = await supabaseClient.auth.getUser();
-const myId = user ? user.id : null;
-const myEmailPrefix = user ? user.email.split('@')[0] : "Observer";
+        leaderboard.forEach((obs, index) => {
+            const rank = getRankInfo(obs.count);
+            const entry = document.createElement('div');
+            entry.className = 'registry-entry';
+            if (user && obs.id === user.id) entry.style.backgroundColor = "rgba(65, 104, 99, 0.05)";
 
-leaderboard.forEach((observer, index) => {
-    const rank = getRankInfo(observer.count);
-    const entry = document.createElement('div');
-    entry.className = 'registry-entry';
-    
-    // Logic: If it's YOU, use your email prefix. If not, use the anonymous ID.
-    let displayName;
-    if (observer.id === myId) {
-        displayName = `${myEmailPrefix} (You)`;
-        entry.style.backgroundColor = "rgba(65, 104, 99, 0.05)"; // Slight highlight for your row
-    } else if (observer.id === ADMIN_UID) {
-        displayName = "Master Naturalist";
-    } else {
-        displayName = `Observer ${observer.id.substring(0, 5)}`;
-    }
-
-    entry.innerHTML = `
-        <span class="registry-name">${index + 1}. ${displayName}</span>
-        <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
-        <span class="registry-count">${observer.count} Species</span>
-    `;
-    listContainer.appendChild(entry);
-});
-
+            entry.innerHTML = `
+                <span class="registry-name">${index + 1}. ${obs.username} ${user && obs.id === user.id ? '(You)' : ''}</span>
+                <span class="registry-rank-badge" style="background-color: ${rank.color}">${rank.name}</span>
+                <span class="registry-count">${obs.count} Species</span>
+            `;
+            listContainer.appendChild(entry);
+        });
     } catch (err) {
-        console.error("Registry fetch failed:", err);
-        listContainer.innerHTML = "<p>The archives are currently sealed.</p>";
+        console.error("Registry failed:", err);
     }
 }
 // 1. SIGN UP
 async function handleSignUp() {
-	const email = document.getElementById('auth-email').value;
-	const password = document.getElementById('auth-password').value;
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
 
-	if (!email || !password) return alert("Please enter both email and password.");
+    if (!email || !password) return alert("Please enter both email and password.");
 
-	const {
-		data,
-		error
-	} = await supabaseClient.auth.signUp({
-		email,
-		password
-	});
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
 
-	if (error) alert("Error: " + error.message);
-	else alert("Success! Check your email for a confirmation link.");
+    if (error) {
+        alert("Error: " + error.message);
+    } else if (data.user) {
+        // Create the public profile entry immediately
+        const username = email.split('@')[0];
+        await supabaseClient
+            .from('profiles')
+            .upsert({ id: data.user.id, username: username });
+            
+        alert("Success! Check your email for a confirmation link.");
+    }
 }
 
 function displayExpeditionCard(tripData) {
