@@ -16,6 +16,9 @@ const ITEMS_PER_PAGE = 100;
 // Summary filter
 let currentSummaryRarityFilter = 'All';
 
+// Rarity chart
+let rarityChart = null;
+
 // Search filter
 let currentSearchQuery = '';
 
@@ -246,6 +249,7 @@ function switchTab(targetTabId) {
 		if (targetTabId === 'stats-view') {
 			console.log("📊 Refreshing Stats Page...");
 			calculateAndDisplayStats();
+			createRarityChart();
 			if (typeof createMonthlyChart === 'function') createMonthlyChart();
 		}
 	}
@@ -1584,8 +1588,51 @@ function createMonthlyChart() {
 			}
 		}
 	});
-} // <--- This is the only closing brace that should be at the end!
-// --- UPDATED AUTHENTICATION LOGIC ---
+} 
+
+function createRarityChart() {
+    const ctx = document.getElementById('rarity-pie-chart');
+    if (!ctx) return;
+
+    const sightingsToUse = getFilteredSightings();
+    const uniqueSpeciesNames = new Set(sightingsToUse.map(s => s.species));
+    
+    // 1. Map counts to rarities
+    const counts = { "Mega": 0, "Rare": 0, "Scarce": 0, "Local": 0, "Common": 0 };
+    
+    uniqueSpeciesNames.forEach(name => {
+        const bird = allUKBirds.find(b => b.CommonName === name);
+        if (bird && counts.hasOwnProperty(bird.Rarity)) {
+            counts[bird.Rarity]++;
+        }
+    });
+
+    if (rarityChart) { rarityChart.destroy(); }
+
+    rarityChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(counts),
+            datasets: [{
+                data: Object.values(counts),
+                backgroundColor: ['#682d1f', '#a4523a', '#416863', '#8a9575', '#ddc8a9'],
+                borderWidth: 2,
+                borderColor: '#fdfaf0'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'EB Garamond', size: 12 } }
+                }
+            },
+            cutout: '70%' // Makes it a ring
+        }
+    });
+}
 
 function getExpeditionData(date, location) {
 	// Filter sightings for this specific trip
