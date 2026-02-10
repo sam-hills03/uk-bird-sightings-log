@@ -1768,6 +1768,8 @@ async function initBirdMap() {
     // 1. Initialize the map (centered on Worthing)
     // view is [latitude, longitude], zoom level 13
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
+	// A test pin on Worthing Pier
+L.marker([50.806, -0.371]).addTo(map).bindPopup("Test Pin: Worthing Pier");
 
     // 2. Add the "Skin" of the map (OpenStreetMap tiles)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
