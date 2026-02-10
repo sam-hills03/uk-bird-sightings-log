@@ -178,46 +178,42 @@
     </section>
 <!-- My stats tab -->
     <section id="stats-view" class="tab-content">
-        <h2>My Birding Statistics</h2>
-        <div id="stats-page">
-            <p>Total Unique Species Seen: <span id="total-species">0</span></p>
-            <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
-            <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
-    <!-- Line chart -->
-            <div class="stats-dashboard-grid">
-        <div class="chart-container vintage-panel">
-            <h3 class="serif-subtitle">Observation Trends</h3>
-            <canvas id="monthly-chart"></canvas>
+    <h2>My Birding Statistics</h2>
+    <div id="stats-page">
+        <p>Total Unique Species Seen: <span id="total-species">0</span></p>
+        <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
+        <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
+
+        <div class="stats-dashboard-grid">
+            <div class="chart-container vintage-panel">
+                <h3 class="serif-subtitle">Observation Trends</h3>
+                <canvas id="monthly-chart"></canvas>
+            </div>
+
+            <div class="chart-container vintage-panel">
+                <h3 class="serif-subtitle">Collection Rarity</h3>
+                <canvas id="rarity-pie-chart"></canvas>
+            </div>
         </div>
 
-        <div class="chart-container vintage-panel">
-            <h3 class="serif-subtitle">Collection Rarity</h3>
-            <canvas id="rarity-pie-chart"></canvas>
+        <div class="year-filter-container vintage-panel">
+            <div class="vintage-select-wrapper">
+                <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
+                <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
+                    <option value="Lifetime">LIFETIME LOG</option>
+                    <option value="2026">ANNUAL LOG: 2026</option>
+                    <option value="2025">ANNUAL LOG: 2025</option>
+                    <option value="2024">ANNUAL LOG: 2024</option>
+                </select>
+                <div class="select-arrow">▼</div>
+            </div>
         </div>
-    </div>
-    <!-- Year selector under chart -->
-            <div class="year-filter-container vintage-panel">
-        <div class="vintage-select-wrapper">
-            <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
-            <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
-                <option value="Lifetime">LIFETIME LOG</option>
-                <option value="2026">ANNUAL LOG: 2026</option>
-                <option value="2025">ANNUAL LOG: 2025</option>
-                <option value="2024">ANNUAL LOG: 2024</option>
-            </select>
-            <div class="select-arrow">▼</div>
-        </div>
-    </div>
-    <!-- Map tab -->
-    <div id="map-tab" class="tab-content" style="display: none;">
+    </div> </section> <section id="map-tab" class="tab-content" style="display: none;">
     <div class="map-header">
         <h2 class="archive-title">Geographic Archives</h2>
         <p class="archive-subtitle">Every recorded sighting across the landscape.</p>
-        <div id="bird-map"></div>
     </div>
-    
-</div>
-            <div id="bird-map"></div>
+    <div id="bird-map"></div> </section>
     <!-- Milestones section -->
             <div class="milestones-container">
                 <h3> Field Milestones</h3>
