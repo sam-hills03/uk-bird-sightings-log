@@ -1706,3 +1706,10 @@ hr {
     border: 2px solid var(--color-primary);
     margin-top: 20px;
 }
+/* Prevents your site's CSS from messing with map pin alignment */
+.leaflet-marker-icon {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    transition: none !important;
+}
