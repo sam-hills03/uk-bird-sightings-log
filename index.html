@@ -179,7 +179,7 @@
 <!-- My stats tab -->
     <section id="stats-view" class="tab-content" style="display: none;">
     <h2>My Birding Statistics</h2>
-    </section>
+    
     <div id="stats-page">
         <p>Total Unique Species Seen: <span id="total-species">0</span></p>
         <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
@@ -210,14 +210,64 @@
             </div>
         </div>
     </div> 
-    <section id="map-tab" class="tab-content" style="display: none;">
+
+    <div class="milestones-container">
+        <h3> Field Milestones</h3>
+        <div id="milestones-grid" class="milestones-grid"></div>
+    </div>
+
+    <div class="registry-container vintage-panel">
+        <h3 class="hub-title">Registry of Distinguished Observers</h3>
+        <div class="registry-header">
+            <span>Naturalist</span>
+            <span>Rank</span>
+            <span>Collection Size</span>
+        </div>
+        <div id="leaderboard-list" class="registry-list">
+            <p class="loading-text">Consulting the registry archives...</p>
+        </div>
+    </div>
+
+    <div class="stats-grid"></div>
+
+    <div class="expedition-hub vintage-panel">
+        <h3 class="hub-title">Field Expedition Archive</h3>
+        <div class="expedition-controls">
+            <div class="museum-drawer">
+                <span class="drawer-label">LOCATION INDEX</span>
+                <input type="text" id="trip-location-search" placeholder="Search Archives..." class="naturalist-input" autocomplete="off">
+            </div>
+            <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
+                <ul id="trip-results-list"></ul>
+            </div>
+        </div>
+        <div id="expedition-card" class="logbook-card">
+            <div class="logbook-header">
+                <div class="logbook-meta">
+                    <span id="expedition-date" class="handwritten">Loading archives...</span>
+                    <h2 id="expedition-location" class="serif-title">Connecting to Field Logs...</h2>
+                </div>
+                <div class="logbook-seal">
+                    <span id="expedition-count">--</span>
+                    <small>Species</small>
+                </div>
+            </div>
+            <div class="logbook-body">
+                <div class="highlight-box">
+                    <span class="label">RAREST ENCOUNTER</span>
+                    <p id="expedition-highlight" class="handwritten">Scanning...</p>
+                </div>
+                <div class="species-grid" id="expedition-species-list"></div>
+            </div>
+        </div>
+    </div>
+</section> <section id="map-tab" class="tab-content" style="display: none;">
     <div class="map-header">
         <h2 class="archive-title">Geographic Archives</h2>
         <p class="archive-subtitle">Every recorded sighting across the landscape.</p>
     </div>
-    <div id="bird-map" style="height: 600px; width: 100%; border: 1px solid #416863; border-radius: 8px;"></div>
+    <div id="bird-map" style="height: 600px; width: 100%; border: 1px solid #416863; border-radius: 8px;"></div> 
 </section>
-    <div id="bird-map"></div> </section>
     <!-- Milestones section -->
             <div class="milestones-container">
                 <h3> Field Milestones</h3>
