@@ -248,13 +248,19 @@ function switchTab(targetTabId) {
 
 		if (targetTabId === 'stats-view') {
     calculateAndDisplayStats();
-    // Use setTimeout to give the browser a millisecond to render the 
-    // container before the chart engine tries to measure it.
+    
+    // Check if charts already exist; if so, destroy them first 
+    // to clear memory before building new ones.
+    if (birdChart) birdChart.destroy();
+    if (rarityChart) rarityChart.destroy();
+
+    // Use a tiny delay to let the HTML render its new width 
+    // before Chart.js tries to measure it.
     setTimeout(() => {
         createMonthlyChart();
         createRarityChart();
-    }, 50); 
-}}
+    }, 100);
+}
 }
 
 // Pagnation on the raw checklist page
@@ -1486,10 +1492,6 @@ let birdChart = null;
 function createMonthlyChart() {
 	const ctx = document.getElementById('monthly-chart');
 	if (!ctx) return;
-
-	// Safety: ensure the canvas is visible and has a size before drawing
-	ctx.style.width = '100%';
-	ctx.style.height = '300px';
 
 	const sightingsToUse = getFilteredSightings();
 	let labels = [];
