@@ -1844,66 +1844,92 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
-    if (map) map.remove();
+    if (map) {
+        map.remove();
+        map = null;
+    }
 
+    // 1. Initialize Map
     map = L.map('bird-map').setView([50.8139, -0.3711], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    // 1. Fetch Data
-    const { data: sightings } = await supabaseClient.from('sightings').select('lat, lng, species, location').not('lat', 'is', null);
+    // 2. Fetch Data from both tables
+    const { data: sightings, error: sError } = await supabaseClient
+        .from('sightings')
+        .select('lat, lng, species, location');
+    
     const { data: locations, error: lError } = await supabaseClient
         .from('saved_locations')
-        .select('location, lat, lng')
-        .not('lat', 'is', null);
+        .select('location, lat, lng');
 
-    if (lError) return console.error("Locations fetch error:", lError);
-
-    // 2. Heat Layer (Runs ONCE, not inside a loop)
-    if (sightings && sightings.length > 0) {
-        L.heatLayer(sightings.map(s => [s.lat, s.lng, 0.5]), {
-            radius: 25, blur: 15, maxZoom: 17
-        }).addTo(map);
+    if (sError || lError) {
+        console.error("Map Data Fetch Error:", sError || lError);
+        return;
     }
 
-    // 3. Setup Hubs Pane (Runs ONCE)
-    if (!map.getPane('hubsPane')) {
-        map.createPane('hubsPane');
-        map.getPane('hubsPane').style.zIndex = 650;
+    console.log("Sightings found:", sightings?.length);
+    console.log("Locations found:", locations?.length);
+
+    // 3. Create a dedicated Pane for Hubs to ensure they stay on top
+    const pane = map.createPane('hubsPane');
+    pane.style.zIndex = 650;
+    pane.style.pointerEvents = 'none'; // Allows clicks to pass through to the markers
+
+    // 4. Heat Layer (Background)
+    const heatData = sightings
+        .filter(s => s.lat && s.lng)
+        .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
+
+    if (heatData.length > 0) {
+        L.heatLayer(heatData, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
     }
 
-    // 4. Draw Hubs
-    // Filter out any invalid data first
-    const validLocations = locations.filter(loc => !isNaN(parseFloat(loc.lat)));
+    // 5. Draw the Red Hub Markers
+    if (locations) {
+        locations.forEach(loc => {
+            // Skip if coordinates are missing or zero
+            if (!loc.lat || !loc.lng) return;
 
-    validLocations.forEach(loc => {
-        const locationSightings = sightings.filter(s => s.location === loc.location);
-        const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
+            const lat = parseFloat(loc.lat);
+            const lng = parseFloat(loc.lng);
+            
+            // Get species for this specific location name
+            const locationSightings = sightings.filter(s => s.location === loc.location);
+            const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
-        const hubMarker = L.circleMarker([parseFloat(loc.lat), parseFloat(loc.lng)], {
-            pane: 'hubsPane',
-            radius: 5, 
-            fillColor: "#8c2e1b",
-            color: "#ffffff",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.9,
-            interactive: true
-        }).addTo(map);
+            const hubMarker = L.circleMarker([lat, lng], {
+                pane: 'hubsPane',
+                radius: 8, // Made slightly larger to ensure visibility
+                fillColor: "#8c2e1b",
+                color: "#ffffff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 1,
+                interactive: true
+            }).addTo(map);
 
-        hubMarker.bindPopup(`
-            <div class="map-popup-container">
-                <header class="map-popup-header">
-                    <h3 class="serif-title">${loc.location}</h3>
-                    <span class="species-count-badge">${uniqueSpecies.length} Species</span>
-                </header>
-                <div class="map-popup-body">
-                    <p class="handwritten-label">Historical Records:</p>
-                    <div class="map-logbook-list">
-                        ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
+            hubMarker.bindPopup(`
+                <div class="map-popup-container">
+                    <header class="map-popup-header">
+                        <h3 class="serif-title" style="margin:0; color:#416863;">${loc.location}</h3>
+                        <span class="species-count-badge" style="background:#8c2e1b; color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem;">
+                            ${uniqueSpecies.length} Species
+                        </span>
+                    </header>
+                    <hr style="border:0; border-top:1px solid #d1ccbc; margin:8px 0;">
+                    <div class="map-popup-body">
+                        <p style="font-family:'EB Garamond',serif; font-style:italic; margin-bottom:5px;">Species recorded here:</p>
+                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
+                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
+                        </ul>
                     </div>
                 </div>
-            </div>
-        `, { maxWidth: 250 });
+            `, { maxWidth: 250 });
+        });
+    }
+}
 
         // AUTOMATIC SCALING
         map.on('zoomend', () => {
