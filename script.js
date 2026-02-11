@@ -1773,12 +1773,14 @@ async function initBirdMap() {
     }).addTo(map);
 
     // 1. FETCH ALL SIGHTINGS FOR THE HEAT
-    const { data: sightings } = await supabaseClient
+    const { data: sightings, error: sError } = await supabaseClient
         .from('sightings')
         .select('lat, lng, species, location')
         .not('lat', 'is', null);
 
-    // 2. PREPARE HEAT DATA (Latitude, Longitude, Intensity)
+    if (sError) return console.error("Sightings fetch error:", sError);
+
+    // 2. PREPARE HEAT DATA
     const heatPoints = sightings.map(s => [s.lat, s.lng, 0.5]); 
     L.heatLayer(heatPoints, {
         radius: 25,
@@ -1787,37 +1789,34 @@ async function initBirdMap() {
         gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
     }).addTo(map);
 
-    // 3. FETCH UNIQUE LOCATIONS FOR THE CLICKABLE HUBS
-    const { data: locations } = await supabaseClient
+    // 3. FETCH UNIQUE LOCATIONS (Added .not null check here)
+    const { data: locations, error: lError } = await supabaseClient
         .from('saved_locations')
-        .select('name, lat, lng');
+        .select('name, lat, lng')
+        .not('lat', 'is', null); // Safety check!
+
+    if (lError) return console.error("Locations fetch error:", lError);
 
     locations.forEach(loc => {
-        // 1. Filter sightings for this specific location hub
         const locationSightings = sightings.filter(s => s.location === loc.name);
         const speciesAtLoc = locationSightings.map(s => s.species);
-        
-        // 2. Create the unique list
         const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
 
-        // 3. Create the Hub Marker (The button in the center of the heat)
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
             radius: 10,
-            fillColor: "#8c2e1b", // Your naturalist red
+            fillColor: "#8c2e1b",
             color: "#fff",
             weight: 2,
             opacity: 1,
             fillOpacity: 0.9
         }).addTo(map);
 
-        // 4. Build the Logbook List HTML
         const listHtml = uniqueSpecies.length > 0 
             ? `<div class="map-logbook-list">
                 ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
                </div>`
             : `<p>No species recorded here yet.</p>`;
 
-        // 5. Bind the popup with a clean Header
         hubMarker.bindPopup(`
             <div class="map-popup-container">
                 <header class="map-popup-header">
@@ -1831,6 +1830,7 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
+} // <--- THIS WAS THE MISSING BRACE
 
 // 1. SIGN UP
 async function handleSignUp() {
