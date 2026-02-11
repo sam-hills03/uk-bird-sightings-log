@@ -1797,29 +1797,28 @@ async function initBirdMap() {
 
     if (lError) return console.error("Locations fetch error:", lError);
 
-   // Create a special "top layer" for our clickable hubs
-    map.createPane('hubsPane');
-    map.getPane('hubsPane').style.zIndex = 650;
-    map.getPane('hubsPane').style.pointerEvents = 'none'; // Let the map move
+    // 4. SETUP HUBS PANE (Fixed Click Logic)
+    if (!map.getPane('hubsPane')) {
+        map.createPane('hubsPane');
+        map.getPane('hubsPane').style.zIndex = 650;
+    }
+    // We REMOVED pointerEvents = 'none' here so it works!
 
     locations.forEach(loc => {
         const locationSightings = sightings.filter(s => s.location === loc.name);
-        const speciesAtLoc = locationSightings.map(s => s.species);
-        const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
+        const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
-        // The Marker
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
-            pane: 'hubsPane', // Forces it to the top layer
-            radius: 12,       // Made slightly larger to be easier to hit
+            pane: 'hubsPane',
+            radius: 12,
             fillColor: "#8c2e1b",
             color: "#ffffff",
             weight: 3,
             opacity: 1,
-            fillOpacity: 1,   // Solid color so you can definitely see it
+            fillOpacity: 1,
             interactive: true
         }).addTo(map);
 
-        // Build the Popup (same as before)
         const listHtml = uniqueSpecies.length > 0 
             ? `<div class="map-logbook-list">${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}</div>`
             : `<p>No species recorded here yet.</p>`;
@@ -1837,7 +1836,7 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
-}
+} // This closing brace was the big missing piece!
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
