@@ -1781,3 +1781,19 @@ hr {
 .map-logbook-list::-webkit-scrollbar { width: 5px; }
 .map-logbook-list::-webkit-scrollbar-track { background: #f4f1ea; }
 .map-logbook-list::-webkit-scrollbar-thumb { background: #8c2e1b; }
+/* Ensure the markers are always physically on top of the heat canvas */
+.leaflet-marker-pane, .leaflet-overlay-pane {
+    pointer-events: none; /* Let clicks pass through the general "sheets" */
+}
+
+/* BUT re-enable clicks specifically for the markers and popups */
+.leaflet-marker-icon, 
+.leaflet-marker-shadow, 
+.leaflet-interactive,
+.leaflet-popup {
+    pointer-events: auto !important;
+}
+
+#bird-map {
+    cursor: crosshair; /* Helps you see that the map area is active */
+}
