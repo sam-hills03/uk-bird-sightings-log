@@ -1809,7 +1809,11 @@ hr {
 .leaflet-zoom-animated.leaflet-hubsPane-pane {
     transition: opacity 0.3s ease;
 }
+#location-picker-map, #bird-map {
+    cursor: crosshair; /* Makes it easier to aim */
+}
 
-/* If the zoom is less than 12, make them faint or invisible */
-/* Note: This requires a tiny bit of JS to toggle a class, 
-   but we can start with just making them smaller and subtler first! */
+.leaflet-marker-icon {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}
