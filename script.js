@@ -192,7 +192,7 @@ async function deleteSightingFromDB(idToDelete) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) return false;
 
-        // --- NEW: Find the location of this sighting before we delete it ---
+        // Find the location name BEFORE deleting
         const sightingData = mySightings.find(s => s.id === idToDelete);
         const locationToCleanup = sightingData ? sightingData.location : null;
 
@@ -204,9 +204,10 @@ async function deleteSightingFromDB(idToDelete) {
 
         if (error) throw error;
 
-        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
+        // Update local array
+        mySightings = mySightings.filter(s => s.id !== idToDelete);
         
-        // --- NEW: Run the cleanup now that the bird is gone ---
+        // IMPORTANT: Perform the cleanup and WAIT for it to finish
         if (locationToCleanup) {
             await cleanupEmptyLocations(locationToCleanup);
         }
@@ -1900,15 +1901,15 @@ async function initBirdMap() {
             const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
             const hubMarker = L.circleMarker([lat, lng], {
-                pane: 'hubsPane',
-                radius: 8, // Made slightly larger to ensure visibility
-                fillColor: "#8c2e1b",
-                color: "#ffffff",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 1,
-                interactive: true
-            }).addTo(map);
+    pane: 'hubsPane',
+    radius: 20, // Make it larger so it's easier to "hit" when clicking the heat
+    fillColor: "transparent", 
+    color: "transparent", 
+    weight: 0,
+    opacity: 0,
+    fillOpacity: 0,
+    interactive: true // This is the key!
+}).addTo(map);
 
             hubMarker.bindPopup(`
                 <div class="map-popup-container">
