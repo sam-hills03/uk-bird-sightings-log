@@ -1765,12 +1765,6 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap(){
-	if (map) {
-        map.remove();
-    }
-
-    // Now re-initialize
-    map = L.map('bird-map').setView([50.8139, -0.3711], 13);
     // 1. Initialize the map
     map = L.map('bird-map').setView([50.8139, -0.3711], 13);
     
