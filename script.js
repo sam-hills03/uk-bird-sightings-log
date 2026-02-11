@@ -1853,34 +1853,33 @@ async function initBirdMap() {
     const { data: sightings } = await supabaseClient.from('sightings').select('lat, lng, species, location').not('lat', 'is', null);
     const { data: locations, error: lError } = await supabaseClient
         .from('saved_locations')
-        .select('location, lat, lng') // Ensure 'lat' and 'lng' are included!
+        .select('location, lat, lng')
         .not('lat', 'is', null);
 
     if (lError) return console.error("Locations fetch error:", lError);
 
-    // Filter out any locations that don't actually have numbers for coordinates
-    const validLocations = locations.filter(loc => !isNaN(parseFloat(loc.lat)));
+    // 2. Heat Layer (Runs ONCE, not inside a loop)
+    if (sightings && sightings.length > 0) {
+        L.heatLayer(sightings.map(s => [s.lat, s.lng, 0.5]), {
+            radius: 25, blur: 15, maxZoom: 17
+        }).addTo(map);
+    }
 
-    validLocations.forEach(loc => {
-
-    // 2. Heat Layer
-    L.heatLayer(sightings.map(s => [s.lat, s.lng, 0.5]), {
-        radius: 25, blur: 15, maxZoom: 17
-    }).addTo(map);
-
-    // 3. Setup Hubs Pane
+    // 3. Setup Hubs Pane (Runs ONCE)
     if (!map.getPane('hubsPane')) {
         map.createPane('hubsPane');
         map.getPane('hubsPane').style.zIndex = 650;
     }
 
     // 4. Draw Hubs
-    locations.forEach(loc => {
+    // Filter out any invalid data first
+    const validLocations = locations.filter(loc => !isNaN(parseFloat(loc.lat)));
+
+    validLocations.forEach(loc => {
         const locationSightings = sightings.filter(s => s.location === loc.location);
         const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
-        // We use a small radius (5) and 'weight' (1) to keep them subtle
-        const hubMarker = L.circleMarker([loc.lat, loc.lng], {
+        const hubMarker = L.circleMarker([parseFloat(loc.lat), parseFloat(loc.lng)], {
             pane: 'hubsPane',
             radius: 5, 
             fillColor: "#8c2e1b",
@@ -1906,15 +1905,14 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
 
-        // AUTOMATIC SCALING: This makes the dots grow when you zoom in 
-        // without needing a complex separate function.
+        // AUTOMATIC SCALING
         map.on('zoomend', () => {
             const z = map.getZoom();
-            const r = z > 12 ? 10 : 5; // If zoomed in past 12, make it 10px, otherwise 5px
+            const r = z > 12 ? 10 : 5;
             hubMarker.setRadius(r);
         });
     });
-});
+}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
