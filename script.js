@@ -33,6 +33,9 @@ let map; // Global variable to store the map instance
 let pickerMap;
 let pickerMarker;
 
+// Cashed location save
+let cachedLocations = [];
+
 // Containers
 const entriesContainer = document.getElementById('entries-container');
 const addEntryBtn = document.getElementById('add-entry-btn');
@@ -284,12 +287,15 @@ function switchTab(targetTabId) {
 
         // 1. BIG MAP LOGIC
         if (targetTabId === 'map-tab') {
-            if (!map) {
-                initBirdMap(); 
-            } else {
-                setTimeout(() => { map.invalidateSize(); }, 200); 
-            }
-        } 
+    if (!map) {
+        initBirdMap(); 
+    } else {
+        // Don't rebuild the whole map, just fix the layout
+        requestAnimationFrame(() => {
+            map.invalidateSize();
+        });
+    }
+}
         // 2. NEW: SUBMISSION PICKER LOGIC (Step 3)
         else if (targetTabId === 'submission-view') {
             setTimeout(() => {
@@ -1845,82 +1851,72 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
-    if (map) {
-        map.remove();
-        map = null;
-    }
+    if (map) { map.remove(); map = null; }
 
-    // 1. Initialize Map
-    map = L.map('bird-map').setView([50.8139, -0.3711], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // 2. Fetch Data from both tables
-    const { data: sightings, error: sError } = await supabaseClient
-        .from('sightings')
-        .select('lat, lng, species, location');
+    // Use Canvas renderer for better performance
+    map = L.map('bird-map', {
+        renderer: L.canvas() 
+    }).setView([50.8139, -0.3711], 11);
     
-    const { data: locations, error: lError } = await supabaseClient
-        .from('saved_locations')
-        .select('location, lat, lng');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    if (sError || lError) {
-        console.error("Map Data Fetch Error:", sError || lError);
-        return;
+    // 1. DATA SOURCE: Use local memory first
+    const sightings = mySightings; 
+    
+    // Only fetch locations from the web if we haven't already
+    if (cachedLocations.length === 0) {
+        const { data, error } = await supabaseClient
+            .from('saved_locations')
+            .select('location, lat, lng');
+        if (!error) cachedLocations = data;
     }
+    const locations = cachedLocations;
 
-    console.log("Sightings found:", sightings?.length);
-    console.log("Locations found:", locations?.length);
-
-    // 3. Create a dedicated Pane for Hubs to ensure they stay on top
+    // 2. Setup Hubs Pane
     const pane = map.createPane('hubsPane');
     pane.style.zIndex = 650;
-    pane.style.pointerEvents = 'none'; // Allows clicks to pass through to the markers
+    pane.style.pointerEvents = 'none';
 
-    // 4. Heat Layer (Background)
+    // 3. Heat Layer (Background)
     const heatData = sightings
         .filter(s => s.lat && s.lng)
         .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
-	
-if (heatData.length > 0) {
-    L.heatLayer(heatData, { 
-        radius: 25, 
-        blur: 15, 
-        maxZoom: 17,
-        gradient: {
-            0.2: '#416863', // Low density: Vintage Green (happens at 20% intensity)
-            0.4: '#d1ccbc', // Medium-Low: Parchment 
-            0.6: '#e2a76f', // Medium: Muted Orange
-            0.9: '#8c2e1b', // High: Deep Earth Red
-            1.0: '#5c1e11'  // Core: Burnt Umber
-        }
-    }).addTo(map);
-}
 
-    // 5. Draw the Red Hub Markers
+    if (heatData.length > 0) {
+        L.heatLayer(heatData, { 
+            radius: 25, 
+            blur: 15, 
+            maxZoom: 17,
+            gradient: {
+                0.2: '#416863', 0.4: '#d1ccbc', 0.6: '#e2a76f', 0.9: '#8c2e1b', 1.0: '#5c1e11'
+            }
+        }).addTo(map);
+    }
+
+    // 4. Draw Invisible Interactive Hubs
     if (locations) {
         locations.forEach(loc => {
-            // Skip if coordinates are missing or zero
             if (!loc.lat || !loc.lng) return;
 
             const lat = parseFloat(loc.lat);
             const lng = parseFloat(loc.lng);
             
-            // Get species for this specific location name
             const locationSightings = sightings.filter(s => s.location === loc.location);
+            // Skip drawing a hub if there are no birds there
+            if (locationSightings.length === 0) return;
+
             const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
             const hubMarker = L.circleMarker([lat, lng], {
-    pane: 'hubsPane',
-    radius: 20, // Make it larger so it's easier to "hit" when clicking the heat
-    fillColor: "transparent", 
-    color: "transparent", 
-    weight: 0,
-    opacity: 0,
-    fillOpacity: 0,
-    interactive: true // This is the key!
-}).addTo(map);
+                pane: 'hubsPane',
+                radius: 20, 
+                fillColor: "transparent", 
+                color: "transparent", 
+                weight: 0,
+                opacity: 0,
+                fillOpacity: 0,
+                interactive: true 
+            }).addTo(map);
 
             hubMarker.bindPopup(`
                 <div class="map-popup-container">
@@ -1932,7 +1928,6 @@ if (heatData.length > 0) {
                     </header>
                     <hr style="border:0; border-top:1px solid #d1ccbc; margin:8px 0;">
                     <div class="map-popup-body">
-                        <p style="font-family:'EB Garamond',serif; font-style:italic; margin-bottom:5px;">Species recorded here:</p>
                         <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
                             ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
                         </ul>
