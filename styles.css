@@ -1816,8 +1816,7 @@ hr {
 .leaflet-marker-icon {
     margin-left: 0 !important;
     margin-top: 0 !important;
-    top: -41px;
-    left: -10px;
+    top: -41px !important;
+    left: -10px !important;
     width: 25px !important;
-    height: 41px !important;
 }
