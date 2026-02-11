@@ -1159,10 +1159,15 @@ async function fetchBirdDescription(speciesName) {
 // H. FORM SUBMISSION
 // ============================================
 
-function addSightingEntry() {
+// 1. The Function (with the safety gate)
+function addSightingEntry(isManualClick = false) {
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-    // 1. STOP if at 20
+    // Safety Gate: If it's an auto-call and we already have a box, stop.
+    if (!isManualClick && entryGroups.length >= 1) {
+        return;
+    }
+
     if (entryGroups.length >= 20) {
         alert("Maximum of 20 birds per submission reached.");
         return;
@@ -1173,15 +1178,12 @@ function addSightingEntry() {
     const entryClone = template.content.cloneNode(true);
     const newEntry = entryClone.querySelector('.sighting-entry-group');
 
-    // 2. Setup Remove Button
+    // Remove Button Logic
     newEntry.querySelector('.remove-entry-btn').addEventListener('click', () => {
         newEntry.remove();
-        // If we just removed the very last row, add a fresh one back immediately
         if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 0) {
-            addSightingEntry();
+            addSightingEntry(false); 
         }
-
-        // Re-enable "Add" styling
         if (addEntryBtn) {
             addEntryBtn.style.opacity = '1';
             addEntryBtn.style.cursor = 'pointer';
@@ -1189,34 +1191,27 @@ function addSightingEntry() {
     });
 
     entriesContainer.appendChild(newEntry);
-
-    // 3. Disable "Add" styling visually if we just hit 20
-    if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 20) {
-        if (addEntryBtn) {
-            addEntryBtn.style.opacity = '0.5';
-            addEntryBtn.style.cursor = 'not-allowed';
-        }
-    }
 }
 
-// Set default date to today
+// 2. Set default date
 const dateInput = document.getElementById('sighting-date');
 if (dateInput) {
     dateInput.value = new Date().toISOString().split('T')[0];
 }
 
-// Ensure the button is actually listening
+// 3. Event Listener (Manual Click)
 if (addEntryBtn) {
-    addEntryBtn.onclick = addSightingEntry;
+    addEntryBtn.onclick = () => addSightingEntry(true);
 }
 
-// --- THE FIX FOR THE DOUBLE START ---
-// Clear the container once and add exactly one entry on load
+// 4. Initial Load (Auto-start)
+// This is the ONLY place this should run when the page opens
 if (entriesContainer) {
     entriesContainer.innerHTML = ''; 
-    addSightingEntry();
+    addSightingEntry(false);
 }
 
+// 5. Form Submission
 if (sightingForm) {
     sightingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1259,9 +1254,9 @@ if (sightingForm) {
 
             alert(`Successfully recorded ${savedCount} sightings!`);
 
-            // RESET FORM: Clear container and start with one fresh row
+            // RESET FORM: Wipe and start fresh with ONE
             entriesContainer.innerHTML = '';
-            addSightingEntry();
+            addSightingEntry(false);
 
             if (progressContainer) progressContainer.style.display = 'none';
             if (progressBar) progressBar.style.width = "0%";
