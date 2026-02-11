@@ -1764,46 +1764,68 @@ async function fetchRegistryData() {
 
 // Map setup
 
-async function initBirdMap(){
-    // 1. Initialize the map
-    map = L.map('bird-map').setView([50.8139, -0.3711], 13);
-    
+async function initBirdMap() {
+    if (map) map.remove();
+
+    map = L.map('bird-map').setView([50.8139, -0.3711], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 2. Create the Cluster Group (The "Heavy Lifter" for performance)
-    const markers = L.markerClusterGroup();
-
-    // 3. Fetch sightings with coordinates
-    const { data: sightings, error } = await supabaseClient
+    // 1. FETCH ALL SIGHTINGS FOR THE HEAT
+    const { data: sightings } = await supabaseClient
         .from('sightings')
-        .select('species, location, date, lat, lng')
+        .select('lat, lng, species, location')
         .not('lat', 'is', null);
 
-    if (error) {
-        console.error("Map fetch failed:", error);
-        return;
-    }
+    // 2. PREPARE HEAT DATA (Latitude, Longitude, Intensity)
+    const heatPoints = sightings.map(s => [s.lat, s.lng, 0.5]); 
+    L.heatLayer(heatPoints, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
+    }).addTo(map);
 
-    // 4. Loop through and add to the CLUSTER
-    sightings.forEach(s => {
-        const marker = L.marker([s.lat, s.lng]);
+    // 3. FETCH UNIQUE LOCATIONS FOR THE CLICKABLE HUBS
+    const { data: locations } = await supabaseClient
+        .from('saved_locations')
+        .select('name, lat, lng');
 
-        marker.bindPopup(`
-            <div style="font-family: 'EB Garamond', serif;">
-                <strong style="font-size: 1.1rem; color: #8c2e1b;">${s.species}</strong><br>
-                <span style="font-style: italic;">${s.location}</span><br>
-                <small>${new Date(s.date).toLocaleDateString('en-GB')}</small>
+    locations.forEach(loc => {
+        // Find all species seen at THIS specific location
+        const speciesAtLoc = sightings
+            .filter(s => s.location === loc.name)
+            .map(s => s.species);
+        
+        // Remove duplicates (The "30 instead of 200" logic)
+        const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
+
+        // Create a subtle circle marker as the "Hub"
+        const hubMarker = L.circleMarker([loc.lat, loc.lng], {
+            radius: 8,
+            fillColor: "#8c2e1b", // Your naturalist red
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map);
+
+        // Create the list for the popup
+        const listHtml = uniqueSpecies.length > 0 
+            ? `<ul style="max-height: 150px; overflow-y: auto; padding-left: 15px; margin-top: 5px;">
+                ${uniqueSpecies.map(sp => `<li>${sp}</li>`).join('')}
+               </ul>`
+            : `<p>No species recorded here yet.</p>`;
+
+        hubMarker.bindPopup(`
+            <div style="font-family: 'EB Garamond', serif; min-width: 200px;">
+                <h3 style="margin: 0; color: #8c2e1b; border-bottom: 1px solid #ddd;">${loc.name}</h3>
+                <p style="margin: 5px 0; font-weight: bold;">Species Observed (${uniqueSpecies.length}):</p>
+                ${listHtml}
             </div>
         `);
-        
-        // Add marker to the cluster group
-        markers.addLayer(marker);
     });
-
-    // 5. Add the whole cluster group to the map
-    map.addLayer(markers);
 }
 
 // 1. SIGN UP
