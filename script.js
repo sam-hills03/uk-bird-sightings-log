@@ -1882,10 +1882,21 @@ async function initBirdMap() {
     const heatData = sightings
         .filter(s => s.lat && s.lng)
         .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
-
-    if (heatData.length > 0) {
-        L.heatLayer(heatData, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
-    }
+	
+if (heatData.length > 0) {
+    L.heatLayer(heatData, { 
+        radius: 25, 
+        blur: 15, 
+        maxZoom: 17,
+        gradient: {
+            0.2: '#416863', // Low density: Vintage Green (happens at 20% intensity)
+            0.4: '#d1ccbc', // Medium-Low: Parchment 
+            0.6: '#e2a76f', // Medium: Muted Orange
+            0.9: '#8c2e1b', // High: Deep Earth Red
+            1.0: '#5c1e11'  // Core: Burnt Umber
+        }
+    }).addTo(map);
+}
 
     // 5. Draw the Red Hub Markers
     if (locations) {
