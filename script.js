@@ -188,45 +188,69 @@ async function saveSighting(sighting) {
 
 // Delete sighting from raw datalist 
 async function deleteSightingFromDB(idToDelete) {
-	try {
-		const {
-			data: {
-				user
-			}
-		} = await supabaseClient.auth.getUser();
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return false;
 
-		if (!user) {
-			alert("You must be logged in to delete sightings.");
-			return false;
-		}
+        // --- NEW: Find the location of this sighting before we delete it ---
+        const sightingData = mySightings.find(s => s.id === idToDelete);
+        const locationToCleanup = sightingData ? sightingData.location : null;
 
-		const {
-			error
-		} = await supabaseClient
-			.from('sightings')
-			.delete()
-			.eq('id', idToDelete)
-			.eq('user_id', user.id); 
+        const { error } = await supabaseClient
+            .from('sightings')
+            .delete()
+            .eq('id', idToDelete)
+            .eq('user_id', user.id); 
 
-		if (error) throw error;
+        if (error) throw error;
 
-		mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
-		updateAllDisplays();
+        mySightings = mySightings.filter(sighting => sighting.id !== idToDelete);
+        
+        // --- NEW: Run the cleanup now that the bird is gone ---
+        if (locationToCleanup) {
+            await cleanupEmptyLocations(locationToCleanup);
+        }
 
-		return true;
-	} catch (error) {
-		console.error("Error deleting sighting:", error);
-		return false;
-	}
+        updateAllDisplays();
+        return true;
+    } catch (error) {
+        console.error("Error deleting sighting:", error);
+        return false;
+    }
+}
+async function cleanupEmptyLocations(locationName) {
+    // 1. Check if any other birds are still at this location
+    const { data, error } = await supabaseClient
+        .from('sightings')
+        .select('id')
+        .eq('location', locationName);
+
+    // 2. If NO birds are left, delete the Hub (the red pin)
+    if (data && data.length === 0) {
+        await supabaseClient
+            .from('saved_locations')
+            .delete()
+            .eq('location', locationName);
+            
+        console.log(`Location ${locationName} was empty and has been removed from the map.`);
+        
+        // Refresh the map to show it's gone
+        initBirdMap(); 
+    }
 }
 
 // Updates seen birds, raw list, and stats page
 function updateAllDisplays() {
-	displaySightings();
-	displaySeenBirdsSummary();
-	calculateAndDisplayStats();
-	filterAndDisplayBirds();
-	createMonthlyChart();
+    displaySightings();
+    displaySeenBirdsSummary();
+    calculateAndDisplayStats();
+    filterAndDisplayBirds();
+    createMonthlyChart();
+    
+    // Add this so the big map stays in sync with your data
+    if (typeof initBirdMap === 'function') {
+        initBirdMap(); 
+    }
 
 	// Refresh the Expedition Logbook Card with the latest data
 	if (mySightings && mySightings.length > 0) {
@@ -1296,18 +1320,19 @@ if (sightingForm) {
     });
 }
 function initLocationPicker() {
-	L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-    if (pickerMap) return; // Don't re-init if already exists
+    // Fix the broken marker icons once and for all
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+
+    if (pickerMap) return; 
 
     pickerMap = L.map('location-picker-map').setView([50.8139, -0.3711], 13);
-    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
 
-    // Click on map to move the pin
     pickerMap.on('click', function(e) {
         setPickerLocation(e.latlng.lat, e.latlng.lng);
         reverseGeocode(e.latlng.lat, e.latlng.lng);
