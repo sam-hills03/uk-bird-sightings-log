@@ -1887,10 +1887,15 @@ async function initBirdMap() {
 
     if (heatData.length > 0) {
         L.heatLayer(heatData, { 
-            radius: 25, 
-            blur: 15, 
-            maxZoom: 17,
-            gradient: { 0.2: '#416863', 0.4: '#d1ccbc', 0.6: '#e2a76f', 0.9: '#8c2e1b', 1.0: '#5c1e11' }
+            radius: 35, // Bigger glow
+    		blur: 20,   // Softer edges
+    		minOpacity: 0.4,
+    		gradient: {
+ 					   0.2: 'rgba(140, 46, 27, 0.3)', // Very faint Earth Red glow
+    					0.4: '#e2a76f',               // Muted Sunset Orange
+   						 0.7: '#8c2e1b',               // Deep Naturalist Red (your hub color!)
+    					1.0: '#4a150a'                // Burnt Umber for the most sightings
+}
         }).addTo(map);
     }
 
