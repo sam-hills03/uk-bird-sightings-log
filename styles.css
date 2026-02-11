@@ -1797,3 +1797,11 @@ hr {
 #bird-map {
     cursor: crosshair; /* Helps you see that the map area is active */
 }
+.leaflet-hubsPane-pane {
+    pointer-events: none; /* The pane itself doesn't block the map */
+}
+
+.leaflet-hubsPane-pane .leaflet-interactive {
+    pointer-events: auto !important; /* The markers DO catch clicks */
+    cursor: pointer;
+}
