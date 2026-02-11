@@ -1793,40 +1793,44 @@ async function initBirdMap() {
         .select('name, lat, lng');
 
     locations.forEach(loc => {
-        // Find all species seen at THIS specific location
-        const speciesAtLoc = sightings
-            .filter(s => s.location === loc.name)
-            .map(s => s.species);
+        // 1. Filter sightings for this specific location hub
+        const locationSightings = sightings.filter(s => s.location === loc.name);
+        const speciesAtLoc = locationSightings.map(s => s.species);
         
-        // Remove duplicates (The "30 instead of 200" logic)
+        // 2. Create the unique list
         const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
 
-        // Create a subtle circle marker as the "Hub"
+        // 3. Create the Hub Marker (The button in the center of the heat)
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
-            radius: 8,
+            radius: 10,
             fillColor: "#8c2e1b", // Your naturalist red
             color: "#fff",
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.8
+            fillOpacity: 0.9
         }).addTo(map);
 
-        // Create the list for the popup
+        // 4. Build the Logbook List HTML
         const listHtml = uniqueSpecies.length > 0 
-            ? `<ul style="max-height: 150px; overflow-y: auto; padding-left: 15px; margin-top: 5px;">
-                ${uniqueSpecies.map(sp => `<li>${sp}</li>`).join('')}
-               </ul>`
+            ? `<div class="map-logbook-list">
+                ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
+               </div>`
             : `<p>No species recorded here yet.</p>`;
 
+        // 5. Bind the popup with a clean Header
         hubMarker.bindPopup(`
-            <div style="font-family: 'EB Garamond', serif; min-width: 200px;">
-                <h3 style="margin: 0; color: #8c2e1b; border-bottom: 1px solid #ddd;">${loc.name}</h3>
-                <p style="margin: 5px 0; font-weight: bold;">Species Observed (${uniqueSpecies.length}):</p>
-                ${listHtml}
+            <div class="map-popup-container">
+                <header class="map-popup-header">
+                    <h3 class="serif-title">${loc.name}</h3>
+                    <span class="species-count-badge">${uniqueSpecies.length} Species</span>
+                </header>
+                <div class="map-popup-body">
+                    <p class="handwritten-label">Historical Records:</p>
+                    ${listHtml}
+                </div>
             </div>
-        `);
+        `, { maxWidth: 250 });
     });
-}
 
 // 1. SIGN UP
 async function handleSignUp() {
