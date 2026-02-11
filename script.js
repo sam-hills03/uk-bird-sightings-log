@@ -1930,15 +1930,6 @@ async function initBirdMap() {
         });
     }
 }
-
-        // AUTOMATIC SCALING
-        map.on('zoomend', () => {
-            const z = map.getZoom();
-            const r = z > 12 ? 10 : 5;
-            hubMarker.setRadius(r);
-        });
-    });
-}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
