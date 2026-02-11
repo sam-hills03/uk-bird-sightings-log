@@ -274,49 +274,56 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // Remove classes from EVERYTHING
+    // 1. Remove classes from EVERYTHING
     tabContents.forEach(content => {
         content.classList.remove('active-content');
     });
     tabButtons.forEach(button => button.classList.remove('active'));
 
-    // Add classes ONLY to the target
+    // 2. Find the target
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        targetContent.classList.add('active-content'); // CSS handles display:block !important
+        targetContent.classList.add('active-content');
         if (targetButton) targetButton.classList.add('active');
 
-        // Trigger specific logic for Maps or Stats
+        // --- START OF TAB LOGIC ---
+        
+        // CASE A: The Big Map
         if (targetTabId === 'map-tab') {
-            setTimeout(() => { if(map) map.invalidateSize(); }, 100);
-        } else if (targetTabId === 'stats-view') {
-            calculateAndDisplayStats();
-        }
-    }
-}
-        // 2. NEW: SUBMISSION PICKER LOGIC (Step 3)
+            if (!map) {
+                initBirdMap(); 
+            } else {
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            }
+        } 
+        
+        // CASE B: Submission Map (Location Picker)
         else if (targetTabId === 'submission-view') {
             setTimeout(() => {
-                initLocationPicker(); // Starts the mini-map
+                initLocationPicker(); 
                 if (pickerMap) {
-                    pickerMap.invalidateSize(); // Forces it to fill the container
+                    pickerMap.invalidateSize(); 
                 }
             }, 300);
         }
-        // 3. STATS LOGIC
+        
+        // CASE C: Stats Page
         else if (targetTabId === 'stats-view') {
             calculateAndDisplayStats();
             fetchRegistryData();
-            if (birdChart) birdChart.destroy();
-            if (rarityChart) rarityChart.destroy();
+            
+            // Clean up old charts before redrawing
+            if (typeof birdChart !== 'undefined' && birdChart) birdChart.destroy();
+            if (typeof rarityChart !== 'undefined' && rarityChart) rarityChart.destroy();
 
             setTimeout(() => {
                 createMonthlyChart();
                 createRarityChart();
             }, 100);
         }
+        // --- END OF TAB LOGIC ---
     }
 }
 
