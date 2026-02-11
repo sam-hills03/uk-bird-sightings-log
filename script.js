@@ -144,42 +144,46 @@ async function loadUKBirds() {
 
 // Save sightings to database
 async function saveSighting(sighting) {
-	try {
-		// Get the logged-in user's data
-		const {
-			data: {
-				user
-			}
-		} = await supabaseClient.auth.getUser();
+    try {
+        // Get the logged-in user's data
+        const {
+            data: {
+                user
+            }
+        } = await supabaseClient.auth.getUser();
 
-		if (!user) {
-			alert("You must be logged in to save sightings."); // Only shows if not logged in 
-			return false;
-		}
+        if (!user) {
+            alert("You must be logged in to save sightings.");
+            return false;
+        }
 
-		const {
-			data,
-			error
-		} = await supabaseClient
-			.from('sightings')
-			.insert([{
-				species: sighting.species,
-				date: sighting.date,
-				location: sighting.location,
-				user_id: user.id
-			}]);
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from('sightings')
+            .insert([{
+                species: sighting.species,
+                date: sighting.date,
+                location: sighting.location,
+                user_id: user.id,
+                // --- ADD THESE TWO LINES ---
+                lat: sighting.lat, 
+                lng: sighting.lng
+                // ---------------------------
+            }]);
 
-		if (error) {
-			console.error("Supabase Insert Error:", error.message);
-			throw error;
-		}
+        if (error) {
+            console.error("Supabase Insert Error:", error.message);
+            throw error;
+        }
 
-		console.log("Sighting saved successfully!");
-		return true;
-	} catch (error) {
-		alert("Failed to save: " + error.message);
-		return false;
-	}
+        console.log("Sighting saved successfully!");
+        return true;
+    } catch (error) {
+        alert("Failed to save: " + error.message);
+        return false;
+    }
 }
 
 // Delete sighting from raw datalist 
@@ -707,42 +711,41 @@ async function loadLocations() {
 	}
 }
 
-async function saveNewLocation(location) {
-	if (!location || savedLocations.includes(location)) return;
+async function saveNewLocation(locationName, lat, lng) {
+    if (!locationName) return;
 
-	try {
-		const {
-			data: {
-				user
-			}
-		} = await supabaseClient.auth.getUser();
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
 
-		if (!user) {
-			console.log("No user logged in - skipping location save.");
-			return;
-		}
+        if (!user) {
+            console.log("No user logged in - skipping location hub save.");
+            return;
+        }
 
-		console.log("Saving location:", location, "for user:", user.id);
+        console.log("Syncing location hub:", locationName);
 
-		const {
-			error
-		} = await supabaseClient
-			.from('saved_locations')
-			.insert([{
-				location: location,
-				user_id: user.id
-			}]);
+        // 'upsert' handles both creating NEW hubs and updating OLD ones
+        const { error } = await supabaseClient
+            .from('saved_locations')
+            .upsert({ 
+                location: locationName, 
+                lat: lat ? parseFloat(lat) : null, 
+                lng: lng ? parseFloat(lng) : null,
+                user_id: user.id 
+            }, { onConflict: 'location' });
 
-		if (error) {
-			console.error("Supabase Error:", error.message);
-		} else {
-			console.log("Location successfully saved!");
-			savedLocations.push(location);
-			populateLocationDatalist();
-		}
-	} catch (error) {
-		console.error("Error:", error);
-	}
+        if (error) {
+            console.error("Supabase Hub Error:", error.message);
+        } else {
+            // Update your local list so the search bar knows about it
+            if (!savedLocations.includes(locationName)) {
+                savedLocations.push(locationName);
+                populateLocationDatalist();
+            }
+        }
+    } catch (error) {
+        console.error("Error in saveNewLocation:", error);
+    }
 }
 
 function populateLocationDatalist() {
@@ -1226,6 +1229,10 @@ if (sightingForm) {
         const location = document.getElementById('location').value.trim();
         const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
+        // NEW: Grab the coordinates from the map picker
+        const lat = document.getElementById('selected-lat').value;
+        const lng = document.getElementById('selected-lng').value;
+
         if (!date || !location) {
             alert("Please enter both a Date and a Location.");
             return;
@@ -1240,14 +1247,23 @@ if (sightingForm) {
         const totalToSave = entryGroups.length;
 
         try {
-            await saveNewLocation(location);
+            // This saves the location name to your 'saved_locations' table
+            await saveNewLocation(location, lat, lng); 
 
             for (const group of entryGroups) {
                 const speciesInput = group.querySelector('.species-input');
                 const species = speciesInput?.value.trim();
 
                 if (species && isSpeciesValid(species)) {
-                    await saveSighting({ species, date, location });
+                    // UPDATED: Now sending the coordinates along with the bird!
+                    await saveSighting({ 
+                        species, 
+                        date, 
+                        location,
+                        lat: lat ? parseFloat(lat) : null,
+                        lng: lng ? parseFloat(lng) : null
+                    });
+                    
                     savedCount++;
 
                     if (progressBar && progressText) {
@@ -1280,6 +1296,11 @@ if (sightingForm) {
     });
 }
 function initLocationPicker() {
+	L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
     if (pickerMap) return; // Don't re-init if already exists
 
     pickerMap = L.map('location-picker-map').setView([50.8139, -0.3711], 13);
