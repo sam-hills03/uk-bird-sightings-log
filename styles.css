@@ -1713,3 +1713,14 @@ hr {
     border: none !important;
     transition: none !important;
 }
+.leaflet-popup-content ul {
+    scrollbar-width: thin;
+    scrollbar-color: #8c2e1b #f4f1ea;
+}
+
+.leaflet-popup-content li {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    margin-bottom: 3px;
+    color: #333;
+}
