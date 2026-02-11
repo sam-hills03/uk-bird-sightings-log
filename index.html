@@ -119,9 +119,19 @@
             <label for="sighting-date">Date:</label>
             <input type="date" id="sighting-date" required>
 
-            <label for="location">Location:</label>
-            <input type="text" id="location" list="location-datalist" required>
-            <datalist id="location-datalist"></datalist>
+            <label for="location">Location Hub:</label>
+<div class="location-picker-container">
+    <div class="search-box">
+        <input type="text" id="location" placeholder="Search for a place or click the map..." required>
+        <div id="search-suggestions" class="suggestions-list"></div>
+    </div>
+    
+    <div id="location-picker-map" style="height: 300px; width: 100%; margin-top: 10px; border: 1px solid #416863; border-radius: 8px;"></div>
+    
+    <input type="hidden" id="selected-lat">
+    <input type="hidden" id="selected-lng">
+    <p class="coords-display">Selected: <span id="display-coords">No location selected</span></p>
+</div>
 
             <div id="entries-container"></div>
 
