@@ -1835,6 +1835,7 @@ async function initBirdMap() {
     // Listen for zoom changes to resize dots
     map.on('zoomend', updateHubSize);
     updateHubSize(); // Run once at start
+}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
