@@ -1837,6 +1837,7 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
+}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
