@@ -1818,13 +1818,6 @@ hr {
     margin-top: 0 !important;
     top: -41px;
     left: -10px;
-}
-/* Force the Leaflet marker to behave */
-.leaflet-marker-icon {
     width: 25px !important;
-    height: 41px !important;
-}
-.leaflet-marker-shadow {
-    width: 41px !important;
     height: 41px !important;
 }
