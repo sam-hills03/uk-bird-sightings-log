@@ -1789,11 +1789,11 @@ async function initBirdMap() {
         gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
     }).addTo(map);
 
-    // 3. FETCH UNIQUE LOCATIONS (Added .not null check here)
+    // 3. FETCH UNIQUE LOCATIONS
     const { data: locations, error: lError } = await supabaseClient
         .from('saved_locations')
         .select('name, lat, lng')
-        .not('lat', 'is', null); // Safety check!
+        .not('lat', 'is', null);
 
     if (lError) return console.error("Locations fetch error:", lError);
 
@@ -1802,14 +1802,22 @@ async function initBirdMap() {
         const speciesAtLoc = locationSightings.map(s => s.species);
         const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
 
+        // --- STEP 1 UPDATES START HERE ---
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
             radius: 10,
             fillColor: "#8c2e1b",
             color: "#fff",
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.9
+            fillOpacity: 0.9,
+            interactive: true // NEW: Ensures the circle responds to mouse clicks
         }).addTo(map);
+
+        // This line changes the cursor to a 'hand' when hovering over the circle
+        if (hubMarker.getElement()) {
+            hubMarker.getElement().style.cursor = 'pointer';
+        }
+        // --- STEP 1 UPDATES END HERE ---
 
         const listHtml = uniqueSpecies.length > 0 
             ? `<div class="map-logbook-list">
@@ -1830,7 +1838,7 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
-} // <--- THIS WAS THE MISSING BRACE
+}
 
 // 1. SIGN UP
 async function handleSignUp() {
