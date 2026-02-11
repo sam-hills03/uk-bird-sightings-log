@@ -1768,73 +1768,63 @@ async function initBirdMap() {
     if (map) map.remove();
 
     map = L.map('bird-map').setView([50.8139, -0.3711], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    // 1. Fetch Data
+    const { data: sightings } = await supabaseClient.from('sightings').select('lat, lng, species, location').not('lat', 'is', null);
+    const { data: locations } = await supabaseClient.from('saved_locations').select('location, lat, lng').not('lat', 'is', null);
+
+    // 2. Heat Layer
+    L.heatLayer(sightings.map(s => [s.lat, s.lng, 0.5]), {
+        radius: 25, blur: 15, maxZoom: 17
     }).addTo(map);
 
-    // 1. FETCH ALL SIGHTINGS FOR THE HEAT
-    const { data: sightings, error: sError } = await supabaseClient
-        .from('sightings')
-        .select('lat, lng, species, location')
-        .not('lat', 'is', null);
-
-    if (sError) return console.error("Sightings fetch error:", sError);
-
-    // 2. PREPARE HEAT DATA
-    const heatPoints = sightings.map(s => [s.lat, s.lng, 0.5]); 
-    L.heatLayer(heatPoints, {
-        radius: 25,
-        blur: 15,
-        maxZoom: 17,
-        gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
-    }).addTo(map);
-
-    // 3. FETCH UNIQUE LOCATIONS (Changed 'name' to 'location' here)
-    const { data: locations, error: lError } = await supabaseClient
-        .from('saved_locations')
-        .select('location, lat, lng') // Corrected column name
-        .not('lat', 'is', null);
-
-    if (lError) return console.error("Locations fetch error:", lError);
-
-    // 4. DRAW THE HUBS
-    // Create a layer group to hold the hubs so we can easily resize them
-    const hubsLayer = L.layerGroup().addTo(map);
-
-    function updateHubSize() {
-        const currentZoom = map.getZoom();
-        // Calculation: At zoom 11, size is 4. At zoom 15, size is 12.
-        const newRadius = Math.max(3, (currentZoom - 10) * 2); 
-        
-        hubsLayer.eachLayer(layer => {
-            if (layer instanceof L.CircleMarker) {
-                layer.setRadius(newRadius);
-            }
-        });
+    // 3. Setup Hubs Pane
+    if (!map.getPane('hubsPane')) {
+        map.createPane('hubsPane');
+        map.getPane('hubsPane').style.zIndex = 650;
     }
 
+    // 4. Draw Hubs
     locations.forEach(loc => {
         const locationSightings = sightings.filter(s => s.location === loc.location);
         const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
+        // We use a small radius (5) and 'weight' (1) to keep them subtle
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
             pane: 'hubsPane',
-            radius: 4, // Start small
+            radius: 5, 
             fillColor: "#8c2e1b",
             color: "#ffffff",
             weight: 1,
             opacity: 1,
             fillOpacity: 0.9,
             interactive: true
-        }).addTo(hubsLayer); // Add to our specific group
+        }).addTo(map);
 
-        // (The bindPopup code remains exactly the same as before...)
-        hubMarker.bindPopup(`...your existing popup code...`);
+        hubMarker.bindPopup(`
+            <div class="map-popup-container">
+                <header class="map-popup-header">
+                    <h3 class="serif-title">${loc.location}</h3>
+                    <span class="species-count-badge">${uniqueSpecies.length} Species</span>
+                </header>
+                <div class="map-popup-body">
+                    <p class="handwritten-label">Historical Records:</p>
+                    <div class="map-logbook-list">
+                        ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `, { maxWidth: 250 });
+
+        // AUTOMATIC SCALING: This makes the dots grow when you zoom in 
+        // without needing a complex separate function.
+        map.on('zoomend', () => {
+            const z = map.getZoom();
+            const r = z > 12 ? 10 : 5; // If zoomed in past 12, make it 10px, otherwise 5px
+            hubMarker.setRadius(r);
+        });
     });
-
-    // Listen for zoom changes to resize dots
-    map.on('zoomend', updateHubSize);
-    updateHubSize(); // Run once at start
 }
 // 1. SIGN UP
 async function handleSignUp() {
