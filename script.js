@@ -1789,27 +1789,22 @@ async function initBirdMap() {
         gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
     }).addTo(map);
 
-    // 3. FETCH UNIQUE LOCATIONS
+    // 3. FETCH UNIQUE LOCATIONS (Changed 'name' to 'location' here)
     const { data: locations, error: lError } = await supabaseClient
         .from('saved_locations')
-        .select('name, lat, lng')
+        .select('location, lat, lng') // Corrected column name
         .not('lat', 'is', null);
 
     if (lError) return console.error("Locations fetch error:", lError);
 
-    // 4. SETUP HUBS PANE (Fixed Click Logic)
-    if (!map.getPane('hubsPane')) {
-        map.createPane('hubsPane');
-        map.getPane('hubsPane').style.zIndex = 650;
-    }
-    // We REMOVED pointerEvents = 'none' here so it works!
-
+    // 4. DRAW THE HUBS
     locations.forEach(loc => {
-        const locationSightings = sightings.filter(s => s.location === loc.name);
-        const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
+        // Match sightings using loc.location instead of loc.name
+        const locationSightings = sightings.filter(s => s.location === loc.location);
+        const speciesAtLoc = locationSightings.map(s => s.species);
+        const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
 
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
-            pane: 'hubsPane',
             radius: 12,
             fillColor: "#8c2e1b",
             color: "#ffffff",
@@ -1820,13 +1815,15 @@ async function initBirdMap() {
         }).addTo(map);
 
         const listHtml = uniqueSpecies.length > 0 
-            ? `<div class="map-logbook-list">${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}</div>`
+            ? `<div class="map-logbook-list">
+                ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
+               </div>`
             : `<p>No species recorded here yet.</p>`;
 
         hubMarker.bindPopup(`
             <div class="map-popup-container">
                 <header class="map-popup-header">
-                    <h3 class="serif-title">${loc.name}</h3>
+                    <h3 class="serif-title">${loc.location}</h3>
                     <span class="species-count-badge">${uniqueSpecies.length} Species</span>
                 </header>
                 <div class="map-popup-body">
@@ -1836,7 +1833,7 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
-} // This closing brace was the big missing piece!
+}
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
