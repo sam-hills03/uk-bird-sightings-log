@@ -1914,7 +1914,7 @@ async function initBirdMap() {
             hubMarker.setRadius(r);
         });
     });
-}
+});
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
