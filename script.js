@@ -1160,14 +1160,22 @@ async function fetchBirdDescription(speciesName) {
 // ============================================
 
 function addSightingEntry() {
-	// Check current count
-	const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
+    const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-	// 1. STOP if at 20
-	if (entryGroups.length >= 20) {
-		alert("Maximum of 20 birds per submission reached.");
-		return;
-	}
+    // NEW SAFETY CHECK: If we are initializing and already have an entry, stop.
+    // This prevents the "Double Start" bug.
+    if (entryGroups.length === 1) {
+        const firstInput = entryGroups[0].querySelector('.species-input');
+        if (firstInput && firstInput.value === "") {
+            return; // Don't add a second empty box if the first is still empty
+        }
+    }
+
+    // Existing check for max 20
+    if (entryGroups.length >= 20) {
+        alert("Maximum of 20 birds per submission reached.");
+        return;
+    }
 
 	const template = document.getElementById('sighting-template');
 	if (!template) return;
