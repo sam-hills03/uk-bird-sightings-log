@@ -1914,7 +1914,7 @@ async function initBirdMap() {
                 fillColor: "#ff0000", // Red (but we set opacity to 0)
                 color: "transparent",
                 weight: 0,
-                fillOpacity: 0, // 0 makes it invisible, but still clickable
+                fillOpacity: 1, // 0 makes it invisible, but still clickable
                 interactive: true 
             }).addTo(map);
 
