@@ -1797,32 +1797,31 @@ async function initBirdMap() {
 
     if (lError) return console.error("Locations fetch error:", lError);
 
+   // Create a special "top layer" for our clickable hubs
+    map.createPane('hubsPane');
+    map.getPane('hubsPane').style.zIndex = 650;
+    map.getPane('hubsPane').style.pointerEvents = 'none'; // Let the map move
+
     locations.forEach(loc => {
         const locationSightings = sightings.filter(s => s.location === loc.name);
         const speciesAtLoc = locationSightings.map(s => s.species);
         const uniqueSpecies = [...new Set(speciesAtLoc)].sort();
 
-        // --- STEP 1 UPDATES START HERE ---
+        // The Marker
         const hubMarker = L.circleMarker([loc.lat, loc.lng], {
-            radius: 10,
+            pane: 'hubsPane', // Forces it to the top layer
+            radius: 12,       // Made slightly larger to be easier to hit
             fillColor: "#8c2e1b",
-            color: "#fff",
-            weight: 2,
+            color: "#ffffff",
+            weight: 3,
             opacity: 1,
-            fillOpacity: 0.9,
-            interactive: true // NEW: Ensures the circle responds to mouse clicks
+            fillOpacity: 1,   // Solid color so you can definitely see it
+            interactive: true
         }).addTo(map);
 
-        // This line changes the cursor to a 'hand' when hovering over the circle
-        if (hubMarker.getElement()) {
-            hubMarker.getElement().style.cursor = 'pointer';
-        }
-        // --- STEP 1 UPDATES END HERE ---
-
+        // Build the Popup (same as before)
         const listHtml = uniqueSpecies.length > 0 
-            ? `<div class="map-logbook-list">
-                ${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}
-               </div>`
+            ? `<div class="map-logbook-list">${uniqueSpecies.map(sp => `<div class="logbook-item">• ${sp}</div>`).join('')}</div>`
             : `<p>No species recorded here yet.</p>`;
 
         hubMarker.bindPopup(`
@@ -1838,8 +1837,6 @@ async function initBirdMap() {
             </div>
         `, { maxWidth: 250 });
     });
-}
-
 // 1. SIGN UP
 async function handleSignUp() {
     const email = document.getElementById('auth-email').value;
