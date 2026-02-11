@@ -1805,13 +1805,3 @@ hr {
     pointer-events: auto !important; /* The markers DO catch clicks */
     cursor: pointer;
 }
-/* This kills the "glass wall" effect for good */
-.leaflet-map-pane {
-    z-index: 1 !important;
-}
-.leaflet-hubsPane-pane {
-    pointer-events: none !important;
-}
-path.leaflet-interactive {
-    pointer-events: auto !important;
-}
