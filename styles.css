@@ -1816,6 +1816,8 @@ hr {
 .leaflet-marker-icon {
     margin-left: 0 !important;
     margin-top: 0 !important;
+    top: -41px;
+    left: -10px;
 }
 /* Force the Leaflet marker to behave */
 .leaflet-marker-icon {
