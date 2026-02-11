@@ -296,7 +296,7 @@ function switchTab(targetTabId) {
                 if (pickerMap) {
                     pickerMap.invalidateSize(); // Forces it to fill the container
                 }
-            }, 100);
+            }, 300);
         }
         // 3. STATS LOGIC
         else if (targetTabId === 'stats-view') {
@@ -1330,7 +1330,10 @@ function initLocationPicker() {
 
     if (pickerMap) return; 
 
-    pickerMap = L.map('location-picker-map').setView([50.8139, -0.3711], 13);
+    pickerMap = L.map('location-picker-map', {
+    tap: false, // Prevents "phantom" clicks on mobile/touch
+    touchZoom: true
+}).setView([50.8139, -0.3711], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
 
     pickerMap.on('click', function(e) {
@@ -1848,7 +1851,17 @@ async function initBirdMap() {
 
     // 1. Fetch Data
     const { data: sightings } = await supabaseClient.from('sightings').select('lat, lng, species, location').not('lat', 'is', null);
-    const { data: locations } = await supabaseClient.from('saved_locations').select('location, lat, lng').not('lat', 'is', null);
+    const { data: locations, error: lError } = await supabaseClient
+        .from('saved_locations')
+        .select('location, lat, lng') // Ensure 'lat' and 'lng' are included!
+        .not('lat', 'is', null);
+
+    if (lError) return console.error("Locations fetch error:", lError);
+
+    // Filter out any locations that don't actually have numbers for coordinates
+    const validLocations = locations.filter(loc => !isNaN(parseFloat(loc.lat)));
+
+    validLocations.forEach(loc => {
 
     // 2. Heat Layer
     L.heatLayer(sightings.map(s => [s.lat, s.lng, 0.5]), {
