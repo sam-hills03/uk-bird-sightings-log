@@ -1724,3 +1724,60 @@ hr {
     margin-bottom: 3px;
     color: #333;
 }
+/* Container styling */
+.map-popup-container {
+    font-family: 'EB Garamond', serif;
+    padding: 5px;
+}
+
+.map-popup-header {
+    border-bottom: 2px solid #8c2e1b;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-popup-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #8c2e1b;
+}
+
+.species-count-badge {
+    background: #416863;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.handwritten-label {
+    font-family: 'EB Garamond', italic;
+    font-size: 0.9rem;
+    color: #666;
+    margin: 5px 0;
+}
+
+/* The Scrollable List */
+.map-logbook-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px inset #eee;
+    background: #fdfaf0; /* Slight paper tint */
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.logbook-item {
+    font-size: 1rem;
+    border-bottom: 1px solid #eee;
+    padding: 4px 0;
+    color: #2c2621;
+}
+
+/* Custom Scrollbar for the vintage look */
+.map-logbook-list::-webkit-scrollbar { width: 5px; }
+.map-logbook-list::-webkit-scrollbar-track { background: #f4f1ea; }
+.map-logbook-list::-webkit-scrollbar-thumb { background: #8c2e1b; }
