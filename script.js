@@ -1911,10 +1911,10 @@ async function initBirdMap() {
             const hubMarker = L.circleMarker([lat, lng], {
                 pane: 'hubsPane',
                 radius: 25, // Large hit area
-                fillColor: "#ff0000", // Red (but we set opacity to 0)
+                fillColor: "#8c2e1b", // Red (but we set opacity to 0)
                 color: "transparent",
                 weight: 0,
-                fillOpacity: 0.1, // 0 makes it invisible, but still clickable
+                fillOpacity: 0.001, // 0 makes it invisible, but still clickable
                 interactive: true 
             }).addTo(map);
 
