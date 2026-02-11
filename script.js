@@ -1162,141 +1162,121 @@ async function fetchBirdDescription(speciesName) {
 function addSightingEntry() {
     const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-    // NEW SAFETY CHECK: If we are initializing and already have an entry, stop.
-    // This prevents the "Double Start" bug.
-    if (entryGroups.length === 1) {
-        const firstInput = entryGroups[0].querySelector('.species-input');
-        if (firstInput && firstInput.value === "") {
-            return; // Don't add a second empty box if the first is still empty
-        }
-    }
-
-    // Existing check for max 20
+    // 1. STOP if at 20
     if (entryGroups.length >= 20) {
         alert("Maximum of 20 birds per submission reached.");
         return;
     }
 
-	const template = document.getElementById('sighting-template');
-	if (!template) return;
-	const entryClone = template.content.cloneNode(true);
-	const newEntry = entryClone.querySelector('.sighting-entry-group');
+    const template = document.getElementById('sighting-template');
+    if (!template) return;
+    const entryClone = template.content.cloneNode(true);
+    const newEntry = entryClone.querySelector('.sighting-entry-group');
 
-	// 2. Setup Remove Button
-	newEntry.querySelector('.remove-entry-btn').addEventListener('click', () => {
-		newEntry.remove();
-		// Always keep at least one row
-		if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 0) {
-			addSightingEntry();
-		}
+    // 2. Setup Remove Button
+    newEntry.querySelector('.remove-entry-btn').addEventListener('click', () => {
+        newEntry.remove();
+        // If we just removed the very last row, add a fresh one back immediately
+        if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 0) {
+            addSightingEntry();
+        }
 
-		// 3. Re-enable "Add" styling
-		if (addEntryBtn) {
-			addEntryBtn.style.opacity = '1';
-			addEntryBtn.style.cursor = 'pointer';
-		}
-	});
+        // Re-enable "Add" styling
+        if (addEntryBtn) {
+            addEntryBtn.style.opacity = '1';
+            addEntryBtn.style.cursor = 'pointer';
+        }
+    });
 
-	entriesContainer.appendChild(newEntry);
+    entriesContainer.appendChild(newEntry);
 
-	// 4. Disable "Add" styling visually if we just hit 20
-	if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 20) {
-		if (addEntryBtn) {
-			addEntryBtn.style.opacity = '0.5';
-			addEntryBtn.style.cursor = 'not-allowed';
-		}
-	}
+    // 3. Disable "Add" styling visually if we just hit 20
+    if (entriesContainer.querySelectorAll('.sighting-entry-group').length === 20) {
+        if (addEntryBtn) {
+            addEntryBtn.style.opacity = '0.5';
+            addEntryBtn.style.cursor = 'not-allowed';
+        }
+    }
 }
+
 // Set default date to today
 const dateInput = document.getElementById('sighting-date');
 if (dateInput) {
-	dateInput.value = new Date().toISOString().split('T')[0];
+    dateInput.value = new Date().toISOString().split('T')[0];
 }
 
 // Ensure the button is actually listening
 if (addEntryBtn) {
-	addEntryBtn.onclick = addSightingEntry;
+    addEntryBtn.onclick = addSightingEntry;
+}
+
+// --- THE FIX FOR THE DOUBLE START ---
+// Clear the container once and add exactly one entry on load
+if (entriesContainer) {
+    entriesContainer.innerHTML = ''; 
+    addSightingEntry();
 }
 
 if (sightingForm) {
-	sightingForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
+    sightingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-		const date = document.getElementById('sighting-date').value;
-		const location = document.getElementById('location').value.trim();
+        const date = document.getElementById('sighting-date').value;
+        const location = document.getElementById('location').value.trim();
+        const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
 
-		// Use the existing entriesContainer variable
-		const entryGroups = entriesContainer.querySelectorAll('.sighting-entry-group');
+        if (!date || !location) {
+            alert("Please enter both a Date and a Location.");
+            return;
+        }
 
-		if (!date || !location) {
-			alert("Please enter both a Date and a Location.");
-			return;
-		}
+        const progressContainer = document.getElementById('upload-progress-container');
+        const progressBar = document.getElementById('upload-progress-bar');
+        const progressText = document.getElementById('upload-progress-text');
 
-		// 1. Prepare Progress Bar
-		const progressContainer = document.getElementById('upload-progress-container');
-		const progressBar = document.getElementById('upload-progress-bar');
-		const progressText = document.getElementById('upload-progress-text');
+        if (progressContainer) progressContainer.style.display = 'block';
+        let savedCount = 0;
+        const totalToSave = entryGroups.length;
 
-		if (progressContainer) progressContainer.style.display = 'block';
-		let savedCount = 0;
-		const totalToSave = entryGroups.length;
+        try {
+            await saveNewLocation(location);
 
-		try {
-			// 2. Save Location
-			await saveNewLocation(location);
+            for (const group of entryGroups) {
+                const speciesInput = group.querySelector('.species-input');
+                const species = speciesInput?.value.trim();
 
-			// 3. The Save Loop (The part that actually talks to the database)
-			for (const group of entryGroups) {
-				const speciesInput = group.querySelector('.species-input');
-				const species = speciesInput?.value.trim();
+                if (species && isSpeciesValid(species)) {
+                    await saveSighting({ species, date, location });
+                    savedCount++;
 
-				if (species && isSpeciesValid(species)) {
-					// This sends the data to Supabase
-					await saveSighting({
-						species,
-						date,
-						location
-					});
-					savedCount++;
+                    if (progressBar && progressText) {
+                        const percent = (savedCount / totalToSave) * 100;
+                        progressBar.style.width = percent + "%";
+                        progressText.textContent = `${savedCount} / ${totalToSave}`;
+                    }
+                }
+            }
 
-					// Update progress bar
-					if (progressBar && progressText) {
-						const percent = (savedCount / totalToSave) * 100;
-						progressBar.style.width = percent + "%";
-						progressText.textContent = `${savedCount} / ${totalToSave}`;
-					}
-				}
-			}
+            alert(`Successfully recorded ${savedCount} sightings!`);
 
-			// 4. Selective Reset (Keeps Date/Location)
-			alert(`Successfully recorded ${savedCount} sightings!`);
+            // RESET FORM: Clear container and start with one fresh row
+            entriesContainer.innerHTML = '';
+            addSightingEntry();
 
-			// Clear bird names
-			const speciesInputs = entriesContainer.querySelectorAll('.species-input');
-			speciesInputs.forEach(input => input.value = '');
+            if (progressContainer) progressContainer.style.display = 'none';
+            if (progressBar) progressBar.style.width = "0%";
+            if (addEntryBtn) {
+                addEntryBtn.style.opacity = '1';
+                addEntryBtn.style.cursor = 'pointer';
+            }
 
-			// Remove extra rows, leave only the first one
-			const allRows = entriesContainer.querySelectorAll('.sighting-entry-group');
-			for (let i = 1; i < allRows.length; i++) {
-				allRows[i].remove();
-			}
+            updateAllDisplays();
 
-			// Reset UI states
-			if (progressContainer) progressContainer.style.display = 'none';
-			if (progressBar) progressBar.style.width = "0%";
-			if (addEntryBtn) {
-				addEntryBtn.style.opacity = '1';
-				addEntryBtn.style.cursor = 'pointer';
-			}
-
-			updateAllDisplays();
-
-		} catch (error) {
-			console.error("Upload failed:", error);
-			alert("There was an error saving your sightings. Check the console for details.");
-		}
-	});
+        } catch (error) {
+            console.error("Upload failed:", error);
+            alert("There was an error saving your sightings.");
+        }
+    });
 }
 // ============================================
 // I. STATISTICS & CHARTS
