@@ -274,26 +274,26 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
+    // Remove classes from EVERYTHING
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        content.style.display = 'none'; 
     });
     tabButtons.forEach(button => button.classList.remove('active'));
 
+    // Add classes ONLY to the target
     const targetContent = document.getElementById(targetTabId);
-    if (targetContent) {
-        targetContent.classList.add('active-content');
-        targetContent.style.display = 'block'; 
+    const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
-        // 1. BIG MAP LOGIC
+    if (targetContent) {
+        targetContent.classList.add('active-content'); // CSS handles display:block !important
+        if (targetButton) targetButton.classList.add('active');
+
+        // Trigger specific logic for Maps or Stats
         if (targetTabId === 'map-tab') {
-    if (!map) {
-        initBirdMap(); 
-    } else {
-        // Don't rebuild the whole map, just fix the layout
-        requestAnimationFrame(() => {
-            map.invalidateSize();
-        });
+            setTimeout(() => { if(map) map.invalidateSize(); }, 100);
+        } else if (targetTabId === 'stats-view') {
+            calculateAndDisplayStats();
+        }
     }
 }
         // 2. NEW: SUBMISSION PICKER LOGIC (Step 3)
