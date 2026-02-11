@@ -1851,19 +1851,21 @@ async function fetchRegistryData() {
 // Map setup
 
 async function initBirdMap() {
-    if (map) { map.remove(); map = null; }
+    if (map) { 
+        map.remove(); 
+        map = null; 
+    }
 
-    // Use Canvas renderer for better performance
+    // 1. Initialize with Canvas for speed
     map = L.map('bird-map', {
         renderer: L.canvas() 
     }).setView([50.8139, -0.3711], 11);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // 1. DATA SOURCE: Use local memory first
-    const sightings = mySightings; 
+    // 2. Data Sourcing
+    const sightings = mySightings || []; 
     
-    // Only fetch locations from the web if we haven't already
     if (cachedLocations.length === 0) {
         const { data, error } = await supabaseClient
             .from('saved_locations')
@@ -1872,12 +1874,13 @@ async function initBirdMap() {
     }
     const locations = cachedLocations;
 
-    // 2. Setup Hubs Pane
+    // 3. Setup the Interactive Pane
+    // Important: We need 'pointer-events: auto' for the markers to be clickable
     const pane = map.createPane('hubsPane');
     pane.style.zIndex = 650;
-    pane.style.pointerEvents = 'none';
+    pane.style.pointerEvents = 'none'; 
 
-    // 3. Heat Layer (Background)
+    // 4. Heat Layer
     const heatData = sightings
         .filter(s => s.lat && s.lng)
         .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
@@ -1887,34 +1890,31 @@ async function initBirdMap() {
             radius: 25, 
             blur: 15, 
             maxZoom: 17,
-            gradient: {
-                0.2: '#416863', 0.4: '#d1ccbc', 0.6: '#e2a76f', 0.9: '#8c2e1b', 1.0: '#5c1e11'
-            }
+            gradient: { 0.2: '#416863', 0.4: '#d1ccbc', 0.6: '#e2a76f', 0.9: '#8c2e1b', 1.0: '#5c1e11' }
         }).addTo(map);
     }
 
-    // 4. Draw Invisible Interactive Hubs
+    // 5. Drawing Invisible Hubs
     if (locations) {
         locations.forEach(loc => {
-            if (!loc.lat || !loc.lng) return;
-
+            // Ensure we have valid numbers
             const lat = parseFloat(loc.lat);
             const lng = parseFloat(loc.lng);
-            
+            if (isNaN(lat) || isNaN(lng)) return;
+
             const locationSightings = sightings.filter(s => s.location === loc.location);
-            // Skip drawing a hub if there are no birds there
             if (locationSightings.length === 0) return;
 
             const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
+            // Create the invisible circle marker
             const hubMarker = L.circleMarker([lat, lng], {
                 pane: 'hubsPane',
-                radius: 20, 
-                fillColor: "transparent", 
-                color: "transparent", 
+                radius: 25, // Large hit area
+                fillColor: "#ff0000", // Red (but we set opacity to 0)
+                color: "transparent",
                 weight: 0,
-                opacity: 0,
-                fillOpacity: 0,
+                fillOpacity: 0, // 0 makes it invisible, but still clickable
                 interactive: true 
             }).addTo(map);
 
