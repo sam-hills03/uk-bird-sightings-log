@@ -1836,3 +1836,12 @@ hr {
     height: auto !important;
     position: relative;
 }
+#map-tab {
+    z-index: 10;
+    position: relative;
+    background-color: var(--color-background-soft); /* Ensures it's not see-through */
+}
+
+#stats-view {
+    z-index: 1; /* Lower than the map */
+}
