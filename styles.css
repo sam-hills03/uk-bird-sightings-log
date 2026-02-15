@@ -1889,3 +1889,11 @@ hr {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
+.leaflet-interactive {
+    cursor: pointer !important;
+}
+
+/* This helps the hubs stay visible as you zoom */
+.leaflet-heatmap-layer {
+    pointer-events: none; /* Ensures the heat doesn't block the clicks */
+}
