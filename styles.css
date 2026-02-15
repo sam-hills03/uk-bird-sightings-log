@@ -1897,19 +1897,3 @@ hr {
 .leaflet-heatmap-layer {
     pointer-events: none; /* Ensures the heat doesn't block the clicks */
 }
-/* FORCE hide stats unless explicitly active */
-#stats-view:not(.active-content) {
-    display: none !important;
-    visibility: hidden !important;
-    position: absolute !important;
-    top: -9999px !important;
-    height: 0 !important;
-    overflow: hidden !important;
-}
-
-/* Ensure the map tab also behaves when inactive */
-#map-tab:not(.active-content) {
-    display: none !important;
-    position: absolute !important;
-    top: -9999px !important;
-}
