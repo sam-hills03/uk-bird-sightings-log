@@ -292,12 +292,15 @@ function switchTab(targetTabId) {
         
         // CASE A: The Big Map
         if (targetTabId === 'map-tab') {
-            if (!map) {
-                initBirdMap(); 
-            } else {
-                setTimeout(() => { map.invalidateSize(); }, 100);
-            }
-        } 
+    setTimeout(() => {
+        if (!map) {
+            initBirdMap(); 
+        } else {
+            map.invalidateSize();
+            map.fire('viewreset'); 
+        }
+    }, 300);
+}
         
         // CASE B: Submission Map (Location Picker)
         else if (targetTabId === 'submission-view') {
