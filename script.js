@@ -960,120 +960,85 @@ function isSpeciesValid(name) {
 // Map setup
 
 async function initBirdMap() {
-    // 1. Cleanup existing map instance
-    if (map) { 
-        map.remove(); 
-        map = null; 
-    }
+    if (map) { map.remove(); map = null; }
 
-    // 2. Initialize Map with Canvas renderer for smoother performance
     map = L.map('bird-map', {
         renderer: L.canvas() 
     }).setView([50.8139, -0.3711], 11);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // 3. Data Sourcing (Using local sightings + cached locations)
     const sightings = mySightings || []; 
-    
     if (cachedLocations.length === 0) {
-        const { data, error } = await supabaseClient
-            .from('saved_locations')
-            .select('location, lat, lng');
+        const { data, error } = await supabaseClient.from('saved_locations').select('location, lat, lng');
         if (!error) cachedLocations = data;
     }
     const locations = cachedLocations;
 
-    // 4. Setup Interactive Pane
-    // This ensures your clickable hubs sit ABOVE the heatmap and tile layers
-    if (!map.getPane('hubsPane')) {
-        const pane = map.createPane('hubsPane');
-        pane.style.zIndex = 1000; 
-        pane.style.pointerEvents = 'none'; 
-    }
+    // 1. Setup Pane with HIGHEST priority
+    const pane = map.createPane('hubsPane');
+    pane.style.zIndex = 1000;
+    pane.style.pointerEvents = 'none';
 
-    // 5. Generate Dynamic Heatmap Data
-    // We calculate intensity based on the diversity of species at each hub
+    // 2. Classic Heat Layer
     const heatData = locations.map(loc => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng);
-        if (isNaN(lat) || isNaN(lng)) return null;
-
-        // Find how many unique species are at this specific location
-        const speciesAtLoc = [...new Set(
-            sightings.filter(s => s.location === loc.location).map(s => s.species)
-        )];
-        
+        const speciesAtLoc = [...new Set(sightings.filter(s => s.location === loc.location).map(s => s.species))];
         if (speciesAtLoc.length === 0) return null;
 
-        // Intensity calculation: 70 species = 1.0 (maximum heat)
-        // This prevents the map from looking "too dark" too early
-        const intensity = Math.min(speciesAtLoc.length / 70, 1.0);
-        
+        // Intensity: 0.2 minimum so it never disappears, scaling up to 70 species
+        const intensity = Math.max(0.2, Math.min(speciesAtLoc.length / 70, 1.0));
         return [lat, lng, intensity];
-    }).filter(data => data !== null);
+    }).filter(d => d !== null);
 
-    // 6. Add Heat Layer with Naturalist Palette
     if (heatData.length > 0) {
         L.heatLayer(heatData, { 
-            radius: 45,        // Larger, softer glow
-            blur: 25,          // Increased blur for a less "spotty" look
-            minOpacity: 0.2,   // Subtle start for low-density areas
+            radius: 40,
+            blur: 20,
+            minOpacity: 0.4, // Higher min opacity so zoomed-in spots don't vanish
             gradient: {
-                0.1: 'rgba(209, 204, 188, 0.4)', // Soft Parchment
-                0.3: '#e2a76f',                 // Sunset Orange
-                0.6: '#8c2e1b',                 // Naturalist Red
-                0.9: '#4a150a',                 // Burnt Umber
-                1.0: '#2c0a05'                  // Deep Earth Core
+                0.4: 'blue',
+                0.6: 'cyan',
+                0.7: 'lime',
+                0.8: 'yellow',
+                1.0: 'red'
             }
         }).addTo(map);
     }
 
-    // 7. Draw Invisible Interactive Hubs
-    if (locations) {
-        locations.forEach(loc => {
-            const lat = parseFloat(loc.lat);
-            const lng = parseFloat(loc.lng);
-            if (isNaN(lat) || isNaN(lng)) return;
+    // 3. The Clickable Hubs
+    locations.forEach(loc => {
+        const lat = parseFloat(loc.lat);
+        const lng = parseFloat(loc.lng);
+        const locationSightings = sightings.filter(s => s.location === loc.location);
+        if (locationSightings.length === 0) return;
 
-            const locationSightings = sightings.filter(s => s.location === loc.location);
-            if (locationSightings.length === 0) return;
+        const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
 
-            const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
+        // Using a tiny radius but solid stroke to keep the browser "interested"
+        const hubMarker = L.circleMarker([lat, lng], {
+            pane: 'hubsPane',
+            radius: 25, 
+            fillColor: "white", 
+            color: "transparent",
+            weight: 1,
+            fillOpacity: 0.0, // Totally clear
+            opacity: 0.0,     // Totally clear
+            interactive: true
+        }).addTo(map);
 
-            // Create invisible circle marker as a "hit zone"
-            const hubMarker = L.circleMarker([lat, lng], {
-                pane: 'hubsPane',
-                radius: 30,           // Extra large radius for easy clicking
-                fillColor: "#8c2e1b", 
-                color: "transparent",
-                weight: 0,
-                fillOpacity: 0.01,    // Microscopic opacity keeps it clickable
-                interactive: true,
-                bubblingMouseEvents: true 
-            }).addTo(map);
-
-            hubMarker.bindPopup(`
-                <div class="map-popup-container">
-                    <header class="map-popup-header">
-                        <h3 class="serif-title" style="margin:0; color:#416863; font-family:'DM Serif Display', serif;">${loc.location}</h3>
-                        <span class="species-count-badge" style="background:#8c2e1b; color:white; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">
-                            ${uniqueSpecies.length} Species
-                        </span>
-                    </header>
-                    <hr style="border:0; border-top:1px solid #d1ccbc; margin:10px 0;">
-                    <div class="map-popup-body">
-                        <p style="font-family:'EB Garamond',serif; font-style:italic; margin-bottom:8px; font-size:0.9rem;">Recorded in this vicinity:</p>
-                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto; font-family:'EB Garamond',serif;">
-                            ${uniqueSpecies.map(sp => `<li style="padding:4px 0; border-bottom:1px solid #eee; font-size:1.1rem;">• ${sp}</li>`).join('')}
-                        </ul>
-                    </div>
-                </div>
-            `, { maxWidth: 260 });
-        });
-    }
+        hubMarker.bindPopup(`
+            <div class="map-popup-container">
+                <h3 class="serif-title" style="margin:0; color:#222;">${loc.location}</h3>
+                <p style="font-size: 0.9rem; color: #666;">${uniqueSpecies.length} Species Recorded</p>
+                <hr style="margin:8px 0; border:0; border-top:1px solid #eee;">
+                <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
+                    ${uniqueSpecies.map(sp => `<li style="padding:2px 0;">• ${sp}</li>`).join('')}
+                </ul>
+            </div>
+        `, { maxWidth: 250 });
+    });
 }
 
 // ============================================
