@@ -109,11 +109,31 @@ h3 {
 }
 
 .tab-content {
-  display: none !important; /* Force it to stay hidden */
+    display: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
 }
-
 .tab-content.active-content {
-  display: block !important; /* Force it to appear when active */
+    display: block !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 1 !important;
+}
+body:has(#map-tab.active-content) .tab-content:not(#map-tab) {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* PAGINATION STYLES */
