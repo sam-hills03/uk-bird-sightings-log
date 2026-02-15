@@ -277,7 +277,6 @@ function switchTab(targetTabId) {
     // 1. THE BLANK SLATE: Immediately kill everything
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        // We use visibility: hidden as a secondary layer of defense
         content.style.visibility = 'hidden'; 
     });
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -286,69 +285,57 @@ function switchTab(targetTabId) {
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 2. Wait 10ms (one browser frame) before showing the next thing
-        // This gives the browser a chance to actually "clear" the screen
+        // 2. Wait 10ms to give the browser a "breather" frame
         setTimeout(() => {
             targetContent.classList.add('active-content');
             targetContent.style.visibility = 'visible';
             if (targetButton) targetButton.classList.add('active');
 
-        // --- START OF TAB LOGIC ---
-        
-        // CASE A: The Big Map
-        if (targetTabId === 'map-tab') {
-            // FORCE hide stats immediately to prevent overlapping/ghosting
-            document.getElementById('stats-view').classList.remove('active-content');
-
-            setTimeout(() => {
-                if (!map) {
-                    initBirdMap(); 
-                } else {
-                    // Force a hard refresh of the map size and internal state
-                    map.invalidateSize(true); 
-                    map.fire('viewreset');
-                    
-                    // Re-sync the invisible hotspots so they land in the right place
-                    setTimeout(() => {
-                        map.eachLayer(layer => {
-                            if (layer instanceof L.CircleMarker) layer.bringToFront();
-                        });
-                    }, 100);
-                }
-            }, 400); // Increased delay to ensure CSS transitions are finished
-        } 
-        
-        // CASE B: Submission Map (Location Picker)
-        else if (targetTabId === 'submission-view') {
-            setTimeout(() => {
-                initLocationPicker(); 
-                if (pickerMap) {
-                    pickerMap.invalidateSize(); 
-                }
-            }, 300);
-        }
-        
-        // CASE C: Stats Page
-        else if (targetTabId === 'stats-view') {
-            // Ensure Map is hidden
-            if (document.getElementById('map-tab')) {
-                document.getElementById('map-tab').classList.remove('active-content');
-            }
-
-            calculateAndDisplayStats();
-            fetchRegistryData();
+            // --- START OF TAB LOGIC ---
             
-            if (typeof birdChart !== 'undefined' && birdChart) birdChart.destroy();
-            if (typeof rarityChart !== 'undefined' && rarityChart) rarityChart.destroy();
+            // CASE A: The Big Map
+            if (targetTabId === 'map-tab') {
+                setTimeout(() => {
+                    if (!map) {
+                        initBirdMap(); 
+                    } else {
+                        map.invalidateSize(true); 
+                        map.fire('viewreset');
+                        setTimeout(() => {
+                            map.eachLayer(layer => {
+                                if (layer instanceof L.CircleMarker) layer.bringToFront();
+                            });
+                        }, 100);
+                    }
+                }, 400); 
+            } 
+            
+            // CASE B: Submission Map (Location Picker)
+            else if (targetTabId === 'submission-view') {
+                setTimeout(() => {
+                    initLocationPicker(); 
+                    if (pickerMap) pickerMap.invalidateSize(); 
+                }, 300);
+            }
+            
+            // CASE C: Stats Page
+            else if (targetTabId === 'stats-view') {
+                calculateAndDisplayStats();
+                fetchRegistryData();
+                
+                if (typeof birdChart !== 'undefined' && birdChart) birdChart.destroy();
+                if (typeof rarityChart !== 'undefined' && rarityChart) rarityChart.destroy();
 
-            setTimeout(() => {
-                createMonthlyChart();
-                createRarityChart();
-            }, 100);
-        }
-        // --- END OF TAB LOGIC ---
-    })
-}
+                setTimeout(() => {
+                    createMonthlyChart();
+                    createRarityChart();
+                }, 100);
+            }
+            // --- END OF TAB LOGIC ---
+            
+        }, 10); // Closes the 10ms setTimeout
+    } // Closes if (targetContent)
+} // Closes the function
 
 // Pagnation on the raw checklist page
 function setupPagination() {
