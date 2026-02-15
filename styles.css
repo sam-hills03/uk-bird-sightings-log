@@ -1845,3 +1845,27 @@ hr {
 #stats-view {
     z-index: 1; /* Lower than the map */
 }
+/* The 'Underworld' - hidden tabs go here */
+.tab-content:not(.active-content) {
+    display: none !important;
+    position: absolute !important;
+    top: -9999px !important; /* Throw it 10,000 pixels off screen */
+    left: -9999px !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important; /* Stops any "ghost" clicks */
+}
+
+/* The 'Real World' - only the active tab lives here */
+.tab-content.active-content {
+    display: block !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
