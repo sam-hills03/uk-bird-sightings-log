@@ -347,7 +347,7 @@ function switchTab(targetTabId) {
             }, 100);
         }
         // --- END OF TAB LOGIC ---
-    }
+    })
 }
 
 // Pagnation on the raw checklist page
