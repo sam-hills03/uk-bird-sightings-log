@@ -968,8 +968,12 @@ async function initBirdMap() {
 
     // 1. Initialize Map
     map = L.map('bird-map').setView([50.8139, -0.3711], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
+    // 2. Data Sourcing
     const sightings = mySightings || []; 
     if (cachedLocations.length === 0) {
         const { data } = await supabaseClient.from('saved_locations').select('location, lat, lng');
@@ -977,39 +981,44 @@ async function initBirdMap() {
     }
     const locations = cachedLocations;
 
-    // 2. CLASSIC HEATMAP COLORS (Fixed for Zoom)
-    const heatData = locations.map(loc => {
+    // 3. Format Heat Data
+    const heatPoints = locations.map(loc => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng);
-        const speciesAtLoc = [...new Set(sightings.filter(s => s.location === loc.location).map(s => s.species))];
-        if (speciesAtLoc.length === 0) return null;
-        
-        // Intensity scales to 1.0 (deep red) at 70 species
-        const intensity = Math.max(0.3, Math.min(speciesAtLoc.length / 70, 1.0));
-        return [lat, lng, intensity];
-    }).filter(d => d !== null);
+        if (isNaN(lat) || isNaN(lng)) return null;
 
-    if (heatData.length > 0) {
-        L.heatLayer(heatData, { 
-            radius: 30,      // Slightly smaller for precision
-            blur: 15,        // Sharper edges so it doesn't look "smudged"
-            minOpacity: 0.5, // Keeps it solid when you zoom in
+        const locSightings = sightings.filter(s => s.location === loc.location);
+        const speciesCount = [...new Set(locSightings.map(s => s.species))].length;
+        if (speciesCount === 0) return null;
+
+        // Intensity: 0.4 min for visibility, 1.0 max at 70 species
+        const intensity = Math.max(0.4, Math.min(speciesCount / 70, 1.0));
+        return [lat, lng, intensity];
+    }).filter(p => p !== null);
+
+    // 4. THE CLASSIC HEATMAP (Guaranteed Visibility)
+    if (heatPoints.length > 0) {
+        L.heatLayer(heatPoints, { 
+            radius: 30,
+            blur: 15,
+            minOpacity: 0.5,
             gradient: {
-                0.4: '#0000ff', // Blue
-                0.6: '#00ff00', // Green
-                0.8: '#ffff00', // Yellow
-                1.0: '#ff0000'  // Red
+                0.4: 'blue',
+                0.6: 'cyan',
+                0.7: 'lime',
+                0.8: 'yellow',
+                1.0: 'red'
             }
         }).addTo(map);
     }
 
-    // 3. THE "SMART CLICK" (Bypasses the "not clickable" bug)
+    // 5. PROXIMITY CLICK LOGIC (Always works on tab switch)
     map.on('click', function(e) {
         const clickLat = e.latlng.lat;
         const clickLng = e.latlng.lng;
         
         let closestLoc = null;
-        let minDistance = 0.008; // Click sensitivity (roughly 800m area)
+        let minDistance = 0.008; // Click sensitivity
 
         locations.forEach(loc => {
             const dist = Math.sqrt(Math.pow(loc.lat - clickLat, 2) + Math.pow(loc.lng - clickLng, 2));
@@ -1026,12 +1035,12 @@ async function initBirdMap() {
             L.popup()
                 .setLatLng([closestLoc.lat, closestLoc.lng])
                 .setContent(`
-                    <div class="map-popup-container">
-                        <h3 class="serif-title" style="margin:0; font-family:'DM Serif Display',serif; color:#416863;">${closestLoc.location}</h3>
-                        <p style="margin:4px 0; font-family:'EB Garamond',serif;"><b>${uniqueSpecies.length} Species Recorded</b></p>
-                        <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
-                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto; font-family:'EB Garamond',serif;">
-                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
+                    <div class="map-popup-container" style="font-family: 'EB Garamond', serif;">
+                        <h3 style="margin:0; font-family: 'DM Serif Display', serif; color: #3d342d;">${closestLoc.location}</h3>
+                        <p style="margin:5px 0;"><b>${uniqueSpecies.length} Species Recorded</b></p>
+                        <hr style="border:0; border-top:1px solid #c4bca6; margin:8px 0;">
+                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
+                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom: 1px dotted #c4bca6;">• ${sp}</li>`).join('')}
                         </ul>
                     </div>
                 `)
@@ -1039,10 +1048,8 @@ async function initBirdMap() {
         }
     });
 
-    // Make the cursor a "pointer" so you know you can click
-    map.getContainer().style.cursor = 'pointer';
-
-    setTimeout(() => { map.invalidateSize(); }, 200);
+    // Reset layout for visibility
+    setTimeout(() => { map.invalidateSize(); }, 250);
 }
 // ============================================
 // G. IMAGE FETCHING
