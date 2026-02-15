@@ -274,9 +274,15 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 1. THE BLANK SLATE: Immediately kill everything
+    // --- STEP 1: THE NUCLEAR BLANK SLATE ---
+    // We stop any pending fetches and throw all tabs 10,000px off-screen
+    window.stop(); 
+    
     tabContents.forEach(content => {
         content.classList.remove('active-content');
+        // Combined with the CSS fix, this ensures the ghosting is physically impossible
+        content.style.position = 'absolute';
+        content.style.top = '-9999px';
         content.style.visibility = 'hidden'; 
     });
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -285,15 +291,18 @@ function switchTab(targetTabId) {
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 2. Wait 10ms to give the browser a "breather" frame
+        // --- STEP 2: THE BREATHER ---
         setTimeout(() => {
+            // Bring the target tab back to the "Real World"
             targetContent.classList.add('active-content');
+            targetContent.style.position = 'relative';
+            targetContent.style.top = '0';
             targetContent.style.visibility = 'visible';
+            
             if (targetButton) targetButton.classList.add('active');
 
-            // --- START OF TAB LOGIC ---
+            // --- STEP 3: TAB SPECIFIC LOGIC ---
             
-            // CASE A: The Big Map
             if (targetTabId === 'map-tab') {
                 setTimeout(() => {
                     if (!map) {
@@ -301,6 +310,8 @@ function switchTab(targetTabId) {
                     } else {
                         map.invalidateSize(true); 
                         map.fire('viewreset');
+                        
+                        // Force hotspots to the very front for reliability
                         setTimeout(() => {
                             map.eachLayer(layer => {
                                 if (layer instanceof L.CircleMarker) layer.bringToFront();
@@ -310,7 +321,6 @@ function switchTab(targetTabId) {
                 }, 400); 
             } 
             
-            // CASE B: Submission Map (Location Picker)
             else if (targetTabId === 'submission-view') {
                 setTimeout(() => {
                     initLocationPicker(); 
@@ -318,7 +328,6 @@ function switchTab(targetTabId) {
                 }, 300);
             }
             
-            // CASE C: Stats Page
             else if (targetTabId === 'stats-view') {
                 calculateAndDisplayStats();
                 fetchRegistryData();
@@ -331,11 +340,10 @@ function switchTab(targetTabId) {
                     createRarityChart();
                 }, 100);
             }
-            // --- END OF TAB LOGIC ---
             
-        }, 10); // Closes the 10ms setTimeout
-    } // Closes if (targetContent)
-} // Closes the function
+        }, 10); 
+    } 
+}
 
 // Pagnation on the raw checklist page
 function setupPagination() {
@@ -1894,7 +1902,7 @@ async function initBirdMap() {
     // 3. Setup the Interactive Pane
     // Important: We need 'pointer-events: auto' for the markers to be clickable
     const pane = map.createPane('hubsPane');
-    pane.style.zIndex = 650;
+    pane.style.zIndex = 1000; // Set this very high
     pane.style.pointerEvents = 'none'; 
 
     // 4. Heat Layer
