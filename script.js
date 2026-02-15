@@ -960,14 +960,17 @@ function isSpeciesValid(name) {
 // Map setup
 
 async function initBirdMap() {
-    if (map) { map.remove(); map = null; }
+    // 1. COMPLETELY DESTROY existing map and panes
+    if (map) { 
+        map.off(); // Remove all event listeners
+        map.remove(); 
+        map = null; 
+    }
 
-    // Using default renderer for better click reliability
+    // 2. Initialize Map
     map = L.map('bird-map').setView([50.8139, -0.3711], 11);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     const sightings = mySightings || []; 
     
@@ -979,12 +982,13 @@ async function initBirdMap() {
     }
     const locations = cachedLocations;
 
-    // 1. Setup the Interaction Pane
+    // 3. Create a fresh Pane for Hubs
+    // By creating it fresh every time, we ensure it's always on top
     const pane = map.createPane('hubsPane');
     pane.style.zIndex = 650;
     pane.style.pointerEvents = 'none';
 
-    // 2. Format Heat Data
+    // 4. Heat Layer
     const heatPoints = locations.map(loc => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng);
@@ -993,28 +997,20 @@ async function initBirdMap() {
         const speciesCount = [...new Set(sightings.filter(s => s.location === loc.location).map(s => s.species))].length;
         if (speciesCount === 0) return null;
 
-        // Intensity: 0.3 minimum so it stays visible when zoomed, 1.0 at 70 species
         const intensity = Math.max(0.3, Math.min(speciesCount / 70, 1.0));
         return [lat, lng, intensity];
     }).filter(p => p !== null);
 
-    // 3. Add Classic Heat Layer
     if (heatPoints.length > 0) {
         L.heatLayer(heatPoints, { 
-            radius: 35, 
-            blur: 20, 
-            minOpacity: 0.5, // High enough to see when zoomed in
-            gradient: {
-                0.4: '#0000ff', // Blue
-                0.6: '#00ffff', // Cyan
-                0.7: '#00ff00', // Lime
-                0.8: '#ffff00', // Yellow
-                1.0: '#ff0000'  // Red
-            }
+            radius: 35, blur: 20, minOpacity: 0.5,
+            gradient: { 0.4: '#0000ff', 0.6: '#00ffff', 0.7: '#00ff00', 0.8: '#ffff00', 1.0: '#ff0000' }
         }).addTo(map);
     }
 
-    // 4. Add the Invisible Buttons
+    // 5. Add Hubs - We use a LayerGroup so they can be managed together
+    const hubLayer = L.layerGroup().addTo(map);
+
     locations.forEach(loc => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng);
@@ -1023,17 +1019,15 @@ async function initBirdMap() {
 
         const uniqueSpecies = [...new Set(locSightings.map(s => s.species))].sort();
 
-        // Making the marker slightly 'visible' to the browser with fillOpacity: 0.0
-        // but keeping it 'interactive'
         const hubMarker = L.circleMarker([lat, lng], {
             pane: 'hubsPane',
             radius: 25,
-            fillColor: "#000",
+            fillColor: "transparent", // Use transparent instead of opacity 0 for better hits
             color: "transparent",
             weight: 0,
             fillOpacity: 0.0, 
             interactive: true
-        }).addTo(map);
+        });
 
         hubMarker.bindPopup(`
             <div class="map-popup-container">
@@ -1045,7 +1039,17 @@ async function initBirdMap() {
                 </ul>
             </div>
         `, { maxWidth: 250 });
+
+        hubLayer.addLayer(hubMarker);
     });
+
+    // 6. THE RELIABILITY PULSE
+    // Forces the map to recalculate all interaction zones after the CSS transition ends
+    setTimeout(() => {
+        map.invalidateSize();
+        // This is the "secret sauce" - it tells Leaflet to re-index all clickable objects
+        map.fire('zoomend'); 
+    }, 500);
 }
 // ============================================
 // G. IMAGE FETCHING
