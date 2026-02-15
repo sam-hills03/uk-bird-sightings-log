@@ -271,78 +271,60 @@ function updateAllDisplays() {
 // ============================================
 
 function switchTab(targetTabId) {
+    // 1. Full stop to prevent async image fetches from messing with the layout
+    window.stop(); 
+    
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // --- STEP 1: THE NUCLEAR BLANK SLATE ---
-    // We stop any pending fetches and throw all tabs 10,000px off-screen
-    window.stop(); 
-    
-    tabContents.forEach(content => {
-        content.classList.remove('active-content');
-        // Combined with the CSS fix, this ensures the ghosting is physically impossible
-        content.style.position = 'absolute';
-        content.style.top = '-9999px';
-        content.style.visibility = 'hidden'; 
-    });
+    // 2. Remove all active classes
+    tabContents.forEach(content => content.classList.remove('active-content'));
     tabButtons.forEach(button => button.classList.remove('active'));
 
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // --- STEP 2: THE BREATHER ---
+        // 3. Tiny delay to allow the "removal" to be registered by the browser
         setTimeout(() => {
-            // Bring the target tab back to the "Real World"
             targetContent.classList.add('active-content');
-            targetContent.style.position = 'relative';
-            targetContent.style.top = '0';
-            targetContent.style.visibility = 'visible';
-            
             if (targetButton) targetButton.classList.add('active');
 
-            // --- STEP 3: TAB SPECIFIC LOGIC ---
-            
+            // --- TAB SPECIFIC LOGIC ---
             if (targetTabId === 'map-tab') {
                 setTimeout(() => {
                     if (!map) {
                         initBirdMap(); 
                     } else {
                         map.invalidateSize(true); 
-                        map.fire('viewreset');
-                        
-                        // Force hotspots to the very front for reliability
+                        // A quick "ping" to the hotspots to make sure they are clickable
                         setTimeout(() => {
-                            map.eachLayer(layer => {
-                                if (layer instanceof L.CircleMarker) layer.bringToFront();
-                            });
-                        }, 100);
+                            map.eachLayer(l => { if (l instanceof L.CircleMarker) l.bringToFront(); });
+                        }, 200);
                     }
-                }, 400); 
+                }, 300); 
             } 
-            
-            else if (targetTabId === 'submission-view') {
-                setTimeout(() => {
-                    initLocationPicker(); 
-                    if (pickerMap) pickerMap.invalidateSize(); 
-                }, 300);
-            }
             
             else if (targetTabId === 'stats-view') {
                 calculateAndDisplayStats();
                 fetchRegistryData();
-                
-                if (typeof birdChart !== 'undefined' && birdChart) birdChart.destroy();
-                if (typeof rarityChart !== 'undefined' && rarityChart) rarityChart.destroy();
-
+                // Destroys old charts to prevent memory leaks
+                if (window.birdChart) window.birdChart.destroy();
+                if (window.rarityChart) window.rarityChart.destroy();
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
-                }, 100);
+                }, 150);
             }
             
-        }, 10); 
-    } 
+            else if (targetTabId === 'submission-view') {
+                setTimeout(() => {
+                    initLocationPicker();
+                    if (pickerMap) pickerMap.invalidateSize();
+                }, 200);
+            }
+        }, 10);
+    }
 }
 
 // Pagnation on the raw checklist page
@@ -973,6 +955,101 @@ function getUniqueSeenSpecies() {
 
 function isSpeciesValid(name) {
 	return allUKBirds.some(b => b.CommonName.trim() === name.trim());
+}
+
+// Map setup
+
+async function initBirdMap() {
+    if (map) { 
+        map.remove(); 
+        map = null; 
+    }
+
+    // 1. Initialize with Canvas for speed
+    map = L.map('bird-map', {
+        renderer: L.canvas() 
+    }).setView([50.8139, -0.3711], 11);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    // 2. Data Sourcing
+    const sightings = mySightings || []; 
+    
+    if (cachedLocations.length === 0) {
+        const { data, error } = await supabaseClient
+            .from('saved_locations')
+            .select('location, lat, lng');
+        if (!error) cachedLocations = data;
+    }
+    const locations = cachedLocations;
+
+    // 3. Setup the Interactive Pane
+    // Important: We need 'pointer-events: auto' for the markers to be clickable
+    const pane = map.createPane('hubsPane');
+    pane.style.zIndex = 1000; // Set this very high
+    pane.style.pointerEvents = 'none'; 
+
+    // 4. Heat Layer
+    const heatData = sightings
+        .filter(s => s.lat && s.lng)
+        .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
+
+    if (heatData.length > 0) {
+        L.heatLayer(heatData, { 
+            radius: 35, // Bigger glow
+    		blur: 20,   // Softer edges
+    		minOpacity: 0.4,
+    		gradient: {
+ 					   0.2: 'rgba(140, 46, 27, 0.3)', // Very faint Earth Red glow
+    					0.4: '#e2a76f',               // Muted Sunset Orange
+   						 0.7: '#8c2e1b',               // Deep Naturalist Red (your hub color!)
+    					1.0: '#4a150a'                // Burnt Umber for the most sightings
+}
+        }).addTo(map);
+    }
+
+    // 5. Drawing Invisible Hubs
+    if (locations) {
+        locations.forEach(loc => {
+            // Ensure we have valid numbers
+            const lat = parseFloat(loc.lat);
+            const lng = parseFloat(loc.lng);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const locationSightings = sightings.filter(s => s.location === loc.location);
+            if (locationSightings.length === 0) return;
+
+            const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
+
+            // Create the invisible circle marker
+            const hubMarker = L.circleMarker([lat, lng], {
+                pane: 'hubsPane',
+                radius: 25, // Large hit area
+                fillColor: "#8c2e1b", // Red (but we set opacity to 0)
+                color: "transparent",
+                weight: 0,
+                fillOpacity: 0.01, // 0 makes it invisible, but still clickable
+                interactive: true 
+            }).addTo(map);
+
+            hubMarker.bindPopup(`
+                <div class="map-popup-container">
+                    <header class="map-popup-header">
+                        <h3 class="serif-title" style="margin:0; color:#416863;">${loc.location}</h3>
+                        <span class="species-count-badge" style="background:#8c2e1b; color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem;">
+                            ${uniqueSpecies.length} Species
+                        </span>
+                    </header>
+                    <hr style="border:0; border-top:1px solid #d1ccbc; margin:8px 0;">
+                    <div class="map-popup-body">
+                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
+                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `, { maxWidth: 250 });
+        });
+    }
 }
 
 // ============================================
@@ -1870,101 +1947,6 @@ async function fetchRegistryData() {
     } catch (err) {
         console.error("Registry failed:", err);
         listContainer.innerHTML = "<p>Archives inaccessible.</p>";
-    }
-}
-
-// Map setup
-
-async function initBirdMap() {
-    if (map) { 
-        map.remove(); 
-        map = null; 
-    }
-
-    // 1. Initialize with Canvas for speed
-    map = L.map('bird-map', {
-        renderer: L.canvas() 
-    }).setView([50.8139, -0.3711], 11);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-    // 2. Data Sourcing
-    const sightings = mySightings || []; 
-    
-    if (cachedLocations.length === 0) {
-        const { data, error } = await supabaseClient
-            .from('saved_locations')
-            .select('location, lat, lng');
-        if (!error) cachedLocations = data;
-    }
-    const locations = cachedLocations;
-
-    // 3. Setup the Interactive Pane
-    // Important: We need 'pointer-events: auto' for the markers to be clickable
-    const pane = map.createPane('hubsPane');
-    pane.style.zIndex = 1000; // Set this very high
-    pane.style.pointerEvents = 'none'; 
-
-    // 4. Heat Layer
-    const heatData = sightings
-        .filter(s => s.lat && s.lng)
-        .map(s => [parseFloat(s.lat), parseFloat(s.lng), 0.5]);
-
-    if (heatData.length > 0) {
-        L.heatLayer(heatData, { 
-            radius: 35, // Bigger glow
-    		blur: 20,   // Softer edges
-    		minOpacity: 0.4,
-    		gradient: {
- 					   0.2: 'rgba(140, 46, 27, 0.3)', // Very faint Earth Red glow
-    					0.4: '#e2a76f',               // Muted Sunset Orange
-   						 0.7: '#8c2e1b',               // Deep Naturalist Red (your hub color!)
-    					1.0: '#4a150a'                // Burnt Umber for the most sightings
-}
-        }).addTo(map);
-    }
-
-    // 5. Drawing Invisible Hubs
-    if (locations) {
-        locations.forEach(loc => {
-            // Ensure we have valid numbers
-            const lat = parseFloat(loc.lat);
-            const lng = parseFloat(loc.lng);
-            if (isNaN(lat) || isNaN(lng)) return;
-
-            const locationSightings = sightings.filter(s => s.location === loc.location);
-            if (locationSightings.length === 0) return;
-
-            const uniqueSpecies = [...new Set(locationSightings.map(s => s.species))].sort();
-
-            // Create the invisible circle marker
-            const hubMarker = L.circleMarker([lat, lng], {
-                pane: 'hubsPane',
-                radius: 25, // Large hit area
-                fillColor: "#8c2e1b", // Red (but we set opacity to 0)
-                color: "transparent",
-                weight: 0,
-                fillOpacity: 0.01, // 0 makes it invisible, but still clickable
-                interactive: true 
-            }).addTo(map);
-
-            hubMarker.bindPopup(`
-                <div class="map-popup-container">
-                    <header class="map-popup-header">
-                        <h3 class="serif-title" style="margin:0; color:#416863;">${loc.location}</h3>
-                        <span class="species-count-badge" style="background:#8c2e1b; color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem;">
-                            ${uniqueSpecies.length} Species
-                        </span>
-                    </header>
-                    <hr style="border:0; border-top:1px solid #d1ccbc; margin:8px 0;">
-                    <div class="map-popup-body">
-                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;">
-                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
-                        </ul>
-                    </div>
-                </div>
-            `, { maxWidth: 250 });
-        });
     }
 }
 // 1. SIGN UP
