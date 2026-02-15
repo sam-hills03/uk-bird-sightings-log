@@ -960,96 +960,89 @@ function isSpeciesValid(name) {
 // Map setup
 
 async function initBirdMap() {
-    // 1. COMPLETELY DESTROY existing map and panes
     if (map) { 
-        map.off(); // Remove all event listeners
+        map.off(); 
         map.remove(); 
         map = null; 
     }
 
-    // 2. Initialize Map
+    // 1. Initialize Map
     map = L.map('bird-map').setView([50.8139, -0.3711], 11);
-    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     const sightings = mySightings || []; 
-    
     if (cachedLocations.length === 0) {
-        const { data, error } = await supabaseClient
-            .from('saved_locations')
-            .select('location, lat, lng');
-        if (!error) cachedLocations = data;
+        const { data } = await supabaseClient.from('saved_locations').select('location, lat, lng');
+        cachedLocations = data || [];
     }
     const locations = cachedLocations;
 
-    // 3. Create a fresh Pane for Hubs
-    // By creating it fresh every time, we ensure it's always on top
-    const pane = map.createPane('hubsPane');
-    pane.style.zIndex = 650;
-    pane.style.pointerEvents = 'none';
-
-    // 4. Heat Layer
-    const heatPoints = locations.map(loc => {
+    // 2. CLASSIC HEATMAP COLORS (Fixed for Zoom)
+    const heatData = locations.map(loc => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng);
-        if (isNaN(lat) || isNaN(lng)) return null;
-
-        const speciesCount = [...new Set(sightings.filter(s => s.location === loc.location).map(s => s.species))].length;
-        if (speciesCount === 0) return null;
-
-        const intensity = Math.max(0.3, Math.min(speciesCount / 70, 1.0));
+        const speciesAtLoc = [...new Set(sightings.filter(s => s.location === loc.location).map(s => s.species))];
+        if (speciesAtLoc.length === 0) return null;
+        
+        // Intensity scales to 1.0 (deep red) at 70 species
+        const intensity = Math.max(0.3, Math.min(speciesAtLoc.length / 70, 1.0));
         return [lat, lng, intensity];
-    }).filter(p => p !== null);
+    }).filter(d => d !== null);
 
-    if (heatPoints.length > 0) {
-        L.heatLayer(heatPoints, { 
-            radius: 35, blur: 20, minOpacity: 0.5,
-            gradient: { 0.4: '#0000ff', 0.6: '#00ffff', 0.7: '#00ff00', 0.8: '#ffff00', 1.0: '#ff0000' }
+    if (heatData.length > 0) {
+        L.heatLayer(heatData, { 
+            radius: 30,      // Slightly smaller for precision
+            blur: 15,        // Sharper edges so it doesn't look "smudged"
+            minOpacity: 0.5, // Keeps it solid when you zoom in
+            gradient: {
+                0.4: '#0000ff', // Blue
+                0.6: '#00ff00', // Green
+                0.8: '#ffff00', // Yellow
+                1.0: '#ff0000'  // Red
+            }
         }).addTo(map);
     }
 
-    // 5. Add Hubs - We use a LayerGroup so they can be managed together
-    const hubLayer = L.layerGroup().addTo(map);
+    // 3. THE "SMART CLICK" (Bypasses the "not clickable" bug)
+    map.on('click', function(e) {
+        const clickLat = e.latlng.lat;
+        const clickLng = e.latlng.lng;
+        
+        let closestLoc = null;
+        let minDistance = 0.008; // Click sensitivity (roughly 800m area)
 
-    locations.forEach(loc => {
-        const lat = parseFloat(loc.lat);
-        const lng = parseFloat(loc.lng);
-        const locSightings = sightings.filter(s => s.location === loc.location);
-        if (locSightings.length === 0) return;
-
-        const uniqueSpecies = [...new Set(locSightings.map(s => s.species))].sort();
-
-        const hubMarker = L.circleMarker([lat, lng], {
-            pane: 'hubsPane',
-            radius: 25,
-            fillColor: "transparent", // Use transparent instead of opacity 0 for better hits
-            color: "transparent",
-            weight: 0,
-            fillOpacity: 0.0, 
-            interactive: true
+        locations.forEach(loc => {
+            const dist = Math.sqrt(Math.pow(loc.lat - clickLat, 2) + Math.pow(loc.lng - clickLng, 2));
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestLoc = loc;
+            }
         });
 
-        hubMarker.bindPopup(`
-            <div class="map-popup-container">
-                <h3 class="serif-title" style="margin:0; font-family:'DM Serif Display',serif;">${loc.location}</h3>
-                <p style="margin:4px 0; font-size:0.9rem; font-weight:bold;">${uniqueSpecies.length} Species Recorded</p>
-                <hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">
-                <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto; font-family:'EB Garamond',serif;">
-                    ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
-                </ul>
-            </div>
-        `, { maxWidth: 250 });
+        if (closestLoc) {
+            const locSightings = sightings.filter(s => s.location === closestLoc.location);
+            const uniqueSpecies = [...new Set(locSightings.map(s => s.species))].sort();
 
-        hubLayer.addLayer(hubMarker);
+            L.popup()
+                .setLatLng([closestLoc.lat, closestLoc.lng])
+                .setContent(`
+                    <div class="map-popup-container">
+                        <h3 class="serif-title" style="margin:0; font-family:'DM Serif Display',serif; color:#416863;">${closestLoc.location}</h3>
+                        <p style="margin:4px 0; font-family:'EB Garamond',serif;"><b>${uniqueSpecies.length} Species Recorded</b></p>
+                        <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
+                        <ul style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto; font-family:'EB Garamond',serif;">
+                            ${uniqueSpecies.map(sp => `<li style="padding:2px 0; border-bottom:1px solid #eee;">• ${sp}</li>`).join('')}
+                        </ul>
+                    </div>
+                `)
+                .openOn(map);
+        }
     });
 
-    // 6. THE RELIABILITY PULSE
-    // Forces the map to recalculate all interaction zones after the CSS transition ends
-    setTimeout(() => {
-        map.invalidateSize();
-        // This is the "secret sauce" - it tells Leaflet to re-index all clickable objects
-        map.fire('zoomend'); 
-    }, 500);
+    // Make the cursor a "pointer" so you know you can click
+    map.getContainer().style.cursor = 'pointer';
+
+    setTimeout(() => { map.invalidateSize(); }, 200);
 }
 // ============================================
 // G. IMAGE FETCHING
