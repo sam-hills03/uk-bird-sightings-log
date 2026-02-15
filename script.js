@@ -274,19 +274,24 @@ function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 1. Remove classes from EVERYTHING
+    // 1. THE BLANK SLATE: Immediately kill everything
     tabContents.forEach(content => {
         content.classList.remove('active-content');
+        // We use visibility: hidden as a secondary layer of defense
+        content.style.visibility = 'hidden'; 
     });
     tabButtons.forEach(button => button.classList.remove('active'));
 
-    // 2. Find the target
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        targetContent.classList.add('active-content');
-        if (targetButton) targetButton.classList.add('active');
+        // 2. Wait 10ms (one browser frame) before showing the next thing
+        // This gives the browser a chance to actually "clear" the screen
+        setTimeout(() => {
+            targetContent.classList.add('active-content');
+            targetContent.style.visibility = 'visible';
+            if (targetButton) targetButton.classList.add('active');
 
         // --- START OF TAB LOGIC ---
         
