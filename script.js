@@ -292,15 +292,26 @@ function switchTab(targetTabId) {
         
         // CASE A: The Big Map
         if (targetTabId === 'map-tab') {
-    setTimeout(() => {
-        if (!map) {
-            initBirdMap(); 
-        } else {
-            map.invalidateSize();
-            map.fire('viewreset'); 
-        }
-    }, 300);
-}
+            // FORCE hide stats immediately to prevent overlapping/ghosting
+            document.getElementById('stats-view').classList.remove('active-content');
+
+            setTimeout(() => {
+                if (!map) {
+                    initBirdMap(); 
+                } else {
+                    // Force a hard refresh of the map size and internal state
+                    map.invalidateSize(true); 
+                    map.fire('viewreset');
+                    
+                    // Re-sync the invisible hotspots so they land in the right place
+                    setTimeout(() => {
+                        map.eachLayer(layer => {
+                            if (layer instanceof L.CircleMarker) layer.bringToFront();
+                        });
+                    }, 100);
+                }
+            }, 400); // Increased delay to ensure CSS transitions are finished
+        } 
         
         // CASE B: Submission Map (Location Picker)
         else if (targetTabId === 'submission-view') {
@@ -314,10 +325,14 @@ function switchTab(targetTabId) {
         
         // CASE C: Stats Page
         else if (targetTabId === 'stats-view') {
+            // Ensure Map is hidden
+            if (document.getElementById('map-tab')) {
+                document.getElementById('map-tab').classList.remove('active-content');
+            }
+
             calculateAndDisplayStats();
             fetchRegistryData();
             
-            // Clean up old charts before redrawing
             if (typeof birdChart !== 'undefined' && birdChart) birdChart.destroy();
             if (typeof rarityChart !== 'undefined' && rarityChart) rarityChart.destroy();
 
