@@ -1419,7 +1419,23 @@ if (sightingForm) {
                 addEntryBtn.style.cursor = 'pointer';
             }
 
-            updateAllDisplays();
+            // 1. REFRESH DATA ONLY (No UI drawing yet)
+            await loadSightings(); 
+
+            // 2. INTELLIGENT UI UPDATE
+            // Instead of updateAllDisplays(), we only update what's needed
+            displaySightings(); // Updates the raw checklist
+            filterAndDisplayBirds(); // Updates the database seen badges
+            displaySeenBirdsSummary(); // Updates the summary tab
+            
+            // 3. THE GHOST STOPPER: Only update stats if the user is actually looking at them
+            const statsTab = document.getElementById('stats-view');
+            if (statsTab && statsTab.classList.contains('active-content')) {
+                calculateAndDisplayStats();
+            }
+
+            // 4. Update the ID Card (if you have that naturalist card at the top)
+            updateUserLevelDisplay();
 
         } catch (error) {
             console.error("Upload failed:", error);
