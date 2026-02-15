@@ -1820,3 +1820,19 @@ hr {
     left: -10px !important;
     width: 25px !important;
 }
+/* This ensures that hidden tabs don't take up any space or layer on top */
+.tab-content:not(.active-content) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute; /* Moves it out of the way of the map */
+}
+
+/* This resets the active tab to behave normally */
+.tab-content.active-content {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    position: relative;
+}
