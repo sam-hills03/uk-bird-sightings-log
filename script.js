@@ -656,33 +656,38 @@ function setupAudioPlayer() {
     const tonearm = document.getElementById('tonearm');
     const disc = document.getElementById('vinyl-disc-group');
     const audioPlayer = document.getElementById('bird-audio-player');
-    const vinylSvg = document.getElementById('vinyl-svg'); // Target the whole SVG
-    const playShape = document.getElementById('play-shape');
+    const vinylSvg = document.getElementById('vinyl-svg');
+    const iconContainer = document.getElementById('play-icon-container');
 
-    if (!vinylSvg || !audioPlayer) return;
+    if (!vinylSvg || !audioPlayer || !iconContainer) return;
+
+    // Defined shapes as SVG paths
+    const playPath = '<path id="play-icon-shape" d="M95,90 L95,110 L110,100 Z" fill="#8c2e1b" />';
+    const pausePath = `
+        <rect x="92" y="90" width="6" height="20" fill="#8c2e1b" />
+        <rect x="103" y="90" width="6" height="20" fill="#8c2e1b" />
+    `;
 
     vinylSvg.onclick = () => {
         if (audioPlayer.paused) {
             audioPlayer.play().then(() => {
                 tonearm.classList.add('arm-on-record');
                 disc.classList.add('spinning-disc');
-                // Change icon to two bars (Pause)
-                if (playShape) playShape.setAttribute('points', '92,90 97,90 97,110 92,110 103,90 108,90 108,110 103,110');
+                iconContainer.innerHTML = pausePath; // Switch to Pause bars
                 if (typeof startSpectrogram === 'function') startSpectrogram();
             }).catch(err => console.error("Playback failed", err));
         } else {
             audioPlayer.pause();
             tonearm.classList.remove('arm-on-record');
             disc.classList.remove('spinning-disc');
-            // Change icon back to Triangle (Play)
-            if (playShape) playShape.setAttribute('points', '95,90 95,110 110,100');
+            iconContainer.innerHTML = playPath; // Switch back to Play triangle
         }
     };
 
     audioPlayer.onended = () => {
         tonearm.classList.remove('arm-on-record');
         disc.classList.remove('spinning-disc');
-        if (playShape) playShape.setAttribute('points', '95,90 95,110 110,100');
+        iconContainer.innerHTML = playPath;
     };
 }
 
