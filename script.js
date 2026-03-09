@@ -304,6 +304,18 @@ function switchTab(targetTabId) {
                     }
                 }, 300); 
             } 
+			// Inside switchTab(targetTabId) under the 'map-tab' case:
+			if (targetTabId === 'map-tab') {
+			    setTimeout(async () => {
+			        await loadLocations(); // Refresh coordinates from Supabase
+			        if (!map) {
+			            initBirdMap(); 
+			        } else {
+			            map.invalidateSize();
+			            initBirdMap(); // Re-run to plot any new sightings
+			        }
+			    }, 300); 
+			}
             
             else if (targetTabId === 'stats-view') {
                 calculateAndDisplayStats();
@@ -1427,6 +1439,27 @@ if (sightingForm) {
         }
     });
 }
+// Add this near your other submission form logic
+const locationInput = document.getElementById('location');
+if (locationInput) {
+    locationInput.addEventListener('change', async () => {
+        const query = locationInput.value;
+        if (query.length < 3) return;
+
+        try {
+            const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            const data = await resp.json();
+            if (data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                setPickerLocation(lat, lon);
+                pickerMap.setView([lat, lon], 15);
+            }
+        } catch (err) {
+            console.error("Geocoding failed", err);
+        }
+    });
+}
 function initLocationPicker() {
     // Fix the broken marker icons once and for all
     delete L.Icon.Default.prototype._getIconUrl;
@@ -1439,10 +1472,33 @@ function initLocationPicker() {
     if (pickerMap) return; 
 
     pickerMap = L.map('location-picker-map', {
-    tap: false, // Prevents "phantom" clicks on mobile/touch
-    touchZoom: true
-}).setView([50.8139, -0.3711], 13);
+        tap: false, // Prevents "phantom" clicks on mobile/touch
+        touchZoom: true
+    }).setView([50.8139, -0.3711], 13);
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
+
+    // PLOT EXISTING HOTSPOTS:
+    // Loops through your cached locations and places clickable green markers.
+    cachedLocations.forEach(loc => {
+        if (loc.lat && loc.lng) {
+            const circle = L.circleMarker([loc.lat, loc.lng], {
+                radius: 8,
+                fillColor: "#416863", // Your naturalist green
+                color: "#fff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(pickerMap);
+
+            // Handle clicking an existing hotspot
+            circle.on('click', (e) => {
+                L.DomEvent.stopPropagation(e); // Prevents triggering a general map click
+                document.getElementById('location').value = loc.location;
+                setPickerLocation(loc.lat, loc.lng);
+            });
+        }
+    });
 
     pickerMap.on('click', function(e) {
         setPickerLocation(e.latlng.lat, e.latlng.lng);
@@ -1461,6 +1517,7 @@ function setPickerLocation(lat, lng) {
         });
     }
     
+    // Update hidden inputs and display coordinates
     document.getElementById('selected-lat').value = lat;
     document.getElementById('selected-lng').value = lng;
     document.getElementById('display-coords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -1476,6 +1533,28 @@ async function reverseGeocode(lat, lng) {
     } catch (err) {
         console.error("Naming failed", err);
     }
+}
+
+// FORWARD GEOCODE: Update the map position when a user types an address in the search bar
+const locationInput = document.getElementById('location');
+if (locationInput) {
+    locationInput.addEventListener('change', async () => {
+        const query = locationInput.value;
+        if (query.length < 3) return;
+
+        try {
+            const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            const data = await resp.json();
+            if (data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                setPickerLocation(lat, lon);
+                pickerMap.setView([lat, lon], 15);
+            }
+        } catch (err) {
+            console.error("Geocoding failed", err);
+        }
+    });
 }
 // ============================================
 // I. STATISTICS & CHARTS
