@@ -1976,3 +1976,15 @@ body .tab-content.active-content {
     display: none;
   }
 }
+#vinyl-svg:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+}
+
+.vinyl-player-area {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
