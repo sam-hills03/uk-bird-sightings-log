@@ -1747,109 +1747,119 @@ function getFilteredSightings() {
 }
 
 function createMonthlyChart() {
-	const ctx = document.getElementById('monthly-chart');
-	if (!ctx) return;
+    const ctx = document.getElementById('monthly-chart');
+    if (!ctx) return;
 
-	const sightingsToUse = getFilteredSightings();
-	let labels = [];
-	let data = [];
+    const sightingsToUse = getFilteredSightings();
+    let labels = [];
+    let data = [];
 
-	if (currentYearFilter !== 'Lifetime') {
-		// --- 12-MONTH VIEW for specific years ---
-		labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-		const monthCounts = new Array(12).fill(0);
+    if (currentYearFilter !== 'Lifetime') {
+        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthCounts = new Array(12).fill(0);
 
-		sightingsToUse.forEach(sighting => {
-			const date = new Date(sighting.date);
-			monthCounts[date.getMonth()]++;
-		});
-		data = monthCounts;
+        sightingsToUse.forEach(sighting => {
+            const date = new Date(sighting.date);
+            monthCounts[date.getMonth()]++;
+        });
+        data = monthCounts;
 
-	} else {
-		// --- CHRONOLOGICAL VIEW for Lifetime (Fixes mobile sorting) ---
-		const monthCounts = {};
+    } else {
+        const monthCounts = {};
+        mySightings.forEach(sighting => {
+            const date = new Date(sighting.date);
+            const sortKey = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
+            const label = date.toLocaleString('default', {
+                month: 'short',
+                year: 'numeric'
+            });
 
-		mySightings.forEach(sighting => {
-			const date = new Date(sighting.date);
-			const sortKey = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
-			const label = date.toLocaleString('default', {
-				month: 'short',
-				year: 'numeric'
-			});
+            if (!monthCounts[sortKey]) {
+                monthCounts[sortKey] = {
+                    count: 0,
+                    label: label
+                };
+            }
+            monthCounts[sortKey].count++;
+        });
 
-			if (!monthCounts[sortKey]) {
-				monthCounts[sortKey] = {
-					count: 0,
-					label: label
-				};
-			}
-			monthCounts[sortKey].count++;
-		});
+        const sortedKeys = Object.keys(monthCounts).sort();
+        labels = sortedKeys.map(key => monthCounts[key].label);
+        data = sortedKeys.map(key => monthCounts[key].count);
+    }
 
-		const sortedKeys = Object.keys(monthCounts).sort();
-		labels = sortedKeys.map(key => monthCounts[key].label);
-		data = sortedKeys.map(key => monthCounts[key].count);
-	}
+    if (birdChart) {
+        birdChart.destroy();
+    }
 
-	// 2. Destroy old chart instance if it exists
-	if (birdChart) {
-		birdChart.destroy();
-	}
+    birdChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: currentYearFilter === 'Lifetime' ? 'Lifetime' : currentYearFilter,
+                data: data,
+                backgroundColor: 'rgba(140, 46, 27, 0.2)',
+                borderColor: '#8c2e1b',
+                borderWidth: 2,
+                tension: 0.3,
+                pointBackgroundColor: '#8c2e1b',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20 // Padding ensures labels aren't cut off at the top
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { family: 'Courier New' }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    ticks: {
+                        font: { family: 'Courier New', size: 10 },
+                        autoSkip: true,
+                        maxRotation: 45
+                    },
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            }
+        },
+        // Custom Plugin to draw numbers above points
+        plugins: [{
+            id: 'alwaysShowLabels',
+            afterDatasetsDraw(chart) {
+                const { ctx, data } = chart;
+                ctx.save();
+                ctx.font = 'bold 12px Courier New';
+                ctx.fillStyle = '#8c2e1b'; 
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
 
-	// 3. Create the Chart (Now ctx is properly enclosed inside the function!)
-	birdChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: labels,
-			datasets: [{
-				label: currentYearFilter === 'Lifetime' ? 'Lifetime' : currentYearFilter,
-				data: data,
-				backgroundColor: 'rgba(140, 46, 27, 0.2)',
-				borderColor: '#8c2e1b',
-				borderWidth: 2,
-				tension: 0.3,
-				pointBackgroundColor: '#8c2e1b',
-				fill: true
-			}]
-		},
-		options: {
-			responsive: true,
-			maintainAspectRatio: false,
-			scales: {
-				y: {
-					beginAtZero: true,
-					ticks: {
-						stepSize: 1,
-						font: {
-							family: 'Courier New'
-						}
-					},
-					grid: {
-						color: 'rgba(0,0,0,0.05)'
-					}
-				},
-				x: {
-					ticks: {
-						font: {
-							family: 'Courier New',
-							size: 10
-						},
-						autoSkip: true,
-						maxRotation: 45
-					},
-					grid: {
-						display: false
-					}
-				}
-			},
-			plugins: {
-				legend: {
-					display: false
-				}
-			}
-		}
-	});
-} 
+                chart.getDatasetMeta(0).data.forEach((point, index) => {
+                    const value = data.datasets[0].data[index];
+                    if (value > 0) {
+                        ctx.fillText(value, point.x, point.y - 8);
+                    }
+                });
+                ctx.restore();
+            }
+        }]
+    });
+}
 
 function createRarityChart() {
     const ctx = document.getElementById('rarity-pie-chart');
