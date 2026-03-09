@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Starting everything -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,19 +12,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
-<!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Load monthly chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦆</text></svg>">
 </head>
-<!-- Log in section/header -->
+
 <body>
     <header>
         <div id="auth-section" class="vintage-panel">
@@ -40,61 +37,29 @@
                     </div>
                 </div>
             </div>
-            <div id="logged-in-view" class="naturalist-id-card" style="display: none;">
-                <div class="id-card-inner">
-                    <header class="id-header">
-                        <span class="auth-text">Authorised Naturalist</span>
-                        <hr class="vintage-hr">
-                    </header>
-
-                    <div class="id-body">
-                        <div class="id-signature-area">
-                            <span id="user-display-name">Observer Name</span>
-                            <span class="id-rank-title">Master of Skies</span>
-                        </div>
-                        <div class="rank-stamp-seal">
-                            <span class="seal-inner-text">OFFICIAL</span>
-                        </div>
-                    </div>
-
-                    <hr class="vintage-hr-alt">
-
-                    <div class="id-footer">
-                        <div class="id-meta">
-                            <span id="next-level-name">Next: Field Naturalist</span>
-                            <span class="species-ratio">
-                        <span id="current-count-display">0</span> / <span id="target-count-display">300</span>
-                            </span>
-                        </div>
-                        <div class="id-progress-track">
-                            <div id="level-progress-bar" class="id-progress-fill"></div>
-                        </div>
-                        <button id="logout-btn" class="id-close-btn">Close Journal</button>
-                    </div>
-                </div>
-            </div>
+            
             <h1>UK Bird Sighting Log</h1>
             <p>A simple log for tracking your UK bird sightings and statistics.</p>
+        </div>
     </header>
-<!-- Navigation tabs -->
+
     <div id="nav-bar">
         <button class="tab-button active" data-tab="database-view">UK Bird Database</button>
         <button class="tab-button" data-tab="submission-view">Submit Sighting</button>
+        <button class="tab-button" data-tab="profile-view">My Profile</button>
         <button class="tab-button" data-tab="checklist-view">Raw Checklist</button>
         <button class="tab-button" data-tab="summary-view">Species Summary</button>
         <button class="tab-button" data-tab="stats-view">My Stats</button>
         <button class="tab-button" data-tab="map-tab">Sightings Map</button>
     </div>
-<!-- UK birds database tab -->
+
     <section id="database-view" class="tab-content active-content">
         <h2>UK Bird Database</h2>
-
         <div id="filters">
             <div class="filter-group">
                 <label for="search-bar">Search:</label>
                 <input type="text" id="search-bar" placeholder="Search by name, latin name, or rarity...">
             </div>
-
             <div class="filter-group">
                 <label for="rarity-filter">Filter by Rarity:</label>
                 <select id="rarity-filter">
@@ -107,12 +72,81 @@
                 </select>
             </div>
         </div>
+        <div id="bird-list">Loading UK bird data...</div>
+    </section>
 
-        <div id="bird-list">
-            Loading UK bird data...
+    <section id="profile-view" class="tab-content">
+        <h2>Naturalist Profile</h2>
+
+        <div id="logged-in-view" class="naturalist-id-card" style="display: none;">
+            <div class="id-card-inner">
+                <header class="id-header">
+                    <span class="auth-text">Authorised Naturalist</span>
+                    <hr class="vintage-hr">
+                </header>
+                <div class="id-body">
+                    <div class="id-signature-area">
+                        <span id="user-display-name">Observer Name</span>
+                        <span class="id-rank-title">Master of Skies</span>
+                    </div>
+                    <div class="rank-stamp-seal">
+                        <span class="seal-inner-text">OFFICIAL</span>
+                    </div>
+                </div>
+                <hr class="vintage-hr-alt">
+                <div class="id-footer">
+                    <div class="id-meta">
+                        <span id="next-level-name">Next: Field Naturalist</span>
+                        <span class="species-ratio">
+                            <span id="current-count-display">0</span> / <span id="target-count-display">300</span>
+                        </span>
+                    </div>
+                    <div class="id-progress-track">
+                        <div id="level-progress-bar" class="id-progress-fill"></div>
+                    </div>
+                    <button id="logout-btn" class="id-close-btn">Close Journal</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="milestones-container">
+            <h3>Field Milestones</h3>
+            <div id="milestones-grid" class="milestones-grid"></div>
+        </div>
+
+        <div class="expedition-hub vintage-panel">
+            <h3 class="hub-title">Field Expedition Archive</h3>
+            <div class="expedition-controls">
+                <div class="museum-drawer">
+                    <span class="drawer-label">LOCATION INDEX</span>
+                    <input type="text" id="trip-location-search" placeholder="Search Archives..." class="naturalist-input" autocomplete="off">
+                </div>
+                <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
+                    <ul id="trip-results-list"></ul>
+                </div>
+            </div>
+            <div id="expedition-card" class="logbook-card">
+                <div class="logbook-header">
+                    <div class="logbook-meta">
+                        <span id="expedition-date" class="handwritten">Loading archives...</span>
+                        <h2 id="expedition-location" class="serif-title">Connecting to Field Logs...</h2>
+                    </div>
+                    <div class="logbook-seal">
+                        <span id="expedition-count">--</span>
+                        <small>Species</small>
+                    </div>
+                </div>
+                <div class="logbook-body">
+                    <div class="highlight-box">
+                        <span class="label">RAREST ENCOUNTER</span>
+                        <p id="expedition-highlight" class="handwritten">Scanning...</p>
+                    </div>
+                    <div class="species-grid" id="expedition-species-list"></div>
+                </div>
+            </div>
         </div>
     </section>
-<!-- Submit new sighting tab -->
+
     <section id="submission-view" class="tab-content">
         <h2>Submit New Sighting</h2>
         <form id="sighting-form">
@@ -120,60 +154,39 @@
             <input type="date" id="sighting-date" required>
 
             <label for="location">Location Hub:</label>
-<div class="location-picker-container">
-    <div class="search-box">
-        <input type="text" id="location" placeholder="Search for a place or click the map..." required>
-        <div id="search-suggestions" class="suggestions-list"></div>
-    </div>
-    
-    <div id="location-picker-map" style="height: 300px; width: 100%; margin-top: 10px; border: 1px solid #416863; border-radius: 8px;"></div>
-    
-    <input type="hidden" id="selected-lat">
-    <input type="hidden" id="selected-lng">
-    <p class="coords-display">Selected: <span id="display-coords">No location selected</span></p>
-</div>
-
+            <div class="location-picker-container">
+                <div class="search-box">
+                    <input type="text" id="location" placeholder="Search for a place or click the map..." required>
+                    <div id="search-suggestions" class="suggestions-list"></div>
+                </div>
+                <div id="location-picker-map" style="height: 300px; width: 100%; margin-top: 10px; border: 1px solid #416863; border-radius: 8px;"></div>
+                <input type="hidden" id="selected-lat">
+                <input type="hidden" id="selected-lng">
+                <p class="coords-display">Selected: <span id="display-coords">No location selected</span></p>
+            </div>
             <div id="entries-container"></div>
-
             <button type="button" id="add-entry-btn">+ Add Another Bird</button>
             <button type="submit" id="submit-all-btn">Record All Sightings</button>
-            <div id="upload-progress-container" style="display: none; margin-top: 15px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                    <span>Recording Sightings...</span>
-                    <span id="upload-progress-text">0 / 0</span>
-                </div>
-                <div style="background: #e9e5d9; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #d1ccbc;">
-                    <div id="upload-progress-bar" style="background: #416863; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
-                </div>
-            </div>
         </form>
     </section>
-<!-- Raw sighting checklist tab -->
+
     <section id="checklist-view" class="tab-content">
         <h2>Raw Sighting Checklist</h2>
-
-        <!-- Pagination controls -->
         <div id="pagination-controls">
             <button id="prev-page-btn" disabled>← Previous</button>
             <span id="page-info">Page 1</span>
             <button id="next-page-btn">Next →</button>
         </div>
-
-        <ul id="sightings-list">
-            No sightings recorded yet.
-        </ul>
-
-        <!-- Pagination controls at bottom -->
+        <ul id="sightings-list">No sightings recorded yet.</ul>
         <div id="pagination-controls-bottom">
             <button id="prev-page-btn-bottom" disabled>← Previous</button>
             <span id="page-info-bottom">Page 1</span>
             <button id="next-page-btn-bottom">Next →</button>
         </div>
     </section>
-<!-- Bird species summary tab -->
+
     <section id="summary-view" class="tab-content">
         <h2>Seen Bird Species Summary</h2>
-
         <div id="summary-filters">
             <label for="summary-rarity-filter">Filter by Rarity:</label>
             <select id="summary-rarity-filter" onchange="handleSummaryFilterChange(this.value)">
@@ -185,217 +198,140 @@
                 <option value="Common">Common</option>
             </select>
         </div>
+        <div id="seen-birds-summary">No unique birds seen yet.</div>
+    </section>
 
-        <div id="seen-birds-summary">
-            No unique birds seen yet.
+    <section id="stats-view" class="tab-content" hidden>
+        <h2>My Birding Statistics</h2>
+        <div id="stats-page">
+            <p>Total Unique Species Seen: <span id="total-species">0</span></p>
+            <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
+            <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
+
+            <div class="stats-dashboard-grid">
+                <div class="chart-container vintage-panel">
+                    <h3 class="serif-subtitle">Observation Trends</h3>
+                    <canvas id="monthly-chart"></canvas>
+                </div>
+                <div class="chart-container vintage-panel">
+                    <h3 class="serif-subtitle">Collection Rarity</h3>
+                    <canvas id="rarity-pie-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="year-filter-container vintage-panel">
+                <div class="vintage-select-wrapper">
+                    <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
+                    <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
+                        <option value="Lifetime">LIFETIME LOG</option>
+                        <option value="2026">ANNUAL LOG: 2026</option>
+                        <option value="2025">ANNUAL LOG: 2025</option>
+                    </select>
+                    <div class="select-arrow">▼</div>
+                </div>
+            </div>
+        </div> 
+
+        <div class="registry-container vintage-panel">
+            <h3 class="hub-title">Registry of Distinguished Observers</h3>
+            <div class="registry-header">
+                <span>Naturalist</span>
+                <span>Rank</span>
+                <span>Collection Size</span>
+            </div>
+            <div id="leaderboard-list" class="registry-list">
+                <p class="loading-text">Consulting the registry archives...</p>
+            </div>
         </div>
     </section>
-<!-- My stats tab -->
-    <section id="stats-view" class="tab-content" hidden>
-    <h2>My Birding Statistics</h2>
-    
-    <div id="stats-page">
-        <p>Total Unique Species Seen: <span id="total-species">0</span></p>
-        <p>Percentage of UK List Seen: <span id="percentage-seen">0.00%</span></p>
-        <p>Percentage Excluding Megas: <span id="percentage-no-mega">0.00%</span></p>
 
-        <div class="stats-dashboard-grid">
-            <div class="chart-container vintage-panel">
-                <h3 class="serif-subtitle">Observation Trends</h3>
-                <canvas id="monthly-chart"></canvas>
-            </div>
-
-            <div class="chart-container vintage-panel">
-                <h3 class="serif-subtitle">Collection Rarity</h3>
-                <canvas id="rarity-pie-chart"></canvas>
-            </div>
+    <section id="map-tab" class="tab-content" style="display: none;">
+        <div class="map-header">
+            <h2 class="archive-title">Geographic Archives</h2>
+            <p class="archive-subtitle">Every recorded sighting across the landscape.</p>
         </div>
+        <div id="bird-map" style="height: 600px; width: 100%; border: 1px solid #416863; border-radius: 8px;"></div> 
+    </section>
 
-        <div class="year-filter-container vintage-panel">
-            <div class="vintage-select-wrapper">
-                <label for="year-selector" class="vintage-label">PERIOD OF OBSERVATION</label>
-                <select id="year-selector" class="naturalist-select" onchange="handleYearChange(this.value)">
-                    <option value="Lifetime">LIFETIME LOG</option>
-                    <option value="2026">ANNUAL LOG: 2026</option>
-                    <option value="2025">ANNUAL LOG: 2025</option>
-                </select>
-                <div class="select-arrow">▼</div>
-            </div>
-        </div>
-    </div> 
-
-    <div class="milestones-container">
-        <h3>Field Milestones</h3>
-        <div id="milestones-grid" class="milestones-grid"></div>
-    </div>
-
-    <div class="registry-container vintage-panel">
-        <h3 class="hub-title">Registry of Distinguished Observers</h3>
-        <div class="registry-header">
-            <span>Naturalist</span>
-            <span>Rank</span>
-            <span>Collection Size</span>
-        </div>
-        <div id="leaderboard-list" class="registry-list">
-            <p class="loading-text">Consulting the registry archives...</p>
-        </div>
-    </div>
-
-    <div class="stats-grid"></div>
-
-    <div class="expedition-hub vintage-panel">
-        <h3 class="hub-title">Field Expedition Archive</h3>
-        <div class="expedition-controls">
-            <div class="museum-drawer">
-                <span class="drawer-label">LOCATION INDEX</span>
-                <input type="text" id="trip-location-search" placeholder="Search Archives..." class="naturalist-input" autocomplete="off">
-            </div>
-            <div id="trip-search-results" class="archive-drawer-results" style="display: none;">
-                <ul id="trip-results-list"></ul>
-            </div>
-        </div>
-        <div id="expedition-card" class="logbook-card">
-            <div class="logbook-header">
-                <div class="logbook-meta">
-                    <span id="expedition-date" class="handwritten">Loading archives...</span>
-                    <h2 id="expedition-location" class="serif-title">Connecting to Field Logs...</h2>
-                </div>
-                <div class="logbook-seal">
-                    <span id="expedition-count">--</span>
-                    <small>Species</small>
-                </div>
-            </div>
-            <div class="logbook-body">
-                <div class="highlight-box">
-                    <span class="label">RAREST ENCOUNTER</span>
-                    <p id="expedition-highlight" class="handwritten">Scanning...</p>
-                </div>
-                <div class="species-grid" id="expedition-species-list"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="map-tab" class="tab-content" style="display: none;">
-    <div class="map-header">
-        <h2 class="archive-title">Geographic Archives</h2>
-        <p class="archive-subtitle">Every recorded sighting across the landscape.</p>
-    </div>
-    <div id="bird-map" style="height: 600px; width: 100%; border: 1px solid #416863; border-radius: 8px;"></div> 
-</section>
-<!-- Bird cards after click -->
     <div id="sighting-modal" class="modal">
         <div class="modal-content">
             <div class="modal-nav">
                 <span class="modal-close">&times;</span>
             </div>
-
             <h2 id="modal-species-name" class="serif-title"></h2>
             <p id="modal-species-info" class="rarity-subtitle"></p>
-    <!-- Bird card audio -->
-          <div class="vinyl-player-area">
-    <svg id="vinyl-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="10" width="180" height="180" rx="10" fill="#e9e4d1" stroke="#c4bca6" stroke-width="2"/>
-        
-        <g id="vinyl-disc-group">
-            <circle cx="100" cy="100" r="80" fill="#111" />
-            
-            <circle cx="100" cy="100" r="70" fill="none" stroke="#222" stroke-width="0.5" />
-            <circle cx="100" cy="100" r="60" fill="none" stroke="#222" stroke-width="0.5" />
-            <circle cx="100" cy="100" r="50" fill="none" stroke="#222" stroke-width="0.5" />
-            <circle cx="100" cy="100" r="40" fill="none" stroke="#222" stroke-width="0.5" />
+            <div class="vinyl-player-area">
+                <svg id="vinyl-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="10" width="180" height="180" rx="10" fill="#e9e4d1" stroke="#c4bca6" stroke-width="2"/>
+                    <g id="vinyl-disc-group">
+                        <circle cx="100" cy="100" r="80" fill="#111" />
+                        <circle cx="100" cy="100" r="25" fill="#fdfaf0" stroke="#8c2e1b" stroke-width="1" />
+                    </g>
+                    <g id="tonearm" style="cursor: pointer; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 160px 40px;">
+                        <circle cx="160" cy="40" r="12" fill="#5d544b" />
+                        <rect x="157" y="40" width="6" height="100" rx="3" fill="#c4bca6" transform="rotate(-15, 160, 40)" />
+                    </g>
+                </svg>
+                <div id="recording-location" class="audio-status-label">Ready to Play</div>
+                <audio id="bird-audio-player" crossorigin="anonymous"></audio>
+            </div>
+            <div id="modal-field-notes" class="museum-note-box">
+                <h4 class="note-label">Field Notes (via Wikipedia)</h4>
+                <p id="modal-description-text">Fetching notes...</p>
+            </div>
+            <h3 class="serif-subtitle">Your Sightings:</h3>
+            <ul id="modal-sightings-list"></ul>
+        </div>
+    </div>
 
-            <circle cx="100" cy="100" r="25" fill="#fdfaf0" stroke="#8c2e1b" stroke-width="1" />
-            
-            <path d="M 100 30 A 70 70 0 0 1 170 100" fill="none" stroke="white" stroke-width="8" opacity="0.1" stroke-linecap="round" />
-            <path d="M 40 120 A 60 60 0 0 0 80 160" fill="none" stroke="white" stroke-width="4" opacity="0.05" stroke-linecap="round" />
-        </g>
+    <datalist id="species-datalist"></datalist>
 
-        <g id="tonearm" style="cursor: pointer; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 160px 40px;">
-            <circle cx="160" cy="40" r="12" fill="#5d544b" />
-            <rect x="157" y="40" width="6" height="100" rx="3" fill="#c4bca6" transform="rotate(-15, 160, 40)" />
-            <rect x="135" y="130" width="12" height="20" rx="2" fill="#2c2621" transform="rotate(-15, 160, 40)" />
-        </g>
-    </svg>
+    <template id="sighting-template">
+        <div class="sighting-entry-group">
+            <label>Species Name:</label>
+            <input type="text" class="species-input" list="species-datalist">
+            <button type="button" class="remove-entry-btn">✕ Remove</button>
+        </div>
+    </template>
 
-    <div id="recording-location" class="audio-status-label">Ready to Play</div>
-    
-    <audio id="bird-audio-player" crossorigin="anonymous"></audio>
-</div>
-    <!-- Bird card wiki info -->
-                <div id="modal-field-notes" class="museum-note-box">
-                    <h4 class="note-label">Field Notes (via Wikipedia)</h4>
-                    <p id="modal-description-text">Fetching notes...</p>
+    <template id="bird-card-template">
+        <div class="bird-card">
+            <div class="card-image-container">
+                <img class="card-image" alt="Bird photo" loading="lazy">
+                <div class="seen-badge">✓</div>
+                <div class="sighting-count-badge">0</div>
+                <div class="image-verify-overlay pencil-icon" style="display: none;">
+                    <button type="button" class="verify-edit-btn" title="Verify Image">✎</button>
                 </div>
-
-                <h3 class="serif-subtitle">Your Sightings:</h3>
-                <ul id="modal-sightings-list"></ul>
+            </div>
+            <div class="card-content">
+                <h3 class="card-common-name"></h3>
+                <p class="card-latin-name"></p>
+                <div class="card-details">
+                    <span class="card-rarity-tag"></span>
+                    <span class="card-status-text"></span>
+                </div>
             </div>
         </div>
-    <!-- Bird card sightings -->
-        <datalist id="species-datalist"></datalist>
+    </template>
 
-<!-- Submit sighting bird box -->
-        
-        <template id="sighting-template">
-            <div class="sighting-entry-group">
-                <label>Species Name:</label>
-                <input type="text" class="species-input" list="species-datalist">
-                <button type="button" class="remove-entry-btn">✕ Remove</button>
+    <div class="bug-report-container">
+        <button type="button" id="bug-fab" title="Report a Bug">
+            <span style="font-size: 1.2rem;">🪲</span>
+        </button>
+        <div id="bug-form-popup" class="bug-popup" style="display: none;">
+            <div class="bug-popup-header">
+                <h4>Report an Issue</h4>
+                <button type="button" id="close-bug-btn">&times;</button>
             </div>
-        </template>
-<!-- Bird card thumbnail -->
-        <template id="bird-card-template">
-            <div class="bird-card">
-                <div class="card-image-container">
-                    <img class="card-image" alt="Bird photo" loading="lazy">
-    <!-- Bird card tags for species summary tab -->
-                    <div class="seen-badge">✓</div>
-                    <div class="sighting-count-badge">0</div>
-
-                    <div class="image-verify-overlay pencil-icon" style="display: none;">
-                        <button type="button" class="verify-edit-btn" title="Verify Image">✎</button>
-                        <div class="verify-controls" style="display: none;">
-                            <p>Is this correct?</p>
-                            <button type="button" class="keep-btn">✓ Keep</button>
-                            <button type="button" class="refresh-btn">⟳ New</button>
-                            <hr>
-                            <button type="button" class="upload-trigger-btn">⇮ Upload My Own</button>
-                            <input type="file" class="bird-image-upload" accept="image/*" style="display: none;">
-                        </div>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-common-name"></h3>
-                    <p class="card-latin-name"></p>
-                    <div class="card-details">
-                        <span class="card-rarity-tag"></span>
-                        <span class="card-status-text"></span>
-                    </div>
-                </div>
-            </div>
-        </template>
-<!-- Bug report button -->
-        <div class="bug-report-container">
-            <button type="button" id="bug-fab" title="Report a Bug">
-                <span style="font-size: 1.2rem;">🪲</span>
-            </button>
-    <!-- Bug report form -->
-            <div id="bug-form-popup" class="bug-popup" style="display: none;">
-                <div class="bug-popup-header">
-                    <h4>Report an Issue</h4>
-                    <button type="button" id="close-bug-btn">&times;</button>
-                </div>
-                <form id="help-form" action="https://formspree.io/f/meeljgyz" method="POST">
-                    <input type="email" name="email" placeholder="Your Email" required>
-                    <textarea name="message" placeholder="Describe the issue..." required></textarea>
-                    <button type="submit" class="id-close-btn" style="width: 100%;">Send Report</button>
-                    <p id="form-status" style="display: none; font-size: 0.8rem; margin-top: 10px;"></p>
-                </form>
-            </div>
+            <form id="help-form" action="https://formspree.io/f/meeljgyz" method="POST">
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Describe the issue..." required></textarea>
+                <button type="submit" class="id-close-btn" style="width: 100%;">Send Report</button>
+            </form>
         </div>
+    </div>
 
-        <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
-
 </html>
