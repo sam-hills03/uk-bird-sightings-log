@@ -656,29 +656,33 @@ function setupAudioPlayer() {
     const tonearm = document.getElementById('tonearm');
     const disc = document.getElementById('vinyl-disc-group');
     const audioPlayer = document.getElementById('bird-audio-player');
-    const labelText = document.getElementById('svg-label-text');
+    const vinylSvg = document.getElementById('vinyl-svg'); // Target the whole SVG
+    const playShape = document.getElementById('play-shape');
 
-    if (!tonearm || !audioPlayer) return;
+    if (!vinylSvg || !audioPlayer) return;
 
-    tonearm.onclick = () => {
+    vinylSvg.onclick = () => {
         if (audioPlayer.paused) {
-            // Play logic
             audioPlayer.play().then(() => {
                 tonearm.classList.add('arm-on-record');
                 disc.classList.add('spinning-disc');
+                // Change icon to two bars (Pause)
+                if (playShape) playShape.setAttribute('points', '92,90 97,90 97,110 92,110 103,90 108,90 108,110 103,110');
                 if (typeof startSpectrogram === 'function') startSpectrogram();
             }).catch(err => console.error("Playback failed", err));
         } else {
-            // Pause logic
             audioPlayer.pause();
             tonearm.classList.remove('arm-on-record');
             disc.classList.remove('spinning-disc');
+            // Change icon back to Triangle (Play)
+            if (playShape) playShape.setAttribute('points', '95,90 95,110 110,100');
         }
     };
 
     audioPlayer.onended = () => {
         tonearm.classList.remove('arm-on-record');
         disc.classList.remove('spinning-disc');
+        if (playShape) playShape.setAttribute('points', '95,90 95,110 110,100');
     };
 }
 
