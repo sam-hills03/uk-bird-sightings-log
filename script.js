@@ -340,49 +340,46 @@ function switchTab(targetTabId) {
 }
 
 // Pagnation on the raw checklist page
-// Pagnation on the raw checklist page
 function setupPagination() {
-    const buttons = [
+    // 1. Define all pagination buttons
+    const paginationIds = [
         { id: 'prev-page-btn', dir: -1 },
         { id: 'next-page-btn', dir: 1 },
         { id: 'prev-page-btn-bottom', dir: -1 },
         { id: 'next-page-btn-bottom', dir: 1 }
     ];
 
-    buttons.forEach(btn => {
+    paginationIds.forEach(btn => {
         const el = document.getElementById(btn.id);
         if (el) {
-            // Remove any old listeners by cloning the node (prevents double-triggering)
-            const newEl = el.cloneNode(true);
-            el.parentNode.replaceChild(newEl, el);
-            
-            newEl.addEventListener('click', (e) => {
+            // Directly assign onclick to ensure any previous listener is replaced
+            el.onclick = (e) => {
                 e.preventDefault();
                 changePage(btn.dir);
-            });
+            };
         }
     });
 }
 
 function changePage(direction) {
+    // Recalculate total pages based on current sightings length
     const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
-    const newPage = currentPage + direction;
-
-    // Safety check: ensure we stay within bounds
-    if (newPage < 1 || newPage > totalPages) return;
-
-    currentPage = newPage;
     
-    // Refresh the list and the UI controls
-    displaySightings();
+    // Calculate and clamp the new page number
+    let newPage = currentPage + direction;
+    if (newPage < 1) newPage = 1;
+    if (newPage > totalPages) newPage = totalPages;
 
-    // Scroll back to the top of the checklist view for better UX
-    const checklistView = document.getElementById('checklist-view');
-    if (checklistView) {
-        checklistView.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
+    // If the page actually changed, update the view
+    if (newPage !== currentPage) {
+        currentPage = newPage;
+        displaySightings(); // This will refresh the list and button states
+
+        // Smooth scroll to top of checklist for better user experience
+        const checklistSection = document.getElementById('checklist-view');
+        if (checklistSection) {
+            checklistSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 }
 
