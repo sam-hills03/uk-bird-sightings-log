@@ -293,7 +293,21 @@ async function switchTab(targetTabId) {
             if (targetButton) targetButton.classList.add('active');
 
             // --- TAB SPECIFIC LOGIC ---
-            if (targetTabId === 'map-tab') {
+            
+            // Logic for the NEW Profile Tab
+            if (targetTabId === 'profile-view') {
+                calculateAndDisplayStats(); // Updates the Naturalist ID Card levels
+                calculateMilestones();      // Renders the achievement badges
+                setupExpeditionSearch();    // Re-initializes the archive search listeners
+                
+                // Load the latest trip report into the card automatically
+                if (mySightings.length > 0) {
+                    const latest = mySightings[0];
+                    const data = getExpeditionData(latest.date, latest.location);
+                    if (data) displayExpeditionCard(data);
+                }
+            } 
+            else if (targetTabId === 'map-tab') {
                 await loadLocations(); 
                 if (!map) {
                     initBirdMap(); 
