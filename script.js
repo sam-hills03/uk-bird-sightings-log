@@ -271,31 +271,23 @@ function updateAllDisplays() {
 // ============================================
 
 async function switchTab(targetTabId) {
-    // 1. Full stop to prevent async image fetches from messing with the layout
+    // 1. Immediate stop to all background processes
     window.stop(); 
     
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. STAGE 1 HIDE: Immediately hide everything to prevent "ghosting"
-    tabContents.forEach(content => {
-        content.classList.remove('active-content');
-        content.style.display = 'none'; // Force display none during transition
-    });
+    // 2. Clear all active states first
+    tabContents.forEach(content => content.classList.remove('active-content'));
     tabButtons.forEach(button => button.classList.remove('active'));
 
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. STAGE 2 SHOW: Use a small timeout to let the browser clear the previous view
+        // 3. A 50ms pause gives the browser a "breather" to hide the old tab 
+        // before we start the heavy work of drawing the new one.
         setTimeout(async () => {
-            // Re-verify display is none for others (safety check)
-            tabContents.forEach(c => {
-                if (c.id !== targetTabId) c.style.display = 'none';
-            });
-
-            targetContent.style.display = 'block'; // Restore display
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
 
@@ -314,20 +306,23 @@ async function switchTab(targetTabId) {
                 displaySightings();
             }
             else if (targetTabId === 'stats-view') {
+                // Ensure calculations only run when the container is visible
                 calculateAndDisplayStats();
                 fetchRegistryData();
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
+                
+                // Wait for the parchment background to render before drawing charts
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
-                }, 150);
+                }, 100);
             }
             else if (targetTabId === 'submission-view') {
                 initLocationPicker();
                 if (pickerMap) pickerMap.invalidateSize();
             }
-        }, 50); // Increased delay slightly to ensure clean transition
+        }, 50);
     }
 }
 
