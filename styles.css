@@ -1933,3 +1933,16 @@ body:not(:has(#stats-view.active-content)) #stats-view {
     margin: 0 !important;
     padding: 0 !important;
 }
+/* Physically prevent the Stats content from existing in the layout 
+   unless the active-content class is present */
+#stats-view:not(.active-content) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Hide every single element inside stats if the tab is inactive */
+#stats-view:not(.active-content) * {
+    display: none !important;
+}
