@@ -271,13 +271,14 @@ function updateAllDisplays() {
 // ============================================
 
 async function switchTab(targetTabId) {
-    // 1. Immediate stop to all background processes
+    // 1. Immediately stop all background rendering
     window.stop(); 
     
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. Clear all active states first
+    // 2. STAGE 1: Total Wipeout
+    // We remove the active class from EVERYTHING first
     tabContents.forEach(content => content.classList.remove('active-content'));
     tabButtons.forEach(button => button.classList.remove('active'));
 
@@ -285,8 +286,9 @@ async function switchTab(targetTabId) {
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. A 50ms pause gives the browser a "breather" to hide the old tab 
-        // before we start the heavy work of drawing the new one.
+        // 3. STAGE 2: 10ms "Visual Flush"
+        // This forces the browser to render an empty page for a split second
+        // to clear the "ghost" stats from the bottom.
         setTimeout(async () => {
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
@@ -306,13 +308,14 @@ async function switchTab(targetTabId) {
                 displaySightings();
             }
             else if (targetTabId === 'stats-view') {
-                // Ensure calculations only run when the container is visible
-                calculateAndDisplayStats();
-                fetchRegistryData();
+                // Clear old charts before calculating new ones
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
                 
-                // Wait for the parchment background to render before drawing charts
+                calculateAndDisplayStats();
+                fetchRegistryData();
+                
+                // Delay chart drawing until the parchment background is fully placed
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
@@ -322,7 +325,7 @@ async function switchTab(targetTabId) {
                 initLocationPicker();
                 if (pickerMap) pickerMap.invalidateSize();
             }
-        }, 50);
+        }, 10); 
     }
 }
 
