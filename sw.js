@@ -7,6 +7,8 @@ const ASSETS = [
   './uk_birds.json',
   'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+  './icon-192.png', // Add this
+  './icon-512.png'  // Add this
 ];
 
 // Install the service worker and cache files
