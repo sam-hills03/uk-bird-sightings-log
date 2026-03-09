@@ -1899,7 +1899,9 @@ hr {
 }
 /* --- THE MASTER TAB GUARD --- */
 
-/* 1. Hide every tab content by default and remove it from layout flow */
+/* --- THE REFINED TAB GUARD --- */
+
+/* 1. Hide every tab content by default and move it out of layout */
 .tab-content {
     display: none !important;
     position: absolute !important;
@@ -1908,11 +1910,11 @@ hr {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
-    z-index: -1 !important;
 }
 
-/* 2. Only the ACTIVE content exists in the flow */
-.tab-content.active-content {
+/* 2. ONLY the ACTIVE content gets to exist. 
+   The 'body' selector here ensures this has higher priority. */
+body .tab-content.active-content {
     display: block !important;
     position: relative !important;
     top: 0 !important;
@@ -1920,19 +1922,14 @@ hr {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    z-index: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
-/* 3. Force the body to ONLY acknowledge the active tab's height */
-body:has(#map-tab.active-content) .tab-content:not(#map-tab),
-body:has(#stats-view.active-content) .tab-content:not(#stats-view),
-body:has(#submission-view.active-content) .tab-content:not(#submission-view),
-body:has(#database-view.active-content) .tab-content:not(#database-view),
-body:has(#checklist-view.active-content) .tab-content:not(#checklist-view),
-body:has(#summary-view.active-content) .tab-content:not(#summary-view) {
+/* 3. Nuclear fix for the Stats Page "ghosting" at the bottom */
+body:not(:has(#stats-view.active-content)) #stats-view {
     display: none !important;
     height: 0 !important;
-    width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
 }
