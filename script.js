@@ -1844,7 +1844,7 @@ function createMonthlyChart() {
             afterDatasetsDraw(chart) {
                 const { ctx, data } = chart;
                 ctx.save();
-                ctx.font = 'bold 12px Courier New';
+                ctx.font = 'bold 8px Courier New';
                 ctx.fillStyle = '#8c2e1b'; 
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
