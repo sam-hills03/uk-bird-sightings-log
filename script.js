@@ -243,27 +243,29 @@ async function cleanupEmptyLocations(locationName) {
     }
 }
 
-// Updates seen birds, raw list, and stats page
 function updateAllDisplays() {
     displaySightings();
     displaySeenBirdsSummary();
-    calculateAndDisplayStats();
     filterAndDisplayBirds();
-    createMonthlyChart();
     
-    // Add this so the big map stays in sync with your data
+    // Only run the heavy visual/chart logic if the user is actually LOOKING at the stats
+    const statsTab = document.getElementById('stats-view');
+    if (statsTab && statsTab.classList.contains('active-content')) {
+        calculateAndDisplayStats();
+        createMonthlyChart();
+    }
+    
     if (typeof initBirdMap === 'function') {
         initBirdMap(); 
     }
 
-	// Refresh the Expedition Logbook Card with the latest data
-	if (mySightings && mySightings.length > 0) {
-		const latest = mySightings[0];
-		const tripData = getExpeditionData(latest.date, latest.location);
-		if (tripData) {
-			displayExpeditionCard(tripData);
-		}
-	}
+    if (mySightings && mySightings.length > 0) {
+        const latest = mySightings[0];
+        const tripData = getExpeditionData(latest.date, latest.location);
+        if (tripData) {
+            displayExpeditionCard(tripData);
+        }
+    }
 }
 
 // ============================================
