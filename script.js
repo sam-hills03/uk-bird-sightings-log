@@ -1439,27 +1439,6 @@ if (sightingForm) {
         }
     });
 }
-// Add this near your other submission form logic
-const locationInput = document.getElementById('location');
-if (locationInput) {
-    locationInput.addEventListener('change', async () => {
-        const query = locationInput.value;
-        if (query.length < 3) return;
-
-        try {
-            const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
-            const data = await resp.json();
-            if (data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                setPickerLocation(lat, lon);
-                pickerMap.setView([lat, lon], 15);
-            }
-        } catch (err) {
-            console.error("Geocoding failed", err);
-        }
-    });
-}
 function initLocationPicker() {
     // Fix the broken marker icons once and for all
     delete L.Icon.Default.prototype._getIconUrl;
