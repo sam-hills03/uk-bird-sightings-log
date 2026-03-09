@@ -1,0 +1,16 @@
+{
+  "name": "UK Bird Sighting Log",
+  "short_name": "Bird Log",
+  "description": "A simple log for tracking UK bird sightings and statistics.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#fdfaf0",
+  "theme_color": "#3d342d",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦆</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
