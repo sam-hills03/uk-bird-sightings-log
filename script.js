@@ -271,14 +271,13 @@ function updateAllDisplays() {
 // ============================================
 
 async function switchTab(targetTabId) {
-    // 1. Immediately stop all background rendering
+    // 1. Stop background rendering
     window.stop(); 
     
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. STAGE 1: Total Wipeout
-    // We remove the active class from EVERYTHING first
+    // 2. Clear all classes first
     tabContents.forEach(content => content.classList.remove('active-content'));
     tabButtons.forEach(button => button.classList.remove('active'));
 
@@ -286,9 +285,7 @@ async function switchTab(targetTabId) {
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. STAGE 2: 10ms "Visual Flush"
-        // This forces the browser to render an empty page for a split second
-        // to clear the "ghost" stats from the bottom.
+        // 3. Short delay to ensure the CSS "hiding" kicks in before we show the new one
         setTimeout(async () => {
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
@@ -308,24 +305,20 @@ async function switchTab(targetTabId) {
                 displaySightings();
             }
             else if (targetTabId === 'stats-view') {
-                // Clear old charts before calculating new ones
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
-                
                 calculateAndDisplayStats();
                 fetchRegistryData();
-                
-                // Delay chart drawing until the parchment background is fully placed
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
-                }, 100);
+                }, 150);
             }
             else if (targetTabId === 'submission-view') {
                 initLocationPicker();
                 if (pickerMap) pickerMap.invalidateSize();
             }
-        }, 10); 
+        }, 20); 
     }
 }
 
