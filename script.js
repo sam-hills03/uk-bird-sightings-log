@@ -273,34 +273,38 @@ function updateAllDisplays() {
 // ============================================
 
 async function switchTab(targetTabId) {
-    // 1. Stop background rendering
+    // 1. Stop background rendering to prevent layout jumps
     window.stop(); 
     
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. Clear all classes first
-    tabContents.forEach(content => content.classList.remove('active-content'));
+    // 2. Clear all classes and reset scroll positions to prevent "ghosting"
+    tabContents.forEach(content => {
+        content.classList.remove('active-content');
+        // Lazy-loading reset: ensure hidden tabs are scrolled to the top
+        content.scrollTop = 0; 
+    });
     tabButtons.forEach(button => button.classList.remove('active'));
 
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. Short delay to ensure the CSS "hiding" kicks in before we show the new one
+        // 3. Short delay to ensure the CSS isolation kicks in
         setTimeout(async () => {
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
 
             // --- TAB SPECIFIC LOGIC ---
             
-            // Logic for the NEW Profile Tab
+            // Logic for the Profile Tab (ID Card, Milestones, Archive)
             if (targetTabId === 'profile-view') {
-                calculateAndDisplayStats(); // Updates the Naturalist ID Card levels
-                calculateMilestones();      // Renders the achievement badges
-                setupExpeditionSearch();    // Re-initializes the archive search listeners
+                calculateAndDisplayStats(); 
+                calculateMilestones();      
+                setupExpeditionSearch();    
                 
-                // Load the latest trip report into the card automatically
+                // Auto-fill the expedition card with the latest data
                 if (mySightings.length > 0) {
                     const latest = mySightings[0];
                     const data = getExpeditionData(latest.date, latest.location);
@@ -321,10 +325,14 @@ async function switchTab(targetTabId) {
                 displaySightings();
             }
             else if (targetTabId === 'stats-view') {
+                // Destroy old charts before re-rendering to prevent canvas overlap
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
+                
                 calculateAndDisplayStats();
                 fetchRegistryData();
+                
+                // Lazy-load charts with a slight delay for smooth transition
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
@@ -2195,35 +2203,29 @@ document.addEventListener('click', function(e) {
 	}
 });
 supabaseClient.auth.onAuthStateChange((event, session) => {
-	const loggedOutView = document.getElementById('logged-out-view');
-	const loggedInView = document.getElementById('logged-in-view');
+    const loggedOutView = document.getElementById('logged-out-view');
+    const loggedInView = document.getElementById('logged-in-view');
 
-	if (session) {
-		// User is LOGGED IN
-		if (loggedOutView) loggedOutView.style.display = 'none';
-		if (loggedInView) loggedInView.style.display = 'block';
-		document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
+    if (session) {
+        if (loggedOutView) loggedOutView.style.display = 'none';
+        if (loggedInView) {
+            // Remove the hardcoded 'block' display so the Tab Guard CSS can control it
+            loggedInView.style.display = ''; 
+        }
+        document.getElementById('user-display-name').textContent = session.user.email.split('@')[0];
 
-		// --- STEP 3: ADMIN CHECK ---
-		const isAdmin = session.user.id === ADMIN_UID;
-		toggleAdminControls(isAdmin);
-		// ---------------------------
+        const isAdmin = session.user.id === ADMIN_UID;
+        toggleAdminControls(isAdmin);
 
-		loadSightings();
-		loadLocations();
-	} else {
-		// User is GUEST
-		if (loggedOutView) loggedOutView.style.display = 'block';
-		if (loggedInView) loggedInView.style.display = 'none';
-
-		// --- STEP 3: HIDE FOR GUESTS ---
-		toggleAdminControls(false);
-		// ------------------------------
-
-		mySightings = [];
-		savedLocations = [];
-		updateAllDisplays();
-	}
+        loadSightings();
+        loadLocations();
+    } else {
+        if (loggedOutView) loggedOutView.style.display = 'block';
+        if (loggedInView) loggedInView.style.display = 'none';
+        toggleAdminControls(false);
+        mySightings = [];
+        updateAllDisplays();
+    }
 });
 // --- BUG REPORT / HELP FORM LOGIC ---
 
