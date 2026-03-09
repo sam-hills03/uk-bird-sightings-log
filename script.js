@@ -340,34 +340,50 @@ function switchTab(targetTabId) {
 }
 
 // Pagnation on the raw checklist page
+// Pagnation on the raw checklist page
 function setupPagination() {
-	const prevBtn = document.getElementById('prev-page-btn');
-	const nextBtn = document.getElementById('next-page-btn');
-	const prevBtnBottom = document.getElementById('prev-page-btn-bottom');
-	const nextBtnBottom = document.getElementById('next-page-btn-bottom');
+    const buttons = [
+        { id: 'prev-page-btn', dir: -1 },
+        { id: 'next-page-btn', dir: 1 },
+        { id: 'prev-page-btn-bottom', dir: -1 },
+        { id: 'next-page-btn-bottom', dir: 1 }
+    ];
 
-	if (prevBtn) prevBtn.addEventListener('click', () => changePage(-1));
-	if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
-	if (prevBtnBottom) prevBtnBottom.addEventListener('click', () => changePage(-1));
-	if (nextBtnBottom) nextBtnBottom.addEventListener('click', () => changePage(1));
+    buttons.forEach(btn => {
+        const el = document.getElementById(btn.id);
+        if (el) {
+            // Remove any old listeners by cloning the node (prevents double-triggering)
+            const newEl = el.cloneNode(true);
+            el.parentNode.replaceChild(newEl, el);
+            
+            newEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                changePage(btn.dir);
+            });
+        }
+    });
 }
 
 function changePage(direction) {
-	const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
-	const newPage = currentPage + direction;
+    const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
+    const newPage = currentPage + direction;
 
-	if (newPage < 1 || newPage > totalPages) return;
+    // Safety check: ensure we stay within bounds
+    if (newPage < 1 || newPage > totalPages) return;
 
-	currentPage = newPage;
-	displaySightings();
+    currentPage = newPage;
+    
+    // Refresh the list and the UI controls
+    displaySightings();
 
-	const checklistView = document.getElementById('checklist-view');
-	if (checklistView) {
-		checklistView.scrollIntoView({
-			behavior: 'smooth',
-			block: 'start'
-		});
-	}
+    // Scroll back to the top of the checklist view for better UX
+    const checklistView = document.getElementById('checklist-view');
+    if (checklistView) {
+        checklistView.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
 }
 
 // Display on raw checklist page
