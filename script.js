@@ -273,16 +273,15 @@ function updateAllDisplays() {
 // ============================================
 
 async function switchTab(targetTabId) {
-    // 1. Stop background rendering to prevent layout jumps
     window.stop(); 
     
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. Clear all classes and reset scroll positions to prevent "ghosting"
+    // 1. Hard Reset: Remove classes AND force display:none on all contents
     tabContents.forEach(content => {
         content.classList.remove('active-content');
-        // Lazy-loading reset: ensure hidden tabs are scrolled to the top
+        content.style.setProperty('display', 'none', 'important');
         content.scrollTop = 0; 
     });
     tabButtons.forEach(button => button.classList.remove('active'));
@@ -291,58 +290,47 @@ async function switchTab(targetTabId) {
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. Short delay to ensure the CSS isolation kicks in
+        // 2. Small timeout to allow the browser to process the 'display: none' of others
         setTimeout(async () => {
+            // 3. Force display back to normal for the target
+            targetContent.style.setProperty('display', 'block', 'important');
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
 
             // --- TAB SPECIFIC LOGIC ---
-            
-            // Logic for the Profile Tab (ID Card, Milestones, Archive)
             if (targetTabId === 'profile-view') {
                 calculateAndDisplayStats(); 
                 calculateMilestones();      
                 setupExpeditionSearch();    
-                
-                // Auto-fill the expedition card with the latest data
                 if (mySightings.length > 0) {
                     const latest = mySightings[0];
                     const data = getExpeditionData(latest.date, latest.location);
                     if (data) displayExpeditionCard(data);
                 }
             } 
-            else if (targetTabId === 'map-tab') {
-                await loadLocations(); 
-                if (!map) {
-                    initBirdMap(); 
-                } else {
-                    map.invalidateSize();
-                    initBirdMap(); 
-                }
-            } 
-            else if (targetTabId === 'checklist-view') {
-                setupPagination(); 
-                displaySightings();
-            }
             else if (targetTabId === 'stats-view') {
-                // Destroy old charts before re-rendering to prevent canvas overlap
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
-                
                 calculateAndDisplayStats();
                 fetchRegistryData();
-                
-                // Lazy-load charts with a slight delay for smooth transition
                 setTimeout(() => {
                     createMonthlyChart();
                     createRarityChart();
                 }, 150);
             }
+            else if (targetTabId === 'map-tab') {
+                await loadLocations(); 
+                if (map) { map.remove(); map = null; } // Complete map destruction to prevent ghosting
+                initBirdMap(); 
+            }
+            else if (targetTabId === 'checklist-view') {
+                displaySightings();
+            }
             else if (targetTabId === 'submission-view') {
                 initLocationPicker();
                 if (pickerMap) pickerMap.invalidateSize();
             }
-        }, 20); 
+        }, 50); // Increased delay slightly for layout stability
     }
 }
 
