@@ -1899,9 +1899,7 @@ hr {
 }
 /* --- THE MASTER TAB GUARD --- */
 
-/* --- THE REFINED TAB GUARD --- */
-
-/* 1. Hide every tab content by default and move it out of layout */
+/* 1. Hide every tab content by default */
 .tab-content {
     display: none !important;
     position: absolute !important;
@@ -1912,8 +1910,7 @@ hr {
     pointer-events: none !important;
 }
 
-/* 2. ONLY the ACTIVE content gets to exist. 
-   The 'body' selector here ensures this has higher priority. */
+/* 2. Only the ACTIVE content exists in the layout */
 body .tab-content.active-content {
     display: block !important;
     position: relative !important;
@@ -1926,12 +1923,14 @@ body .tab-content.active-content {
     overflow: visible !important;
 }
 
-/* 3. Nuclear fix for the Stats Page "ghosting" at the bottom */
-body:not(:has(#stats-view.active-content)) #stats-view {
+/* 3. Specific isolation for Stats and Profile to prevent ghosting */
+body:not(:has(#stats-view.active-content)) #stats-view,
+body:not(:has(#profile-view.active-content)) #profile-view {
     display: none !important;
     height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: hidden !important;
 }
 /* Physically prevent the Stats content from existing in the layout 
    unless the active-content class is present */
