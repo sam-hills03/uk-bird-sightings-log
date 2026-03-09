@@ -277,22 +277,29 @@ async function switchTab(targetTabId) {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // 2. Remove all active classes
-    tabContents.forEach(content => content.classList.remove('active-content'));
+    // 2. STAGE 1 HIDE: Immediately hide everything to prevent "ghosting"
+    tabContents.forEach(content => {
+        content.classList.remove('active-content');
+        content.style.display = 'none'; // Force display none during transition
+    });
     tabButtons.forEach(button => button.classList.remove('active'));
 
     const targetContent = document.getElementById(targetTabId);
     const targetButton = document.querySelector(`[data-tab="${targetTabId}"]`);
 
     if (targetContent) {
-        // 3. Tiny delay to allow the "removal" to be registered by the browser
+        // 3. STAGE 2 SHOW: Use a small timeout to let the browser clear the previous view
         setTimeout(async () => {
+            // Re-verify display is none for others (safety check)
+            tabContents.forEach(c => {
+                if (c.id !== targetTabId) c.style.display = 'none';
+            });
+
+            targetContent.style.display = 'block'; // Restore display
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
 
             // --- TAB SPECIFIC LOGIC ---
-            
-            // Unified Map Tab Logic: Refresh data and re-draw hotspots
             if (targetTabId === 'map-tab') {
                 await loadLocations(); 
                 if (!map) {
@@ -302,13 +309,10 @@ async function switchTab(targetTabId) {
                     initBirdMap(); 
                 }
             } 
-            
-            // Checklist Logic: Re-attach button listeners every time tab is opened
             else if (targetTabId === 'checklist-view') {
                 setupPagination(); 
                 displaySightings();
             }
-            
             else if (targetTabId === 'stats-view') {
                 calculateAndDisplayStats();
                 fetchRegistryData();
@@ -319,12 +323,11 @@ async function switchTab(targetTabId) {
                     createRarityChart();
                 }, 150);
             }
-            
             else if (targetTabId === 'submission-view') {
                 initLocationPicker();
                 if (pickerMap) pickerMap.invalidateSize();
             }
-        }, 10);
+        }, 50); // Increased delay slightly to ensure clean transition
     }
 }
 
