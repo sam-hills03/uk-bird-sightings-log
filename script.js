@@ -270,7 +270,7 @@ function updateAllDisplays() {
 // Tab switch logic
 // ============================================
 
-function switchTab(targetTabId) {
+async function switchTab(targetTabId) {
     // 1. Full stop to prevent async image fetches from messing with the layout
     window.stop(); 
     
@@ -286,41 +286,32 @@ function switchTab(targetTabId) {
 
     if (targetContent) {
         // 3. Tiny delay to allow the "removal" to be registered by the browser
-        setTimeout(() => {
+        setTimeout(async () => {
             targetContent.classList.add('active-content');
             if (targetButton) targetButton.classList.add('active');
 
             // --- TAB SPECIFIC LOGIC ---
+            
+            // Unified Map Tab Logic: Refresh data and re-draw hotspots
             if (targetTabId === 'map-tab') {
-                setTimeout(() => {
-                    if (!map) {
-                        initBirdMap(); 
-                    } else {
-                        map.invalidateSize(true); 
-                        // A quick "ping" to the hotspots to make sure they are clickable
-                        setTimeout(() => {
-                            map.eachLayer(l => { if (l instanceof L.CircleMarker) l.bringToFront(); });
-                        }, 200);
-                    }
-                }, 300); 
+                await loadLocations(); 
+                if (!map) {
+                    initBirdMap(); 
+                } else {
+                    map.invalidateSize();
+                    initBirdMap(); 
+                }
             } 
-			// Inside switchTab(targetTabId) under the 'map-tab' case:
-			if (targetTabId === 'map-tab') {
-			    setTimeout(async () => {
-			        await loadLocations(); // Refresh coordinates from Supabase
-			        if (!map) {
-			            initBirdMap(); 
-			        } else {
-			            map.invalidateSize();
-			            initBirdMap(); // Re-run to plot any new sightings
-			        }
-			    }, 300); 
-			}
+            
+            // Checklist Logic: Re-attach button listeners every time tab is opened
+            else if (targetTabId === 'checklist-view') {
+                setupPagination(); 
+                displaySightings();
+            }
             
             else if (targetTabId === 'stats-view') {
                 calculateAndDisplayStats();
                 fetchRegistryData();
-                // Destroys old charts to prevent memory leaks
                 if (window.birdChart) window.birdChart.destroy();
                 if (window.rarityChart) window.rarityChart.destroy();
                 setTimeout(() => {
@@ -330,18 +321,15 @@ function switchTab(targetTabId) {
             }
             
             else if (targetTabId === 'submission-view') {
-                setTimeout(() => {
-                    initLocationPicker();
-                    if (pickerMap) pickerMap.invalidateSize();
-                }, 200);
+                initLocationPicker();
+                if (pickerMap) pickerMap.invalidateSize();
             }
         }, 10);
     }
 }
 
-// Pagnation on the raw checklist page
+// Pagination setup using direct onclick assignment for reliability
 function setupPagination() {
-    // 1. Define all pagination buttons
     const paginationIds = [
         { id: 'prev-page-btn', dir: -1 },
         { id: 'next-page-btn', dir: 1 },
@@ -352,7 +340,7 @@ function setupPagination() {
     paginationIds.forEach(btn => {
         const el = document.getElementById(btn.id);
         if (el) {
-            // Directly assign onclick to ensure any previous listener is replaced
+            // Directly assign onclick to overwrite any stale listeners
             el.onclick = (e) => {
                 e.preventDefault();
                 changePage(btn.dir);
@@ -362,89 +350,86 @@ function setupPagination() {
 }
 
 function changePage(direction) {
-    // Recalculate total pages based on current sightings length
     const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
-    
-    // Calculate and clamp the new page number
     let newPage = currentPage + direction;
-    if (newPage < 1) newPage = 1;
-    if (newPage > totalPages) newPage = totalPages;
 
-    // If the page actually changed, update the view
-    if (newPage !== currentPage) {
-        currentPage = newPage;
-        displaySightings(); // This will refresh the list and button states
+    // Boundary checks
+    if (newPage < 1 || newPage > totalPages) return;
 
-        // Smooth scroll to top of checklist for better user experience
-        const checklistSection = document.getElementById('checklist-view');
-        if (checklistSection) {
-            checklistSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    currentPage = newPage;
+    displaySightings();
+
+    const checklistView = document.getElementById('checklist-view');
+    if (checklistView) {
+        checklistView.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
     }
 }
 
-// Display on raw checklist page
+// Display sightings for the current page
 function displaySightings() {
-	const list = document.getElementById('sightings-list');
-	if (!list) return;
+    const list = document.getElementById('sightings-list');
+    if (!list) return;
 
-	list.innerHTML = '';
+    list.innerHTML = '';
 
-	if (mySightings.length === 0) {
-		list.innerHTML = 'No sightings recorded yet.';
-		updatePaginationControls(0, 0, 0);
-		return;
-	}
+    if (mySightings.length === 0) {
+        list.innerHTML = 'No sightings recorded yet.';
+        updatePaginationControls(0, 0, 0);
+        return;
+    }
 
-	const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
-	if (currentPage > totalPages) currentPage = totalPages;
-	if (currentPage < 1) currentPage = 1;
+    const totalPages = Math.ceil(mySightings.length / ITEMS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
 
-	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, mySightings.length);
-	const pageSightings = mySightings.slice(startIndex, endIndex);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, mySightings.length);
+    const pageSightings = mySightings.slice(startIndex, endIndex);
 
-	pageSightings.forEach(sighting => {
-		const li = document.createElement('li');
-		const dateObj = new Date(sighting.date + 'T00:00:00');
-		const formattedDate = dateObj.toLocaleDateString();
+    pageSightings.forEach(sighting => {
+        const li = document.createElement('li');
+        const dateObj = new Date(sighting.date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString();
 
-		li.innerHTML = `
+        li.innerHTML = `
             <div>
                 <strong>${sighting.species}</strong> at ${sighting.location} on ${formattedDate}
             </div>
             <button onclick="deleteSighting(${sighting.id})">Delete</button>
         `;
-		list.appendChild(li);
-	});
+        list.appendChild(li);
+    });
 
-	updatePaginationControls(totalPages, startIndex, endIndex);
+    updatePaginationControls(totalPages, startIndex, endIndex);
 }
 
-// More pagnation controls
+// Update text info and enable/disable button states
 function updatePaginationControls(totalPages, startIndex, endIndex) {
-	const pageInfo = totalPages > 0 ?
-		`Page ${currentPage} of ${totalPages} (Showing ${startIndex + 1}-${endIndex} of ${mySightings.length})` :
-		'No sightings';
+    const pageInfo = totalPages > 0 ?
+        `Page ${currentPage} of ${totalPages} (Showing ${startIndex + 1}-${endIndex} of ${mySightings.length})` :
+        'No sightings';
 
-	const pageInfoEl = document.getElementById('page-info');
-	const pageInfoBottomEl = document.getElementById('page-info-bottom');
+    const pageInfoEl = document.getElementById('page-info');
+    const pageInfoBottomEl = document.getElementById('page-info-bottom');
 
-	if (pageInfoEl) pageInfoEl.textContent = pageInfo;
-	if (pageInfoBottomEl) pageInfoBottomEl.textContent = pageInfo;
+    if (pageInfoEl) pageInfoEl.textContent = pageInfo;
+    if (pageInfoBottomEl) pageInfoBottomEl.textContent = pageInfo;
 
-	const prevBtn = document.getElementById('prev-page-btn');
-	const nextBtn = document.getElementById('next-page-btn');
-	const prevBtnBottom = document.getElementById('prev-page-btn-bottom');
-	const nextBtnBottom = document.getElementById('next-page-btn-bottom');
+    const prevBtn = document.getElementById('prev-page-btn');
+    const nextBtn = document.getElementById('next-page-btn');
+    const prevBtnBottom = document.getElementById('prev-page-btn-bottom');
+    const nextBtnBottom = document.getElementById('next-page-btn-bottom');
 
-	const isFirstPage = currentPage === 1;
-	const isLastPage = currentPage >= totalPages || totalPages === 0;
+    const isFirstPage = currentPage === 1;
+    const isLastPage = currentPage >= totalPages || totalPages === 0;
 
-	if (prevBtn) prevBtn.disabled = isFirstPage;
-	if (nextBtn) nextBtn.disabled = isLastPage;
-	if (prevBtnBottom) prevBtnBottom.disabled = isFirstPage;
-	if (nextBtnBottom) nextBtnBottom.disabled = isLastPage;
+    if (prevBtn) prevBtn.disabled = isFirstPage;
+    if (nextBtn) nextBtn.disabled = isLastPage;
+    if (prevBtnBottom) prevBtnBottom.disabled = isFirstPage;
+    if (nextBtnBottom) nextBtnBottom.disabled = isLastPage;
 }
 
 // ============================================
