@@ -1899,38 +1899,40 @@ hr {
 }
 /* --- THE MASTER TAB GUARD --- */
 
-/* 1. Hide every tab content by default */
+/* --- THE FINAL TAB ENFORCEMENT --- */
+
+/* 1. Hide every tab content and kill its height/width completely */
 .tab-content {
     display: none !important;
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* 2. Only the ACTIVE content exists in the layout */
-body .tab-content.active-content {
-    display: block !important;
-    position: relative !important;
-    top: 0 !important;
-    left: 0 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    height: auto !important;
-    overflow: visible !important;
-}
-
-/* 3. Specific isolation for Stats and Profile to prevent ghosting */
-body:not(:has(#stats-view.active-content)) #stats-view,
-body:not(:has(#profile-view.active-content)) #profile-view {
-    display: none !important;
     height: 0 !important;
+    width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    pointer-events: none !important;
+}
+
+/* 2. ONLY the active tab is allowed to exist in the layout */
+body .tab-content.active-content {
+    display: block !important;
+    height: auto !important;
+    width: auto !important;
+    margin: 0 0 20px 0 !important;
+    padding: 25px !important;
+    overflow: visible !important;
+    visibility: visible !important;
+    position: relative !important;
+    pointer-events: auto !important;
+}
+
+/* 3. Extreme isolation for Stats and Map */
+/* This prevents Leaflet and Chart.js from rendering into the wrong space */
+#stats-view:not(.active-content),
+#map-tab:not(.active-content),
+#profile-view:not(.active-content) {
+    display: none !important;
 }
 /* Physically prevent the Stats content from existing in the layout 
    unless the active-content class is present */
