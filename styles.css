@@ -1899,29 +1899,40 @@ hr {
 }
 /* --- THE MASTER TAB GUARD --- */
 
-/* 1. Hide every tab content by default with maximum priority */
+/* 1. Hide every tab content by default and remove it from layout flow */
 .tab-content {
     display: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
     visibility: hidden !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important; /* Move it out of the document flow */
-    top: -9999px !important;      /* Throw it miles off-screen */
     opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
 }
 
-/* 2. Only the ACTIVE content gets to exist in the real world */
+/* 2. Only the ACTIVE content exists in the flow */
 .tab-content.active-content {
     display: block !important;
-    visibility: visible !important;
-    height: auto !important;
     position: relative !important;
     top: 0 !important;
+    left: 0 !important;
+    visibility: visible !important;
     opacity: 1 !important;
-    overflow: visible !important;
+    pointer-events: auto !important;
+    z-index: 1 !important;
 }
 
-/* 3. Specific fix for the Stats Page bleeding */
-#stats-view:not(.active-content) * {
+/* 3. Force the body to ONLY acknowledge the active tab's height */
+body:has(#map-tab.active-content) .tab-content:not(#map-tab),
+body:has(#stats-view.active-content) .tab-content:not(#stats-view),
+body:has(#submission-view.active-content) .tab-content:not(#submission-view),
+body:has(#database-view.active-content) .tab-content:not(#database-view),
+body:has(#checklist-view.active-content) .tab-content:not(#checklist-view),
+body:has(#summary-view.active-content) .tab-content:not(#summary-view) {
     display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
