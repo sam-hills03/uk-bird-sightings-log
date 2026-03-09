@@ -1897,15 +1897,31 @@ hr {
 .leaflet-heatmap-layer {
     pointer-events: none; /* Ensures the heat doesn't block the clicks */
 }
-/* Ensure the "Underworld" remains hidden even during lag */
-.tab-content:not(.active-content) {
+/* --- THE MASTER TAB GUARD --- */
+
+/* 1. Hide every tab content by default with maximum priority */
+.tab-content {
     display: none !important;
+    visibility: hidden !important;
     height: 0 !important;
     overflow: hidden !important;
-    pointer-events: none !important;
+    position: absolute !important; /* Move it out of the document flow */
+    top: -9999px !important;      /* Throw it miles off-screen */
+    opacity: 0 !important;
 }
 
-/* Ensure the Stats page doesn't expand until it is active */
-#stats-view:not(.active-content) {
-    max-height: 0;
+/* 2. Only the ACTIVE content gets to exist in the real world */
+.tab-content.active-content {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    position: relative !important;
+    top: 0 !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+}
+
+/* 3. Specific fix for the Stats Page bleeding */
+#stats-view:not(.active-content) * {
+    display: none !important;
 }
